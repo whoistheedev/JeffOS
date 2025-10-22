@@ -27,7 +27,9 @@ export default function SocialsWidget() {
 
       {/* LinkedIn */}
       <a
-        href="https://linkedin.com/in/jeffreyidodo"
+        href="https://www.linkedin.com/in/
+jeffrey-james-idodo-4402b6390
+"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="LinkedIn"
@@ -38,7 +40,7 @@ export default function SocialsWidget() {
 
       {/* Resume */}
       <a
-        href="/resume.pdf"
+        href="/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Resume"

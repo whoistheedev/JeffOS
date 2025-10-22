@@ -29,6 +29,7 @@ export interface PrefsData {
   recentWallpapers?: WallpaperData[]
   clickSound: string
   holidayThemeOverride: ThemeId | null
+   hasSeenBootScreen?: boolean  
 }
 
 export interface PrefsSlice {
@@ -87,6 +88,7 @@ export const createPrefsSlice: StateCreator<PrefsSlice> = (set, get) => {
       recentWallpapers: savedPrefs.recentWallpapers ?? [],
       clickSound: savedPrefs.clickSound ?? "pop.mp3",
       holidayThemeOverride: savedPrefs.holidayThemeOverride ?? null,
+        hasSeenBootScreen: savedPrefs.hasSeenBootScreen ?? false,
     },
 
     activeTheme: null,

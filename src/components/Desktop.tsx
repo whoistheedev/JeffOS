@@ -121,14 +121,12 @@ export default function Desktop() {
   useEffect(() => {
     if (!themesLoadedAt) return
 
-    // User-selected wallpaper always takes priority
     if (wallpaper?.full && wallpaper.folder !== "themes") {
       setWallpaperUrl(wallpaper.full)
       console.log("🎨 User wallpaper:", wallpaper.name)
       return
     }
 
-    // Active or holiday theme wallpaper
     const currentTheme = holidayTheme || activeTheme
     const pack = currentTheme ? THEME_PACKS[currentTheme] : null
 
@@ -158,20 +156,6 @@ export default function Desktop() {
     }),
     [wallpaperUrl, ready]
   )
-
-  /* -------------------------------------------------------------------------- */
-  /* 📁 Context menu + icons layout                                            */
-  /* -------------------------------------------------------------------------- */
-  const columns = useMemo(() => {
-    const availableHeight = window.innerHeight - 100
-    const iconHeight = 80
-    const maxPerColumn = Math.floor(availableHeight / iconHeight)
-    const cols: typeof icons[] = []
-    for (let i = 0; i < icons.length; i += maxPerColumn) {
-      cols.push(icons.slice(i, i + maxPerColumn))
-    }
-    return cols
-  }, [icons])
 
   const newFolder = () => {
     const folder = {
@@ -225,37 +209,8 @@ export default function Desktop() {
             />
           )}
 
-          {/* Desktop icons grid */}
-          {/* 🖥 macOS X Tiger–style icon grid */}
-<div
-  className="absolute inset-y-12 right-8 select-none pointer-events-auto"
-  style={{
-    display: "grid",
-    gridAutoFlow: "column",
-    gridTemplateRows: "repeat(auto-fill, 96px)", // each icon “slot”
-    gridAutoColumns: "max-content",
-    gap: "22px",
-    justifyContent: "end",
-    alignContent: "start",
-    height: "calc(100vh - 6rem)",
-    width: "auto",
-  }}
->
-  {icons.map((icon) => (
-    <div
-      key={icon.id}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-      }}
-    >
-      <DesktopIcon icon={icon} />
-    </div>
-  ))}
-</div>
-
+          {/* Desktop icons grid (auto arranged, above Dock) */}
+          <AutoArrangedIcons icons={icons.filter((icon) => !icon.pinned)} />
         </div>
       </ContextMenu.Trigger>
 
@@ -313,5 +268,73 @@ export default function Desktop() {
         </DialogContent>
       </Dialog>
     </ContextMenu.Root>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* 📦 AutoArrangedIcons Component                                             */
+/* -------------------------------------------------------------------------- */
+function AutoArrangedIcons({ icons }: { icons: any[] }) {
+  const [positions, setPositions] = useState<{ id: string; x: number; y: number }[]>([])
+
+  useEffect(() => {
+    const ICON_WIDTH = 96
+    const ICON_HEIGHT = 96
+    const ICON_GAP = 22
+    const TOP_OFFSET = 100
+    const LEFT_OFFSET = 80
+    const DOCK_HEIGHT = 80
+
+    const arrange = () => {
+      const viewportHeight = window.innerHeight - (DOCK_HEIGHT + ICON_GAP)
+      const usableHeight = viewportHeight - TOP_OFFSET
+      const maxPerColumn = Math.floor(usableHeight / (ICON_HEIGHT + ICON_GAP))
+
+      const newPositions: { id: string; x: number; y: number }[] = []
+      let col = 0
+      let row = 0
+
+      icons.forEach((icon) => {
+        const x = window.innerWidth - LEFT_OFFSET - (col + 1) * (ICON_WIDTH + ICON_GAP)
+        const y = TOP_OFFSET + row * (ICON_HEIGHT + ICON_GAP)
+        newPositions.push({ id: icon.id, x, y })
+
+        row++
+        if (row >= maxPerColumn) {
+          row = 0
+          col++
+        }
+      })
+
+      setPositions(newPositions)
+    }
+
+    arrange()
+    window.addEventListener("resize", arrange)
+    return () => window.removeEventListener("resize", arrange)
+  }, [icons])
+
+  return (
+    <div className="absolute inset-0 select-none pointer-events-auto">
+      {positions.map(({ id, x, y }) => {
+        const icon = icons.find((i) => i.id === id)
+        if (!icon) return null
+        return (
+          <div
+            key={id}
+            style={{
+              position: "absolute",
+              left: x,
+              top: y,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <DesktopIcon icon={icon} />
+          </div>
+        )
+      })}
+    </div>
   )
 }

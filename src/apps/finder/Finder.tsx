@@ -254,9 +254,9 @@ export default function Finder() {
           <div className="px-2 py-1 text-[11px] font-semibold text-gray-500">DEVICES</div>
           <div className="py-1">
             {[
-              { id: "network", title: "Network", iconUrl: "/icons/network.png" },
-              { id: "untitled", title: "Untitled", iconUrl: "/icons/drive.png" },
-              { id: "dvd", title: "DVD", iconUrl: "/icons/dvd.png" },
+              { id: "network", title: "Network", iconUrl: "/icons/Network Utility.png" },
+              { id: "untitled", title: "Untitled", iconUrl: "/icons/Disk Utility.png" },
+              { id: "dvd", title: "DVD", iconUrl: "/icons/DVD Player.png" },
             ].map((entry) => (
               <div
                 key={entry.id}

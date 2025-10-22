@@ -15,8 +15,19 @@ import { createGamesSlice } from "./games";
 import type { MetricsSlice } from "./metrics";
 import { createMetricsSlice } from "./metrics";
 
+// Debounce helper
+function debounce<T extends (...args: any[]) => void>(fn: T, delay = 200) {
+  let timer: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
 // Combined store type
 export type StoreState = UiSlice & PrefsSlice & AppsSlice & GamesSlice & MetricsSlice;
+
+const LOCAL_STORAGE_KEY = "whoisthedev-root";
 
 const useBoundStore = create<StoreState>()(
   persist(
@@ -28,22 +39,45 @@ const useBoundStore = create<StoreState>()(
       ...createMetricsSlice(...a),
     }),
     {
-      name: "whoisthedev-root",
+      name: LOCAL_STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      // Persist only anonId(s) and prefs
       partialize: (s) =>
         ({
+          // Anonymous IDs
           anonId: s.anonId,
-          anonIdOld: (s as any).anonIdOld, // keep if you added it
-          anoId: (s as any).anoId,         // keep if you added it
+          anonIdOld: (s as any).anonIdOld,
+          anoId: (s as any).anoId,
+
+          // UI slice
+          
+          windows: s.windows,
+
+          // Prefs slice
           prefs: s.prefs,
+
+          // Apps slice
+          apps: s.apps,
+
+          // Games slice
+          sessions: s.sessions,
+          leaderboards: s.leaderboards,
+
+          // Metrics slice
+          metrics: s.metrics,
         }) as Partial<StoreState>,
+      // Debounced storage writes
+      onRehydrateStorage: () => (state) => {
+        const save = debounce(() => {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        }, 200);
+        return save;
+      },
     }
   )
 );
 
 /**
- * Primary hook — keep the full zustand API (getState, setState, subscribe, etc.)
+ * Primary hook — full zustand API
  */
 export const useStore = useBoundStore;
 
@@ -52,5 +86,5 @@ export const useStore = useBoundStore;
  */
 export { shallow, useShallow };
 
-// If you want the direct API:
+// Direct API access
 export const storeApi = useBoundStore;

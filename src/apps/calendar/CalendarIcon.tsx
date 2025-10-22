@@ -8,7 +8,9 @@ type CalendarIconProps = {
 
 export default function CalendarIcon({ size = "desktop" }: CalendarIconProps) {
   const [today, setToday] = useState(new Date())
-  const activeTheme = useStore((s) => s.activeTheme)
+
+  // Type the store value properly
+  const activeTheme = useStore((s) => s.activeTheme) as keyof typeof THEME_PACKS
   const theme = THEME_PACKS[activeTheme]
 
   useEffect(() => {

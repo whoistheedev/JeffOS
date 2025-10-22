@@ -39,14 +39,32 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set, get) 
   dock: [],
 
   openWindow: (win) =>
-    set((state) => ({
+  set((state) => {
+    const existing = state.windows[win.id];
+
+    if (existing) {
+      // Window exists → restore if minimized & bring to front
+      return {
+        windows: {
+          ...state.windows,
+          [win.id]: { ...existing, minimized: false, minimizing: false },
+        },
+        focusStack: [...state.focusStack.filter((i) => i !== win.id), win.id],
+        dock: state.dock.filter((d) => d.winId !== win.id),
+      };
+    }
+
+    // Window does not exist → create new
+    return {
       windows: {
         ...state.windows,
-        [win.id]: { ...win, minimizing: false }, // reset flag
+        [win.id]: { ...win, minimizing: false },
       },
       focusStack: [...state.focusStack.filter((i) => i !== win.id), win.id],
       dock: state.dock.filter((d) => d.winId !== win.id),
-    })),
+    };
+  }),
+
 
   closeWindow: (id) =>
     set((state) => {

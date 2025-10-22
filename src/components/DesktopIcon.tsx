@@ -23,20 +23,25 @@ export default function DesktopIcon({ icon }: Props) {
   const touchTimer = useRef<number | null>(null)
 
   const handleOpen = () => {
-    playSystemSound("appOpen")
-    const winId = `${icon.id}-${Math.random().toString(36).slice(2)}`
-    openWindow({
-      id: winId,
-      appKey: icon.id,
-      x: 100,
-      y: 100,
-      width: 400,
-      height: 300,
-      minimized: false,
-      zoomed: false,
-    })
-    focusWindow(winId)
-  }
+  playSystemSound("appOpen")
+
+  // Use deterministic window ID (single-instance)
+  const winId = icon.id
+
+  openWindow({
+    id: winId,
+    appKey: icon.id,
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    minimized: false,
+    zoomed: false,
+  })
+
+  focusWindow(winId)
+}
+
 
   function renameIcon() {
     playSystemSound("select")
