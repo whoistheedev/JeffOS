@@ -43,6 +43,29 @@ export default function Desktop() {
   }, [])
 
   /* -------------------------------------------------------------------------- */
+  /* 🖼️ Decode wallpaper off-DOM before swapping it in (Phase 1 perf).         */
+  /* Avoids the janky progressive/half-painted repaint when a large image      */
+  /* streams in; the black backdrop shows until the image is fully decoded,    */
+  /* then it fades in in one paint. (Pairs with the setWallpaper de-dupe.)     */
+  /* -------------------------------------------------------------------------- */
+  useEffect(() => {
+    const next = wallpaper?.full
+    if (!next || next === wallpaperUrl) return
+    let cancelled = false
+    const img = new Image()
+    img.src = next
+    const swap = () => {
+      if (!cancelled) setWallpaperUrl(next)
+    }
+    // decode() resolves once the image is paint-ready; fall back to onload.
+    img.decode?.().then(swap).catch(swap)
+    img.onload = swap
+    return () => {
+      cancelled = true
+    }
+  }, [wallpaper?.full, wallpaperUrl])
+
+  /* -------------------------------------------------------------------------- */
   /* ⏰ Hourly holiday theme detection + auto apply                             */
   /* -------------------------------------------------------------------------- */
   useEffect(() => {

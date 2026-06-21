@@ -98,6 +98,15 @@ export const createPrefsSlice: StateCreator<PrefsSlice> = (set, get) => {
       set((s) => ({ prefs: { ...s.prefs, themeEra: era } })),
 
     setWallpaper: (wallpaper) => {
+      // Idempotency guard (Phase 1 perf): three App.tsx effects + the boot
+      // loader all call setWallpaper with the same theme URL on startup.
+      // Skipping a no-op set avoids redundant store writes, re-renders, and
+      // localStorage churn (and the default→theme flash when the URL is equal).
+      const current = get().prefs.wallpaper
+      if (current?.full && wallpaper?.full && current.full === wallpaper.full) {
+        return
+      }
+
       set((s) => ({
         prefs: {
           ...s.prefs,
