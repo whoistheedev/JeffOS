@@ -103,7 +103,7 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 /* ----------------------------- Current Impact ----------------------------- */
 export function CurrentImpact() {
   return (
-    <SectionShell title="Current Impact">
+    <SectionShell id="impact" title="Current Impact">
       <ul className="space-y-4">
         {CURRENT_IMPACT.map((item, i) => (
           <li key={i} className="flex items-baseline gap-3">
@@ -123,7 +123,7 @@ export function CurrentImpact() {
 /* ------------------------- Architecture Highlights ------------------------ */
 export function ArchitectureHighlights() {
   return (
-    <SectionShell title="Architecture Highlights">
+    <SectionShell id="architecture" title="Architecture Highlights">
       <div className="grid gap-4 sm:grid-cols-2">
         {ARCHITECTURE_HIGHLIGHTS.map((h) => (
           <Card key={h.title}>
@@ -139,7 +139,7 @@ export function ArchitectureHighlights() {
 /* ------------------------------ Featured Work ----------------------------- */
 export function FeaturedWork() {
   return (
-    <SectionShell title="Featured Work">
+    <SectionShell id="work" title="Featured Work">
       <div className="space-y-4">
         {FEATURED_WORK.map((w) => (
           <Card key={w.slug}>
@@ -180,7 +180,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 /* ------------------------------- Experience ------------------------------- */
 export function ExperienceTimeline() {
   return (
-    <SectionShell title="Experience">
+    <SectionShell id="experience" title="Experience">
       <ol className="space-y-5">
         {EXPERIENCE.map((e, i) => (
           <li key={i} className="relative pl-5">
@@ -221,7 +221,7 @@ export function ExperienceTimeline() {
 /* ------------------------------ Available For ----------------------------- */
 export function AvailableFor() {
   return (
-    <SectionShell title="Available For">
+    <SectionShell id="available" title="Available For">
       <div className="flex flex-wrap gap-2">
         {AVAILABLE_FOR.map((r) => (
           <span key={r} className="rounded-lg border border-border px-3 py-1.5 text-sm">{r}</span>
