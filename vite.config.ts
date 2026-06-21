@@ -74,6 +74,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,woff2}'],
         cleanupOutdatedCaches: true,
+        // Take over immediately so a client that cached a broken build (e.g.
+        // the earlier vendor-chunk crash) gets the fixed bundle on next load
+        // instead of being served the stale, broken precache.
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           // ✅ Cache wallpapers, icons, sounds, etc. from Supabase Storage
           {

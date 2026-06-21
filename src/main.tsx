@@ -25,25 +25,42 @@ function BootLoader({ children }: { children: React.ReactNode }) {
   const [phase, setPhase] = useState<"boot" | "fadein" | "done">("done")
 
   useEffect(() => {
-    const seen = localStorage.getItem("hasSeenBootScreen") === "true"
+    let seen = false
+    try {
+      seen = localStorage.getItem("hasSeenBootScreen") === "true"
+    } catch {
+      // Safari private mode can throw on localStorage — treat as not-seen and
+      // never let storage access block rendering.
+      seen = false
+    }
     if (seen) return // RETURN IMMEDIATELY for returning visitors
 
     setPhase("boot") // only for first-time visitors
 
-    ;(async () => {
+    // CRITICAL: the boot-screen timing must NOT be gated on the wallpaper
+    // fetch. Previously we `await`ed loadGlobalDefaultWallpaper() before
+    // scheduling these timers, so a hung/slow Supabase request (seen on
+    // Safari) left the boot screen stuck forever → white/frozen screen.
+    // Schedule the transitions immediately; load the wallpaper in the
+    // background (best-effort).
+    const t1 = setTimeout(() => setPhase("fadein"), 2200)
+    const t2 = setTimeout(() => {
+      setPhase("done")
       try {
-        await loadGlobalDefaultWallpaper()
-        // show boot screen → fade desktop in → done
-        setTimeout(() => setPhase("fadein"), 2200)
-        setTimeout(() => {
-          setPhase("done")
-          localStorage.setItem("hasSeenBootScreen", "true")
-        }, 3000)
-      } catch {
-        setPhase("done")
         localStorage.setItem("hasSeenBootScreen", "true")
+      } catch {
+        /* ignore storage failures */
       }
-    })()
+    }, 3000)
+
+    void loadGlobalDefaultWallpaper().catch(() => {
+      /* best-effort; never blocks the boot sequence */
+    })
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
   }, [])
 
   if (phase === "done") return <>{children}</>
