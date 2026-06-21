@@ -10,6 +10,7 @@ import {
   themesLoadedAt,
 } from "../config/themes"
 import { getActiveHoliday, type ThemeId, type Holiday } from "../config/holidays"
+import { wallpaperUrl as renderWallpaper } from "../lib/imageUrl"
 
 /* -------------------------------------------------------------------------- */
 /* 🖥 Desktop Component                                                       */
@@ -53,7 +54,8 @@ export default function Desktop() {
     if (!next || next === wallpaperUrl) return
     let cancelled = false
     const img = new Image()
-    img.src = next
+    // Decode the SAME (rendered, smaller) URL the background will paint.
+    img.src = renderWallpaper(next)
     const swap = () => {
       if (!cancelled) setWallpaperUrl(next)
     }
@@ -169,7 +171,9 @@ export default function Desktop() {
   /* -------------------------------------------------------------------------- */
   const bgStyle = useMemo<React.CSSProperties>(
     () => ({
-      backgroundImage: wallpaperUrl ? `url('${wallpaperUrl}')` : undefined,
+      // Route through the render endpoint: resized + CDN-cacheable (the public
+      // object endpoint serves no-cache originals). ~21× smaller payload.
+      backgroundImage: wallpaperUrl ? `url('${renderWallpaper(wallpaperUrl)}')` : undefined,
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",

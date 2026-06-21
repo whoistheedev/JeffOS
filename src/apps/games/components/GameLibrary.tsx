@@ -1,4 +1,5 @@
 import type { GameItem } from "../EmulatorApp"
+import { thumbUrl } from "../../../lib/imageUrl"
 
 /**
  * GameLibrary — PRESENTATIONAL only (Phase 1 perf).
@@ -68,8 +69,9 @@ export function GameLibrary({
                        transition-all duration-200 ease-out"
           >
             <img
-              src={g.thumb}
+              src={thumbUrl(g.thumb)}
               alt={g.title}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 (e.target as HTMLImageElement).src =
