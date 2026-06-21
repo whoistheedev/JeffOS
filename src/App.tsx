@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { Toaster } from "sonner"
-import ResponsiveShellRouter from "./shells/ResponsiveShellRouter"
+import RootRouter from "./RootRouter"
 
 import { useStore } from "./store"
 import {
@@ -136,7 +136,9 @@ export default function App() {
   /* -------------------------------------------------------------------------- */
   return (
     <>
-      <ResponsiveShellRouter />
+      {/* Phase 6: RootRouter shows Recruiter Mode by default and lazy-loads the
+          JeffOS desktop OS only when the visitor opts in via "Launch JeffOS". */}
+      <RootRouter />
       {/* Mounts sonner so existing app toasts (Recruiter/Guestbook/Wallpapers)
           actually render — there was no <Toaster> in the tree before. */}
       <Toaster position="bottom-center" richColors />

@@ -88,6 +88,18 @@ html, body, #root {
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 
+  /* ---- Recruiter Mode tokens (Phase 6) ----
+     Conversion-intent tokens. Theme-INDEPENDENT on purpose: holiday themes
+     shift --accent seasonally, but the Hire CTA must stay recognizable and
+     AA-contrast across every theme. See PHASE_6_RECRUITER_MODE.md §6.1. */
+  --color-hire: oklch(0.55 0.2 264);              /* indigo-600-ish CTA */
+  --color-hire-foreground: oklch(0.985 0 0);      /* text on hire */
+  --color-live: oklch(0.72 0.19 145);             /* realtime "live" dot (green) */
+  --touch-target-min: 44px;                       /* WCAG 2.5.5 / Apple HIG */
+  --space-safe-top: env(safe-area-inset-top, 0px);
+  --space-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sheet-radius: 16px;                           /* vaul bottom sheets */
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
