@@ -48,11 +48,14 @@ export const TRUST_INDICATORS = [
  */
 export const STAT_BAND: { value: string; label: string }[] = [
   { value: "50+", label: "Healthcare databases" },
-  { value: "837·835·277·999", label: "EDI workflows" },
+  { value: "4", label: "EDI transaction types" },
   { value: "AI-Powered", label: "RCM automation" },
   { value: "Multi-Tenant", label: "Architecture" },
   { value: "HIPAA-Aware", label: "Systems" },
 ]
+
+/** The EDI transaction codes — shown as chips (Current Impact + EDI card). */
+export const EDI_CODES = ["837", "835", "277", "999"]
 
 /**
  * Current Impact — what Jeffrey is building TODAY at BFLOW, executive altitude.
@@ -78,6 +81,7 @@ export const ARCHITECTURE_HIGHLIGHTS: {
   problem: string
   architecture: string
   impact: string
+  codes?: string[]
   caseStudy?: string
 }[] = [
   {
@@ -99,6 +103,7 @@ export const ARCHITECTURE_HIGHLIGHTS: {
     problem: "Healthcare transactions must be exchanged reliably and compliantly across payers.",
     architecture: "Ingestion → normalization → reconciliation pipelines on serverless Edge Functions; secrets off-client.",
     impact: "Reliable, compliant transaction exchange operations can trust.",
+    codes: ["837", "835", "277", "999"],
     caseStudy: "edi-automation",
   },
   {

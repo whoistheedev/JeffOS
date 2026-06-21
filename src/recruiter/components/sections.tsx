@@ -122,13 +122,13 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 export function StatBand() {
   return (
     <section id="proof" className="scroll-mt-20">
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5">
         {STAT_BAND.map((s) => (
-          <div key={s.label} className="flex flex-col gap-1 bg-background p-4">
-            <span className="font-mono text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-xl">
+          <div key={s.label} className="flex min-w-0 flex-col gap-1 bg-background p-4">
+            <span className="font-mono text-base font-semibold leading-snug tracking-tight text-foreground [overflow-wrap:anywhere] sm:text-lg">
               {s.value}
             </span>
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.label}</span>
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground [overflow-wrap:anywhere]">{s.label}</span>
           </div>
         ))}
       </div>
@@ -181,6 +181,11 @@ export function ArchitectureHighlights() {
                 <dd className="text-sm leading-relaxed text-foreground">{h.impact}</dd>
               </div>
             </dl>
+            {h.codes && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {h.codes.map((c) => <CodeChip key={c}>{c}</CodeChip>)}
+              </div>
+            )}
           </Card>
         ))}
       </div>
