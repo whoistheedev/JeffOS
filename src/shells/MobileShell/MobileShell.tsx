@@ -1,17 +1,15 @@
 import { useState } from "react"
-import { Github, Linkedin, FileText, Mail, Briefcase } from "lucide-react"
+import { Github, Linkedin, Mail, Briefcase } from "lucide-react"
 import DesktopShell from "../DesktopShell"
-
-const RESUME_PDF = "/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf"
 
 /**
  * 📱 MobileShell — FOUNDATION SCAFFOLD (not the full mobile redesign).
  *
  * Phase 3 delivers only the shell architecture. The full mobile UX from
- * MOBILE_STRATEGY.md (fixed TabBar, full-screen app stack, More drawer, mobile
- * Resume/Recruiter views) lands in Phase 4. Until then this scaffold gives a
- * mobile visitor a recruiter-friendly, accessible landing — identity + the
- * Tier-0 hire links — instead of a broken floating-window desktop. It also
+ * MOBILE_STRATEGY.md (fixed TabBar, full-screen app stack, More drawer) lands
+ * in a later phase. Until then this scaffold gives a mobile visitor an
+ * accessible landing — identity + Tier-0 links — instead of a broken
+ * floating-window desktop. It also
  * offers an explicit opt-in escape hatch into the full JeffOS desktop so no
  * functionality is lost.
  */
@@ -42,14 +40,6 @@ export default function MobileShell() {
 
       {/* Tier-0 hire actions */}
       <nav aria-label="Primary" className="mt-8 grid grid-cols-1 gap-3">
-        <a
-          href={RESUME_PDF}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-4 text-base font-medium backdrop-blur transition-colors hover:bg-white/15"
-        >
-          <FileText size={20} aria-hidden="true" /> Résumé
-        </a>
         <button
           onClick={() => setShowFullOS(true)}
           className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-4 text-left text-base font-medium backdrop-blur transition-colors hover:bg-white/15"

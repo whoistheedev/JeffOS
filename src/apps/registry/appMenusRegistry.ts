@@ -14,12 +14,6 @@ export const appMenusRegistry: Record<string, AppMenus> = {
     Help: [{ label: "Wallpaper Help" }],
   },
 
-  resume: {
-    File: [{ label: "Export as PDF", shortcut: "⌘E" }],
-    Edit: [{ label: "Copy Text", shortcut: "⌘C" }],
-    Help: [{ label: "Resume Help" }],
-  },
-
   games: {
     File: [{ label: "New Game", shortcut: "⌘N" }],
     Edit: [{ label: "Pause", shortcut: "␣" }],

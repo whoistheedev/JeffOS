@@ -17,25 +17,11 @@ type Project = {
 export default function Recruiter() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [resumeUrl, setResumeUrl] = useState("")
 
   const email = "jeffreyjidodo@gmail.com"
 
-  // Fetch resume PDF & projects dynamically from Supabase
+  // Fetch projects dynamically from Supabase
   useEffect(() => {
-    const fetchResume = async () => {
-      const { data } = supabase
-        .storage
-        .from("portfolio")
-        .getPublicUrl("Jeffrey James Idodo PERN_Full_Stack_Developer.pdf")
-
-      if (data?.publicUrl) {
-        setResumeUrl(data.publicUrl)
-      } else {
-        toast.error("Failed to fetch resume")
-      }
-    }
-
     const fetchProjects = async () => {
       setLoading(true)
       const { data, error } = await supabase
@@ -53,44 +39,11 @@ export default function Recruiter() {
       setLoading(false)
     }
 
-    fetchResume()
     fetchProjects()
-  }, [])
-
-  // ⌘R shortcut for Resume tile
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "r") {
-        e.preventDefault()
-        document.getElementById("resume-tile")?.scrollIntoView({ behavior: "smooth" })
-      }
-    }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
   }, [])
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-      {/* Resume Tile */}
-      <motion.div
-        id="resume-tile"
-        className="border rounded-md p-4 flex flex-col bg-[#f2f2f2] shadow-md hover:shadow-lg transition-shadow"
-        whileHover={{ scale: 1.02 }}
-      >
-        <h2 className="font-bold mb-2 text-[#1a1a1a]">Resume</h2>
-        {resumeUrl ? (
-          <iframe
-            src={resumeUrl}
-            className="flex-1 w-full border rounded-md"
-            title="Resume PDF"
-          />
-        ) : (
-          <div className="flex-1 w-full h-40 flex items-center justify-center text-gray-500">
-            Loading resume...
-          </div>
-        )}
-      </motion.div>
-
       {/* Dynamic Projects (including Mac Portfolio) */}
       {loading ? (
         <motion.div className="col-span-full flex items-center justify-center p-6 bg-[#f9f9f9] rounded-md shadow-md">
@@ -131,22 +84,6 @@ export default function Recruiter() {
           </motion.div>
         ))
       )}
-
-      {/* One-pager (same as resume) */}
-      <motion.div
-        className="border rounded-md p-4 flex flex-col items-center justify-center bg-[#f2f2f2] shadow-md hover:shadow-lg transition-shadow"
-        whileHover={{ scale: 1.02 }}
-      >
-        <h2 className="font-bold mb-2 text-[#1a1a1a]">One-pager</h2>
-        <Button
-          onClick={() => {
-            if (resumeUrl) window.open(resumeUrl, "_blank")
-            toast("Downloading one-pager...")
-          }}
-        >
-          Download One-pager
-        </Button>
-      </motion.div>
 
       {/* Contact */}
       <motion.div

@@ -13,13 +13,10 @@ type Tab = {
 
 type TopSite = { name: string; url: string; image: string }
 
-const RESUME_URL = "/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf"
-
 const whitelist: Record<string, string> = {
   GitHub: "https://github.com/whoistheedev",
   LinkedIn: "https://www.linkedin.com/in/jeffrey-james-idodo-4402b6390",
   X: "https://x.com/whoistheedev",
-  Resume: RESUME_URL,
 }
 
 const HOME_URL = "iweb://topsites"
@@ -49,11 +46,6 @@ const TOP_SITES: TopSite[] = [
     name: "X",
     url: "https://x.com/whoistheedev",
     image: siteImage("https://x.com"),
-  },
-  {
-    name: "Résumé",
-    url: RESUME_URL,
-    image: "/icons/explorer.png",
   },
 ]
 

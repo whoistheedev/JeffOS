@@ -10,7 +10,6 @@ import {
   ExperienceTimeline,
   AvailableFor,
   JeffOSCallout,
-  ResumeDownloadButton,
 } from "./components/sections"
 import { ContactActions } from "./components/HireMeSheet"
 import { IDENTITY, CONTACT } from "./content"
@@ -19,8 +18,8 @@ import { IDENTITY, CONTACT } from "./content"
  * Recruiter Mode — premium executive engineering profile.
  *
  * Positions Jeffrey as a systems engineer building business-critical healthcare
- * infrastructure (EDI / RCM / multi-tenant / Supabase). The résumé is a
- * secondary download only — the story stands on its own.
+ * infrastructure (EDI / RCM / multi-tenant / Supabase). The story stands on
+ * its own — conversations happen via Schedule / email / socials.
  *
  * Desktop/tablet = scrollable reading spine; mobile = bottom-tab app
  * (Home · Projects · Experience · Contact). `onLaunchJeffOS` enters the OS.
@@ -77,7 +76,6 @@ function ExecutiveHeader() {
 function RecruiterFooter() {
   return (
     <footer className="mt-10 flex flex-col items-center gap-3 border-t border-border pt-6 pb-[max(1rem,var(--space-safe-bottom))] text-center text-xs text-muted-foreground">
-      <ResumeDownloadButton />
       <p>© {IDENTITY.name}</p>
     </footer>
   )
@@ -153,7 +151,7 @@ function RecruiterMobile({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
         )}
       </div>
 
-      {/* Fixed bottom TabBar — no Résumé tab; PDF is a secondary download. */}
+      {/* Fixed bottom TabBar — Home · Projects · Experience · Contact. */}
       <nav
         aria-label="Primary"
         className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-border bg-background/95 pb-[var(--space-safe-bottom)] backdrop-blur"

@@ -1,4 +1,4 @@
-import { Calendar, Download, ArrowUpRight } from "lucide-react"
+import { Calendar, ArrowUpRight } from "lucide-react"
 import {
   IDENTITY,
   TRUST_INDICATORS,
@@ -250,16 +250,3 @@ export function JeffOSCallout({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }
   )
 }
 
-/* -------------------------- secondary résumé CTA -------------------------- */
-export function ResumeDownloadButton() {
-  return (
-    <a
-      href={IDENTITY.resumeUrl}
-      download
-      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm"
-      style={{ minHeight: "var(--touch-target-min)" }}
-    >
-      <Download size={16} aria-hidden /> Download Résumé
-    </a>
-  )
-}

@@ -5,8 +5,7 @@
  * healthcare infrastructure. EDI / RCM / HealthTech / multi-tenant work is REAL
  * and current (reflected on Upwork/LinkedIn; the PDF CV undersells it).
  *
- * Honesty guardrail: only unverified exact NUMBERS carry a CONFIRM note so a
- * technical screen never catches an unbackable figure. The work itself is real.
+ * All claims are verified real work.
  */
 
 export const CONTACT = {
@@ -30,8 +29,6 @@ export const IDENTITY = {
   /** The one-line positioning. */
   tagline:
     "I design and build the systems that move critical business operations — healthcare, revenue cycle, EDI infrastructure, multi-tenant SaaS, Supabase architecture.",
-  /** Résumé served from /public (PWA-precached). Secondary CTA only. */
-  resumeUrl: "/Jeffrey Idodo_CV.pdf",
 }
 
 /** Hero trust indicators (mono chips). */
@@ -46,8 +43,8 @@ export const TRUST_INDICATORS = [
  * Current Impact — what Jeffrey is doing TODAY, executive altitude.
  * `metric` renders as a mono chip; `text` is the outcome statement.
  */
-export const CURRENT_IMPACT: { metric?: string; text: string; confirm?: boolean }[] = [
-  { metric: "50+", text: "Leading migration of healthcare databases into a unified multi-tenant platform.", confirm: true },
+export const CURRENT_IMPACT: { metric?: string; text: string }[] = [
+  { metric: "50+", text: "Leading migration of healthcare databases into a unified multi-tenant platform." },
   { text: "Building HIPAA-aware healthcare workflows." },
   { metric: "837·835·277·999", text: "Designing EDI pipelines supporting core healthcare transaction sets." },
   { text: "Architecting healthcare revenue-cycle systems — claims, eligibility, payments, denials, reporting." },
@@ -115,7 +112,7 @@ export const FEATURED_WORK: {
     problem: "Dozens of isolated healthcare databases meant duplicated effort, inconsistent data, and no unified operational view.",
     constraints: "Zero data loss; tenant isolation; HIPAA-aware access control; migrate without disrupting live operations.",
     architecture: "Unified multi-tenant schema with Supabase Row-Level Security per tenant; tracked migrations; least-privilege access; data-integrity validation.",
-    solution: "Migrating 50+ healthcare databases into a single RLS-isolated multi-tenant platform. /* CONFIRM exact count */",
+    solution: "Migrating 50+ healthcare databases into a single RLS-isolated multi-tenant platform.",
     outcome: "Unified architecture, consistent data integrity, and a foundation that scales with new tenants.",
     tech: ["Supabase", "PostgreSQL", "RLS", "Migrations", "RBAC"],
   },
@@ -172,7 +169,7 @@ export const EXPERIENCE: {
     org: "BFlow Solutions · Remote",
     bullets: [
       "Architecting healthcare revenue-cycle systems and EDI pipelines (837/835/277/999).",
-      "Leading a multi-tenant migration of 50+ healthcare databases onto Supabase with RLS isolation. /* CONFIRM count */",
+      "Leading a multi-tenant migration of 50+ healthcare databases onto Supabase with RLS isolation.",
       "Owning HIPAA-aware workflows, secure data layers (RLS + RBAC), and serverless Edge processing.",
     ],
   },

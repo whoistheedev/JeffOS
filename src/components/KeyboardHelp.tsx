@@ -26,7 +26,6 @@ export function KeyboardHelp() {
           <li><kbd>⌘M</kbd> Minimize window</li>
           <li><kbd>⌘`</kbd> Cycle windows</li>
           <li><kbd>⌘1/2/3</kbd> Finder view modes</li>
-          <li><kbd>⌘R</kbd> Resume (Recruiter Mode)</li>
           <li><kbd>L</kbd> Toggle leaderboard</li>
           <li><kbd>?</kbd> Show this help</li>
         </ul>

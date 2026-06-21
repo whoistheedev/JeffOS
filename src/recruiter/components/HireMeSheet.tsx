@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Calendar, Mail, Copy, Github, Linkedin, FileText } from "lucide-react"
+import { Calendar, Mail, Copy, Github, Linkedin } from "lucide-react"
 import {
   Drawer,
   DrawerContent,
@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../../components/ui/drawer"
-import { CONTACT, IDENTITY } from "../content"
+import { CONTACT } from "../content"
 
 /**
  * Contact funnel (§8). Primary CTA: "Schedule a Conversation".
@@ -71,9 +71,6 @@ export function ContactActions({ onAnalytics }: { onAnalytics?: (e: string) => v
       </a>
       <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" onClick={() => track("github")} className={row} style={touch}>
         <Github size={16} aria-hidden /> GitHub
-      </a>
-      <a href={IDENTITY.resumeUrl} download onClick={() => track("resume_download")} className={row} style={touch}>
-        <FileText size={16} aria-hidden /> Download résumé
       </a>
     </div>
   )

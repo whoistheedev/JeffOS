@@ -8,7 +8,6 @@ type FSNode = { type: "dir" | "file"; name: string; target?: string }
 const FS: Record<string, FSNode[]> = {
   "/": [
     { type: "dir", name: "Projects" },
-    { type: "file", name: "Resume.pdf", target: "resume.open" },
     { type: "dir", name: "Guestbook" },
   ],
   "/Projects": [
@@ -20,7 +19,6 @@ const COMMANDS = [
   "help",
   "about",
   "projects",
-  "resume",
   "socials",
   "clear",
   "ls",
@@ -74,7 +72,7 @@ export default function Terminal() {
 
       case "about":
         append("👋 Hello! I'm Jeffrey — a creative full-stack developer passionate about design and user experience.")
-        append("Explore my projects or open Resume.pdf for more info.")
+        append("Explore my projects or type 'socials' for more info.")
         break
 
       case "projects":
@@ -115,10 +113,6 @@ export default function Terminal() {
         break
       }
 
-      case "resume":
-        commandBus.dispatch("resume.open")
-        append("Opening Resume.pdf…")
-        break
 
       case "socials":
         append("🌐 LinkedIn: linkedin.com/in/jeffrey")
