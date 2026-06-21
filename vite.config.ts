@@ -12,21 +12,27 @@ export default defineConfig({
         /**
          * ⚡ Vendor chunk optimization.
          *
-         * Group large, stable third-party libraries into named chunks so they
-         * cache independently of app code and don't all land in the entry chunk.
-         * Grouped conservatively to avoid circular vendor chunks. App code itself
-         * is split automatically via React.lazy() in the app registry — heavy
-         * apps (Games/EmulatorJS, Synth, Explorer, Terminal, iTunes) therefore
-         * become their own on-demand chunks and stay out of the initial bundle.
+         * IMPORTANT: React MUST share a chunk with every library that consumes
+         * it at module-evaluation time (react-rnd, @dnd-kit, @radix-ui,
+         * framer-motion). Splitting them into separate chunks broke the
+         * initialization order in the production build — a React-consuming vendor
+         * chunk could evaluate before vendor-react finished, throwing
+         * "Cannot set properties of undefined (setting 'Children')" (white
+         * screen). So all React + React-UI libs go in ONE `vendor-react` chunk.
+         *
+         * Supabase has no React dependency at eval time, so it stays separate for
+         * independent caching. App code is still code-split via React.lazy() in
+         * the app registry (heavy apps stay out of the initial bundle).
          */
         manualChunks(id) {
           if (!id.includes('node_modules')) return
-          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id))
-            return 'vendor-react'
-          if (id.includes('framer-motion')) return 'vendor-motion'
           if (id.includes('@supabase')) return 'vendor-supabase'
-          if (id.includes('@dnd-kit') || id.includes('react-rnd')) return 'vendor-dnd'
-          if (id.includes('@radix-ui')) return 'vendor-radix'
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|scheduler|react-rnd|@dnd-kit|@radix-ui|framer-motion|use-sync-external-store)[\\/]/.test(
+              id,
+            )
+          )
+            return 'vendor-react'
           // everything else: let Rollup decide (default vendor splitting)
         },
       },
