@@ -13,39 +13,47 @@ type Tab = {
 
 type TopSite = { name: string; url: string; image: string }
 
+const RESUME_URL = "/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf"
+
 const whitelist: Record<string, string> = {
-  Portfolio: "https://yourdomain.com",
-  GitHub: "https://github.com/yourhandle",
-  LinkedIn: "https://linkedin.com/in/yourhandle",
-  Resume: "/resume.pdf",
+  GitHub: "https://github.com/whoistheedev",
+  LinkedIn: "https://www.linkedin.com/in/jeffrey-james-idodo-4402b6390",
+  X: "https://x.com/whoistheedev",
+  Resume: RESUME_URL,
 }
 
 const HOME_URL = "iweb://topsites"
 
+/** Thumbnail derived from the domain's favicon — no broken remote placeholders. */
+const siteImage = (url: string) => {
+  try {
+    const host = new URL(url, window.location.origin).hostname || "file"
+    return `https://www.google.com/s2/favicons?sz=128&domain=${host}`
+  } catch {
+    return "/icons/explorer.png"
+  }
+}
+
 const TOP_SITES: TopSite[] = [
   {
-    name: "Portfolio",
-    url: "https://yourdomain.com",
-    image:
-      "https://YOUR_SUPABASE_URL/storage/v1/object/public/siteshots/portfolio.png",
-  },
-  {
     name: "GitHub",
-    url: "https://github.com/yourhandle",
-    image:
-      "https://YOUR_SUPABASE_URL/storage/v1/object/public/siteshots/github.png",
+    url: "https://github.com/whoistheedev",
+    image: siteImage("https://github.com/whoistheedev"),
   },
   {
     name: "LinkedIn",
-    url: "https://linkedin.com/in/yourhandle",
-    image:
-      "https://YOUR_SUPABASE_URL/storage/v1/object/public/siteshots/linkedin.png",
+    url: "https://www.linkedin.com/in/jeffrey-james-idodo-4402b6390",
+    image: siteImage("https://www.linkedin.com"),
   },
   {
-    name: "Resume",
-    url: "/resume.pdf",
-    image:
-      "https://YOUR_SUPABASE_URL/storage/v1/object/public/siteshots/resume.png",
+    name: "X",
+    url: "https://x.com/whoistheedev",
+    image: siteImage("https://x.com"),
+  },
+  {
+    name: "Résumé",
+    url: RESUME_URL,
+    image: "/icons/explorer.png",
   },
 ]
 

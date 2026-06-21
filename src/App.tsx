@@ -1,11 +1,6 @@
 import { useEffect } from "react"
-import StatusBar from "./components/StatusBar"
-import Desktop from "./components/Desktop"
-import Dock from "./components/Dock"
-import WindowManager from "./components/WindowManager"
-import SocialsWidget from "./components/SocialsWidget"
-import { VisitorsWidget } from "./components/VisitorsWidget"
-import { KeyboardHelp } from "./components/KeyboardHelp"
+import { Toaster } from "sonner"
+import ResponsiveShellRouter from "./shells/ResponsiveShellRouter"
 
 import { useStore } from "./store"
 import {
@@ -29,12 +24,14 @@ export default function App() {
   /* 🪄 INITIAL LOAD: themes + holiday check                                   */
   /* -------------------------------------------------------------------------- */
   useEffect(() => {
-    // ✅ Ensure viewport meta exists for responsive layout
+    // ✅ Ensure viewport meta exists for responsive layout.
+    // NOTE: no `maximum-scale` / `user-scalable=no` — locking zoom is a WCAG
+    // 1.4.4 failure that hurts low-vision users. Pinch-zoom stays enabled.
     const meta = document.querySelector("meta[name='viewport']")
     if (!meta) {
       const m = document.createElement("meta")
       m.name = "viewport"
-      m.content = "width=device-width,initial-scale=1,maximum-scale=1"
+      m.content = "width=device-width,initial-scale=1"
       document.head.appendChild(m)
     }
 
@@ -131,34 +128,18 @@ export default function App() {
   }, [])
 
   /* -------------------------------------------------------------------------- */
-  /* 🖥 LAYOUT – Responsive container                                          */
+  /* 🖥 LAYOUT – Responsive shell router                                       */
+  /* The desktop tree now lives in DesktopShell (extracted verbatim). The       */
+  /* router selects Desktop / Tablet / Mobile by form factor and defaults to    */
+  /* desktop, preserving the existing experience. App-level theme/holiday       */
+  /* effects above are unchanged.                                               */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden bg-transparent">
-      <StatusBar />
-      <Desktop />
-      <WindowManager />
-      <Dock />
-
-      {/* 🌍 Widgets visible on tablets and desktops only */}
-      <div
-        className="
-          hidden sm:flex
-          absolute bottom-4 left-0 w-full
-          justify-between items-center
-          px-6
-          pointer-events-none
-        "
-      >
-        <div className="pointer-events-auto">
-          <VisitorsWidget />
-        </div>
-        <div className="pointer-events-auto">
-          <SocialsWidget />
-        </div>
-      </div>
-
-      <KeyboardHelp />
-    </div>
+    <>
+      <ResponsiveShellRouter />
+      {/* Mounts sonner so existing app toasts (Recruiter/Guestbook/Wallpapers)
+          actually render — there was no <Toaster> in the tree before. */}
+      <Toaster position="bottom-center" richColors />
+    </>
   )
 }

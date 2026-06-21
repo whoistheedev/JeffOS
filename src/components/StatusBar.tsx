@@ -122,13 +122,26 @@ export default function StatusBar() {
           e.preventDefault()
           if (activeWinId) closeWindow(activeWinId)
           break
-        case "c":
-          e.preventDefault()
-          console.log("Copy action (placeholder)")
+        case "c": {
+          // Don't hijack copy when typing in a field — let the browser handle it.
+          const el = e.target as HTMLElement | null
+          const inField =
+            el?.tagName === "INPUT" ||
+            el?.tagName === "TEXTAREA" ||
+            el?.isContentEditable
+          if (inField) break
+
+          const selection = window.getSelection()?.toString() ?? ""
+          if (selection && navigator.clipboard?.writeText) {
+            e.preventDefault()
+            navigator.clipboard.writeText(selection).catch(() => {})
+          }
+          // No selection → let the default (browser) copy behavior proceed.
           break
+        }
         case "v":
-          e.preventDefault()
-          console.log("Paste action (placeholder)")
+          // Paste only makes sense in editable targets, which the browser
+          // already handles natively. Do not intercept in OS chrome.
           break
         case "q":
           e.preventDefault()
@@ -186,6 +199,19 @@ export default function StatusBar() {
            className="z-[9999] bg-white/95 text-black rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-white/60 backdrop-blur-md p-1.5 min-w-[220px] sm:min-w-[240px] transition-all duration-150"
             sideOffset={4}
           >
+            {/* Tier-0 hire signal — always one click from the menu bar. */}
+            <MenuItem
+              onClick={() =>
+                window.open(
+                  "/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              💼 Hire Me — Résumé
+            </MenuItem>
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
             <MenuItem onClick={openAboutThisMac}>About This Mac</MenuItem>
             <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
             {Object.values(apps).map((app) => {

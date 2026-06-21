@@ -6,6 +6,32 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        /**
+         * ⚡ Vendor chunk optimization.
+         *
+         * Group large, stable third-party libraries into named chunks so they
+         * cache independently of app code and don't all land in the entry chunk.
+         * Grouped conservatively to avoid circular vendor chunks. App code itself
+         * is split automatically via React.lazy() in the app registry — heavy
+         * apps (Games/EmulatorJS, Synth, Explorer, Terminal, iTunes) therefore
+         * become their own on-demand chunks and stay out of the initial bundle.
+         */
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id))
+            return 'vendor-react'
+          if (id.includes('framer-motion')) return 'vendor-motion'
+          if (id.includes('@supabase')) return 'vendor-supabase'
+          if (id.includes('@dnd-kit') || id.includes('react-rnd')) return 'vendor-dnd'
+          if (id.includes('@radix-ui')) return 'vendor-radix'
+          // everything else: let Rollup decide (default vendor splitting)
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
