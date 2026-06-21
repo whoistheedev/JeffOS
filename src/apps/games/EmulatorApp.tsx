@@ -113,30 +113,11 @@ export default function EmulatorApp() {
     }
   }, [])
 
-  // 🔁 Watch Supabase changes
-  useEffect(() => {
-    const channel = supabase
-      .channel("games-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "storage",
-          table: "objects",
-          filter: "bucket_id=eq.games",
-        },
-        () => {
-          clearTimeout((window as any)._gamesRefreshTimer)
-          ;(window as any)._gamesRefreshTimer = setTimeout(() => loadGames(), 1200)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [loadGames])
-
+  // NOTE: a `games-realtime` postgres_changes subscription on storage.objects
+  // was removed in Phase 5 (P2.3). storage.objects is not in the
+  // supabase_realtime publication, so it never fired; ROM uploads are rare and
+  // admin-driven. The games list loads on mount (below) and on remount; a
+  // precomputed games_index (P5.1) is the path to live/cheap refresh later.
   useEffect(() => {
     loadGames()
   }, [loadGames])
