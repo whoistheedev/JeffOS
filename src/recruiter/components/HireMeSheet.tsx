@@ -8,7 +8,6 @@ import {
   DrawerTrigger,
 } from "../../components/ui/drawer"
 import { CONTACT, IDENTITY } from "../content"
-import { supabase } from "../../lib/supabase"
 
 /**
  * Contact funnel (§8). Primary CTA: "Schedule a Conversation".
@@ -16,10 +15,6 @@ import { supabase } from "../../lib/supabase"
  * Used on mobile as a bottom sheet (vaul); the inner <ContactActions> is
  * reused inline on desktop/tablet.
  */
-function resumeUrl() {
-  return supabase.storage.from(IDENTITY.resumeBucket).getPublicUrl(IDENTITY.resumeFile).data
-    ?.publicUrl
-}
 
 export function ContactActions({ onAnalytics }: { onAnalytics?: (e: string) => void }) {
   const [copied, setCopied] = useState(false)
@@ -77,7 +72,7 @@ export function ContactActions({ onAnalytics }: { onAnalytics?: (e: string) => v
       <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" onClick={() => track("github")} className={row} style={touch}>
         <Github size={16} aria-hidden /> GitHub
       </a>
-      <a href={resumeUrl() ?? "#"} download onClick={() => track("resume_download")} className={row} style={touch}>
+      <a href={IDENTITY.resumeUrl} download onClick={() => track("resume_download")} className={row} style={touch}>
         <FileText size={16} aria-hidden /> Download résumé
       </a>
     </div>

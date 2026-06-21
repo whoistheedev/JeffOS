@@ -7,22 +7,16 @@ import {
   OPEN_TO,
   SKILLS,
   EXPERIENCE,
+  EDUCATION,
   INSIGHTS,
   INSIGHTS_CATEGORIES,
   CONTACT,
 } from "../content"
-import { supabase } from "../../lib/supabase"
 
 /**
  * Static Recruiter Mode sections (§3–§9). Shell-agnostic: composed by
- * RecruiterMode for each form factor. All copy comes from content.ts (which
- * carries the CONFIRM placeholders).
+ * RecruiterMode for each form factor. All copy comes from content.ts.
  */
-
-function resumeUrl() {
-  return supabase.storage.from(IDENTITY.resumeBucket).getPublicUrl(IDENTITY.resumeFile).data
-    ?.publicUrl
-}
 
 export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
   const scheduleHref = CONTACT.schedulerUrl ?? `mailto:${CONTACT.email}?subject=Let's%20talk`
@@ -46,7 +40,7 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
           <Calendar size={16} aria-hidden /> Schedule a Conversation
         </a>
         <a
-          href={resumeUrl() ?? "#"}
+          href={IDENTITY.resumeUrl}
           download
           className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
           style={{ minHeight: "var(--touch-target-min)" }}
@@ -127,6 +121,8 @@ export function OpenTo() {
         <div><dt className="inline font-medium">Focus: </dt><dd className="inline text-muted-foreground">{OPEN_TO.focus}</dd></div>
         <div><dt className="inline font-medium">Engagement: </dt><dd className="inline text-muted-foreground">{OPEN_TO.engagement}</dd></div>
         <div><dt className="inline font-medium">Work mode: </dt><dd className="inline text-muted-foreground">{OPEN_TO.workMode}</dd></div>
+        {/* Aspirational direction — explicitly labeled, NOT claimed experience. */}
+        <div><dt className="inline font-medium">Targeting: </dt><dd className="inline text-muted-foreground">{OPEN_TO.targeting}</dd></div>
       </dl>
       <p className="mt-2 inline-flex items-center gap-2 text-sm">
         <span className="inline-block h-2 w-2 rounded-full" style={{ background: "var(--color-live)" }} aria-hidden />
@@ -181,6 +177,16 @@ export function ExperienceTimeline() {
           </li>
         ))}
       </ol>
+
+      <h3 className="mt-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Education</h3>
+      <ul className="space-y-1 text-sm">
+        {EDUCATION.map((ed, i) => (
+          <li key={i} className="flex flex-wrap justify-between gap-2">
+            <span><span className="font-medium">{ed.credential}</span> — {ed.org}</span>
+            <span className="text-muted-foreground">{ed.period}</span>
+          </li>
+        ))}
+      </ul>
     </SectionCard>
   )
 }
@@ -190,7 +196,7 @@ export function Insights() {
     <SectionCard title="Insights">
       {INSIGHTS.length === 0 ? (
         <div className="text-sm text-muted-foreground">
-          <p>Writing on healthcare engineering, EDI, and Supabase architecture. Coming soon.</p>
+          <p>Writing on backend engineering, Supabase architecture, and HealthTech data. Coming soon.</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {INSIGHTS_CATEGORIES.map((c) => (
               <span key={c} className="rounded bg-muted px-2 py-0.5 text-xs">{c}</span>

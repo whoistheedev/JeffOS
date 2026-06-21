@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Download, Share2, Printer } from "lucide-react"
-import { supabase } from "../../lib/supabase"
 import { IDENTITY } from "../content"
 
 /**
@@ -9,23 +8,17 @@ import { IDENTITY } from "../content"
  * Falls back to a download link if the embed is blocked.
  */
 export function ResumeViewer() {
-  const [url, setUrl] = useState<string | null>(null)
+  // Served from /public (PWA-precached) — see IDENTITY.resumeUrl.
+  const url = IDENTITY.resumeUrl
   const [embedFailed, setEmbedFailed] = useState(false)
 
-  useEffect(() => {
-    const { data } = supabase.storage
-      .from(IDENTITY.resumeBucket)
-      .getPublicUrl(IDENTITY.resumeFile)
-    setUrl(data?.publicUrl ?? null)
-  }, [])
-
   const share = async () => {
-    if (!url) return
+    const absolute = new URL(url, window.location.origin).href
     try {
       if (navigator.share) {
-        await navigator.share({ title: `${IDENTITY.name} — Résumé`, url })
+        await navigator.share({ title: `${IDENTITY.name} — Résumé`, url: absolute })
       } else {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(absolute)
       }
     } catch {
       /* user cancelled share — no-op */
@@ -36,7 +29,7 @@ export function ResumeViewer() {
     <section aria-label="Résumé" className="flex h-full flex-col gap-3">
       <div className="flex flex-wrap gap-2">
         <a
-          href={url ?? "#"}
+          href={url}
           download
           className="inline-flex items-center gap-2 rounded-md bg-foreground px-3 py-2 text-sm text-background"
           style={{ minHeight: "var(--touch-target-min)" }}
@@ -51,7 +44,7 @@ export function ResumeViewer() {
           <Share2 size={16} aria-hidden /> Share
         </button>
         <button
-          onClick={() => window.open(url ?? "", "_blank")?.print()}
+          onClick={() => window.open(url, "_blank")?.print()}
           className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm"
           style={{ minHeight: "var(--touch-target-min)" }}
         >
@@ -60,7 +53,7 @@ export function ResumeViewer() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-muted">
-        {url && !embedFailed ? (
+        {!embedFailed ? (
           <object
             data={url}
             type="application/pdf"
@@ -77,13 +70,9 @@ export function ResumeViewer() {
           </object>
         ) : (
           <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
-            {url ? (
-              <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
-                Open the résumé PDF
-              </a>
-            ) : (
-              "Loading résumé…"
-            )}
+            <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
+              Open the résumé PDF
+            </a>
           </div>
         )}
       </div>
