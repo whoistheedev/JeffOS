@@ -13,10 +13,15 @@
 /* -------------------------------------------------------
    Document defaults
 --------------------------------------------------------*/
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+/* #root grows with content (Recruiter Mode scrolls); JeffOS pins it to 100%
+   via html.jeffos-active below. */
+#root {
+  min-height: 100%;
 }
 
 /* -------------------------------------------------------
@@ -250,12 +255,21 @@ html {
   touch-action: manipulation;
 }
 
-/* Global scaling for all elements */
+/* Recruiter Mode is a normal scrolling document, so body/#root must NOT clip
+   or be locked to viewport height by default. JeffOS (the fixed desktop OS)
+   re-applies the lock via the `.jeffos-active` class on <html> while it's
+   mounted (see RootRouter). */
 body, #root {
   width: 100%;
+  overscroll-behavior: none;
+}
+
+/* JeffOS fixed-viewport lock — only while the OS is active. */
+html.jeffos-active,
+html.jeffos-active body,
+html.jeffos-active #root {
   height: 100%;
   overflow: hidden;
-  overscroll-behavior: none;
 }
 
 /* Safe area for devices with notches (e.g. iPhone) */

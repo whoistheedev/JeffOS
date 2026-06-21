@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import RecruiterMode from "./recruiter/RecruiterMode"
 import ErrorBoundary from "./components/ErrorBoundary"
 
@@ -37,6 +37,13 @@ export default function RootRouter() {
     }
     setLaunched(false)
   }
+
+  // JeffOS is a fixed-viewport desktop that must clip body scroll; Recruiter
+  // Mode is a normal scrolling document. Toggle the lock class accordingly.
+  useEffect(() => {
+    document.documentElement.classList.toggle("jeffos-active", launched)
+    return () => document.documentElement.classList.remove("jeffos-active")
+  }, [launched])
 
   if (!launched) {
     return <RecruiterMode onLaunchJeffOS={launch} />
