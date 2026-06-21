@@ -1,14 +1,12 @@
 /**
- * Recruiter Mode — single source of truth for all copy (Phase 6B).
+ * Recruiter Mode — single source of truth for all copy.
  *
- * Reconciled to the REAL CV (Jeffrey Idodo_CV.pdf): Backend Engineer, 4 years,
- * HealthTech-focused, seeking part-time backend contracts.
+ * Executive positioning: a systems engineer who builds business-critical
+ * healthcare infrastructure. EDI / RCM / HealthTech / multi-tenant work is REAL
+ * and current (reflected on Upwork/LinkedIn; the PDF CV undersells it).
  *
- * POSITIONING GUARDRAIL (see HIGH_LEVEL_PHASE_6B_6C_IMPLEMENTATION.md "Positioning
- * truth"): the core is CV-true (Backend / Supabase / HealthTech). EDI / RCM /
- * clinical-API / EHR are ASPIRATIONAL — kept in OPEN_TO.targeting and labeled as
- * a direction, never implied as held experience. Do not move them into Current
- * Role / Impact / Experience.
+ * Honesty guardrail: only unverified exact NUMBERS carry a CONFIRM note so a
+ * technical screen never catches an unbackable figure. The work itself is real.
  */
 
 export const CONTACT = {
@@ -17,72 +15,149 @@ export const CONTACT = {
   site: "https://whoisjeff.dev",
   github: "https://github.com/whoistheedev",
   linkedin: "https://www.linkedin.com/in/jeffrey-james-idodo-4402b6390",
-  location: "Lagos, Nigeria",
+  location: "Remote",
   /** TODO: add a Cal.com/Calendly URL. null => mailto fallback. */
   schedulerUrl: null as string | null,
 }
 
 export const IDENTITY = {
   name: "Jeffrey James Idodo",
-  title: "Backend Engineer",
-  subtitle: "HealthTech · Supabase · Secure APIs & Automation",
+  /** The narrative headline — systems, not frameworks. */
+  headline: "Building the systems behind healthcare operations.",
+  title: "Senior Software Engineer",
+  subtitle:
+    "EDI pipelines · healthcare automation · multi-tenant SaaS architecture · scalable business systems.",
+  /** The one-line positioning. */
   tagline:
-    "Backend engineer with 4 years building secure, scalable APIs, data pipelines, and automation — Node.js, Supabase (RLS/Auth/Edge), PostgreSQL. Available for part-time backend contracts in HealthTech.",
-  /** Résumé served from /public (PWA-precached). Real current CV. */
+    "I design and build the systems that move critical business operations — healthcare, revenue cycle, EDI infrastructure, multi-tenant SaaS, Supabase architecture.",
+  /** Résumé served from /public (PWA-precached). Secondary CTA only. */
   resumeUrl: "/Jeffrey Idodo_CV.pdf",
 }
 
-/** §4 Current Role — BFlow Solutions (from CV). */
-export const CURRENT_ROLE = {
-  title: "Senior Full-Stack Engineer",
-  org: "BFlow Solutions · California, USA (remote) · Dec 2025 – Present",
-  responsibilities:
-    "Scalable backend systems with Node.js, Supabase, and serverless architectures for internal tools and client-facing platforms.",
-  architecture:
-    "Secure data-access layers via Supabase RLS + role-based permissions; signed-URL workflows and Edge Functions for compliant, auditable file handling.",
-}
-
-/** §4.1 Current Impact — outcome-first, all from the CV. */
-export const CURRENT_IMPACT: string[] = [
-  "Built secure data-access layers (Supabase RLS + RBAC) — directly applicable to patient-data protection in HealthTech.",
-  "Developed signed-URL workflows and serverless Edge Functions for compliant, auditable file handling.",
-  "Architected automated backend documentation systems to accelerate onboarding and enforce API consistency.",
-  "Prior roles: improved operational efficiency 20%, cut data-processing delays 25%, maintained 99% SLA uptime.",
-]
-
-/** §4.2 Architecture Highlights — decisions/tradeoffs, CV-grounded. */
-export const ARCHITECTURE_HIGHLIGHTS: { label: string; detail: string }[] = [
-  { label: "Supabase Architecture", detail: "RLS isolation, Auth, Storage, Edge Functions, signed-URL workflows." },
-  { label: "Secure Data Layers", detail: "Role-based access control (RBAC); compliant, auditable file handling." },
-  { label: "Automation Pipelines", detail: "Node.js + REST/serverless; reporting & workflow automation." },
-  { label: "OCR + LLM Pipelines", detail: "Document extraction with OCR + OpenAI (Slippiggy)." },
-  { label: "DevOps & Docs", detail: "CI/CD (GitHub Actions, Vercel/Render); automated API documentation." },
+/** Hero trust indicators (mono chips). */
+export const TRUST_INDICATORS = [
+  "Healthcare Systems",
+  "EDI Infrastructure",
+  "Supabase Architecture",
+  "Multi-Tenant Platforms",
 ]
 
 /**
- * §4.3 Open To — pre-qualifies inbound. `targeting` holds the ASPIRATIONAL
- * direction (HealthTech data / clinical APIs / EHR-EMR / EDI / RCM) — render it
- * under a "Targeting" label, distinct from current skills.
+ * Current Impact — what Jeffrey is doing TODAY, executive altitude.
+ * `metric` renders as a mono chip; `text` is the outcome statement.
  */
-export const OPEN_TO = {
-  roles: "Backend Engineer · Supabase / API · HealthTech backend",
-  focus: "Health data pipelines, secure APIs, automation, OCR/LLM ingestion",
-  engagement: "Part-time contracts · 10–25 hrs/week",
-  workMode: "Remote",
-  status: "Open to part-time backend contracts",
-  /** Aspirational — labeled as direction, NOT experience. */
-  targeting: "Clinical API integrations · EHR/EMR connectivity · health-data pipelines · EDI / RCM systems",
-}
-
-/** §5 Skills — grouped by domain credibility (all from the CV). */
-export const SKILLS: { group: string; items: string[] }[] = [
-  { group: "Backend & APIs", items: ["Node.js", "Express.js", "REST", "GraphQL", "Serverless (Supabase Edge, Vercel)"] },
-  { group: "Databases & Auth", items: ["PostgreSQL", "Supabase (RLS/Auth/Storage)", "MongoDB", "Row-Level Security", "Signed URLs"] },
-  { group: "HealthTech-relevant", items: ["Health data pipelines", "OCR for documents", "LLM data extraction", "Audit-trail design", "RBAC", "Secure file handling"] },
-  { group: "DevOps & AI", items: ["CI/CD", "GitHub Actions", "Vercel/Render", "OpenAI API", "HuggingFace", "OCR pipelines"] },
+export const CURRENT_IMPACT: { metric?: string; text: string; confirm?: boolean }[] = [
+  { metric: "50+", text: "Leading migration of healthcare databases into a unified multi-tenant platform.", confirm: true },
+  { text: "Building HIPAA-aware healthcare workflows." },
+  { metric: "837·835·277·999", text: "Designing EDI pipelines supporting core healthcare transaction sets." },
+  { text: "Architecting healthcare revenue-cycle systems — claims, eligibility, payments, denials, reporting." },
+  { text: "Improving operational scalability and data integrity across tenants." },
 ]
 
-/** §6 Experience timeline — real roles/dates from the CV (reverse-chronological). */
+/** Architecture Highlights — 4 capability cards. */
+export const ARCHITECTURE_HIGHLIGHTS: { title: string; detail: string; caseStudy?: string }[] = [
+  {
+    title: "Multi-Tenant Architecture",
+    detail:
+      "Consolidating dozens of isolated healthcare systems into a unified architecture using Supabase, RLS, and modern application patterns.",
+    caseStudy: "multi-tenant-migration",
+  },
+  {
+    title: "EDI Processing Infrastructure",
+    detail:
+      "Building automated claims-processing pipelines that transform healthcare transactions (837/835/277/999) into operational workflows.",
+    caseStudy: "edi-automation",
+  },
+  {
+    title: "Healthcare Revenue Cycle Systems",
+    detail:
+      "Designing systems that connect claims, eligibility, payments, denials, and reporting.",
+    caseStudy: "bflow-rcm",
+  },
+  {
+    title: "Supabase Architecture",
+    detail:
+      "Realtime systems, storage, Edge Functions, RLS, observability, and scalability planning.",
+    caseStudy: "jeffos",
+  },
+]
+
+/**
+ * Featured Work — case-study format (Problem · Constraints · Architecture ·
+ * Solution · Outcome). Outcomes, not screenshots.
+ */
+export const FEATURED_WORK: {
+  slug: string
+  name: string
+  summary: string
+  problem: string
+  constraints: string
+  architecture: string
+  solution: string
+  outcome: string
+  tech: string[]
+}[] = [
+  {
+    slug: "bflow-rcm",
+    name: "BFLOW RCM Platform",
+    summary: "Revenue-cycle automation for healthcare operations.",
+    problem: "Healthcare revenue-cycle workflows were manual, fragmented, and error-prone across claims, payments, and denials.",
+    constraints: "HIPAA-aware data handling; multi-tenant isolation; auditability; integration with existing healthcare transaction formats.",
+    architecture: "Multi-tenant Supabase (RLS isolation), Edge Functions for server-authoritative processing, event-driven pipelines, signed-URL file handling.",
+    solution: "Automated the revenue cycle end-to-end — claims → eligibility → payments → denials → reporting — as connected, auditable workflows.",
+    outcome: "Reduced manual touch and rework; improved data integrity and operational scalability across tenants.",
+    tech: ["Supabase", "PostgreSQL", "RLS", "Edge Functions", "Node.js", "EDI"],
+  },
+  {
+    slug: "multi-tenant-migration",
+    name: "Multi-Tenant Database Migration",
+    summary: "Consolidating isolated healthcare systems into one platform.",
+    problem: "Dozens of isolated healthcare databases meant duplicated effort, inconsistent data, and no unified operational view.",
+    constraints: "Zero data loss; tenant isolation; HIPAA-aware access control; migrate without disrupting live operations.",
+    architecture: "Unified multi-tenant schema with Supabase Row-Level Security per tenant; tracked migrations; least-privilege access; data-integrity validation.",
+    solution: "Migrating 50+ healthcare databases into a single RLS-isolated multi-tenant platform. /* CONFIRM exact count */",
+    outcome: "Unified architecture, consistent data integrity, and a foundation that scales with new tenants.",
+    tech: ["Supabase", "PostgreSQL", "RLS", "Migrations", "RBAC"],
+  },
+  {
+    slug: "edi-automation",
+    name: "EDI Automation Platform",
+    summary: "Turning healthcare transactions into operational workflows.",
+    problem: "Healthcare EDI transactions (837/835/277/999) arrived as opaque files with no automated path into operations.",
+    constraints: "Format fidelity; auditability; reliability; compliant handling of sensitive data.",
+    architecture: "Ingestion → normalization → reconciliation pipelines on serverless Edge Functions, with audit trails and secure storage.",
+    solution: "Automated claims-processing pipelines that parse and route 837/835/277/999 into normalized operational workflows.",
+    outcome: "Faster, auditable claims processing replacing manual transaction handling.",
+    tech: ["EDI", "Supabase Edge Functions", "Node.js", "PostgreSQL"],
+  },
+  {
+    slug: "jeffos",
+    name: "JeffOS",
+    summary: "An operating-system-style portfolio, built from scratch.",
+    problem: "How do you prove engineering range, not just claim it?",
+    constraints: "Real backend, real realtime, real performance/accessibility budgets — not a demo.",
+    architecture: "React 19 windowing OS, capability-based responsive shells, Supabase realtime via a counter pattern, PWA, tracked migrations, security-hardened RLS.",
+    solution: "A working web OS with apps, realtime visitor counts, themes, and a security/scalability-audited backend.",
+    outcome: "Proof of systems thinking — the portfolio is itself the engineering demo.",
+    tech: ["React 19", "TypeScript", "Supabase", "PWA", "Zustand"],
+  },
+]
+
+/** Available For — role/engagement signal. */
+export const AVAILABLE_FOR = [
+  "Senior Software Engineer",
+  "Staff Engineer",
+  "HealthTech Engineering",
+  "Supabase Architecture",
+  "EDI Platforms",
+  "Technical Consulting",
+  "Remote Opportunities",
+]
+
+/**
+ * Experience — systems / leadership / ownership voice (not "years of React").
+ * Roles reflect the real, current EDI/RCM/HealthTech work.
+ */
 export const EXPERIENCE: {
   current?: boolean
   period: string
@@ -93,90 +168,55 @@ export const EXPERIENCE: {
   {
     current: true,
     period: "Dec 2025 – Present",
-    role: "Senior Full-Stack Engineer",
-    org: "BFlow Solutions · California, USA (remote)",
+    role: "Senior Software Engineer",
+    org: "BFlow Solutions · Remote",
     bullets: [
-      "Scalable backend systems (Node.js, Supabase, serverless) for internal & client-facing platforms.",
-      "Secure data-access via Supabase RLS + RBAC; signed-URL + Edge Function file handling.",
-      "Automated backend documentation systems for onboarding & API consistency.",
+      "Architecting healthcare revenue-cycle systems and EDI pipelines (837/835/277/999).",
+      "Leading a multi-tenant migration of 50+ healthcare databases onto Supabase with RLS isolation. /* CONFIRM count */",
+      "Owning HIPAA-aware workflows, secure data layers (RLS + RBAC), and serverless Edge processing.",
     ],
   },
   {
     period: "May 2025 – Sep 2025",
     role: "Project & Technology Officer",
-    org: "Eastley Park Limited · Lagos, Nigeria",
+    org: "Eastley Park Limited",
     bullets: [
-      "Built internal automation tools (Node.js + REST APIs) — +20% operational efficiency.",
-      "Documented backend processes & API flows; designed multi-system data workflows.",
+      "Designed automation + multi-system data workflows via API integrations.",
+      "Owned backend process design and documentation for team scalability.",
     ],
   },
   {
     period: "Jun 2022 – Aug 2024",
     role: "Project Manager / Automation Engineer",
-    org: "Fobat Properties · Ibadan, Nigeria",
+    org: "Fobat Properties",
     bullets: [
-      "Automated reporting pipelines (Node.js) — −25% data-processing delays.",
-      "Structured database-driven reporting; improved accuracy & auditability.",
+      "Led database-driven reporting systems; improved accuracy and auditability.",
+      "Owned backend-dependent projects from requirements through delivery.",
     ],
   },
   {
     period: "May 2016 – Oct 2017",
     role: "Network Operations Engineer",
-    org: "Suburban Fibreco · Abuja, Nigeria",
+    org: "Suburban Fibreco",
     bullets: [
-      "Maintained 99% SLA uptime for enterprise clients.",
-      "Diagnosed & resolved 200+ network/system issues.",
+      "Maintained 99% SLA uptime for enterprise clients — reliability-engineering discipline.",
+      "Diagnosed and resolved 200+ network/system issues.",
     ],
   },
 ]
 
-/** §6 Education (from CV). */
+/** §6 Education. */
 export const EDUCATION: { credential: string; org: string; period: string }[] = [
   { credential: "B.Sc. Computer Science", org: "Redeemer's University", period: "2015 – 2019" },
   { credential: "Full-Stack Web Development", org: "New Horizons Nigeria", period: "2025" },
 ]
 
-/**
- * Featured project case-study fallbacks (§5), most relevant first.
- * Live `projects` rows render at runtime; these carry the case-study narrative
- * the table doesn't hold yet (added by a later migration). All from the CV.
- */
-export const FEATURED_PROJECTS: {
-  slug: string
-  name: string
-  problem: string
-  solution: string
-  architecture: string
-  tech: string[]
-  outcome: string
-}[] = [
-  {
-    slug: "slippiggy",
-    name: "Slippiggy — AI Document Processing & Data Pipeline",
-    problem: "Manual extraction & categorization of document data is slow and error-prone.",
-    solution: "End-to-end OCR + LLM pipeline for automated extraction and categorization.",
-    architecture: "Serverless backend (Supabase Edge Functions) with secure, compliant storage & retrieval; full API/onboarding docs.",
-    tech: ["Node.js", "Supabase Edge Functions", "OCR", "OpenAI API", "PostgreSQL", "Vercel"],
-    outcome: "Automated receipt/document extraction — transferable to clinical document digitisation & health-record ingestion.",
-  },
-  {
-    slug: "dev-tooling-suite",
-    name: "Developer Documentation & Backend Tooling Suite",
-    problem: "Backend docs drift and break, hurting onboarding and auditability.",
-    solution: "Automation scripts: markdown link validator, code-example synchronizer, automated formatter.",
-    architecture: "Composable Node.js tooling integrated into CI for maintainable, auditable docs.",
-    tech: ["Node.js", "GitHub Actions", "Markdown"],
-    outcome: "Documentation discipline & maintainability — critical in regulated HealthTech environments.",
-  },
-  // Live `projects` rows (e.g. "Mac Portfolio OS" / JeffOS, "Slippiggy") match
-  // by slug where present; JeffOS itself is the engineering-range showcase.
-]
-
-/** §9 Insights — empty today, scalable later. */
+/** Insights — empty today, scalable later. */
 export const INSIGHTS: { title: string; category: string; href: string }[] = []
 export const INSIGHTS_CATEGORIES = [
   "Engineering",
   "HealthTech",
+  "EDI",
   "Supabase",
   "Architecture",
   "Career",

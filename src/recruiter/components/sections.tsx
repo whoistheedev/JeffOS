@@ -1,160 +1,187 @@
-import { Calendar, Download } from "lucide-react"
+import { Calendar, Download, ArrowUpRight } from "lucide-react"
 import {
   IDENTITY,
-  CURRENT_ROLE,
+  TRUST_INDICATORS,
   CURRENT_IMPACT,
   ARCHITECTURE_HIGHLIGHTS,
-  OPEN_TO,
-  SKILLS,
+  FEATURED_WORK,
+  AVAILABLE_FOR,
   EXPERIENCE,
   EDUCATION,
-  INSIGHTS,
-  INSIGHTS_CATEGORIES,
   CONTACT,
 } from "../content"
 
 /**
- * Static Recruiter Mode sections (§3–§9). Shell-agnostic: composed by
- * RecruiterMode for each form factor. All copy comes from content.ts.
+ * Recruiter Mode sections — executive, systems-engineer altitude.
+ * Aesthetic: minimal, monochrome + one accent, generous whitespace, hairline
+ * cards, mono chips for metrics/EDI codes. No gradients, no glow.
+ * All copy from content.ts.
  */
 
-export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
-  const scheduleHref = CONTACT.schedulerUrl ?? `mailto:${CONTACT.email}?subject=Let's%20talk`
+const scheduleHref = () =>
+  CONTACT.schedulerUrl ?? `mailto:${CONTACT.email}?subject=Let's%20talk`
+
+/* ------------------------------- primitives ------------------------------- */
+export function CodeChip({ children }: { children: React.ReactNode }) {
   return (
-    <header className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{IDENTITY.name}</h1>
-        {/* CONFIRM: title / subtitle / tagline in content.ts */}
-        <p className="mt-1 text-lg font-medium">{IDENTITY.title}</p>
-        <p className="text-muted-foreground">{IDENTITY.subtitle}</p>
-        <p className="mt-3 max-w-prose text-sm text-muted-foreground">{IDENTITY.tagline}</p>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <a
-          href={scheduleHref}
-          target={CONTACT.schedulerUrl ? "_blank" : undefined}
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold"
-          style={{ background: "var(--color-hire)", color: "var(--color-hire-foreground)", minHeight: "var(--touch-target-min)" }}
-        >
-          <Calendar size={16} aria-hidden /> Schedule a Conversation
-        </a>
-        <a
-          href={IDENTITY.resumeUrl}
-          download
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
-          style={{ minHeight: "var(--touch-target-min)" }}
-        >
-          <Download size={16} aria-hidden /> Download Résumé
-        </a>
-        <button
-          onClick={onLaunchJeffOS}
-          className="inline-flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2.5 text-sm text-muted-foreground"
-          style={{ minHeight: "var(--touch-target-min)" }}
-        >
-          Launch JeffOS →
-        </button>
-      </div>
-    </header>
+    <span className="rounded border border-border px-1.5 py-0.5 font-mono text-[11px] tracking-tight text-muted-foreground">
+      {children}
+    </span>
   )
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionShell({
+  id,
+  title,
+  children,
+}: {
+  id?: string
+  title?: string
+  children: React.ReactNode
+}) {
   return (
-    <section className="rounded-xl border border-border p-5">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-        {title}
-      </h2>
+    <section id={id} className="scroll-mt-20">
+      {title && (
+        <h2 className="mb-5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          {title}
+        </h2>
+      )}
       {children}
     </section>
   )
 }
 
-export function CurrentRole() {
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <SectionCard title="Current Role">
-      <p className="font-medium">{CURRENT_ROLE.title}</p>
-      <p className="text-sm text-muted-foreground">{CURRENT_ROLE.org}</p>
-      <dl className="mt-3 space-y-1 text-sm">
-        <div><dt className="inline font-medium">Responsibilities: </dt><dd className="inline text-muted-foreground">{CURRENT_ROLE.responsibilities}</dd></div>
-        <div><dt className="inline font-medium">Architecture: </dt><dd className="inline text-muted-foreground">{CURRENT_ROLE.architecture}</dd></div>
-      </dl>
-    </SectionCard>
+    <div className={`rounded-xl border border-border p-5 transition-colors hover:border-foreground/20 ${className}`}>
+      {children}
+    </div>
   )
 }
 
+/* --------------------------------- Hero ----------------------------------- */
+export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+  return (
+    <header className="flex flex-col gap-6 py-4">
+      <div className="space-y-4">
+        <h1 className="max-w-[18ch] text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+          {IDENTITY.headline}
+        </h1>
+        <p className="max-w-prose text-base text-muted-foreground">
+          {IDENTITY.title} specializing in {IDENTITY.subtitle}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={scheduleHref()}
+          target={CONTACT.schedulerUrl ? "_blank" : undefined}
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium"
+          style={{ background: "var(--color-hire)", color: "var(--color-hire-foreground)", minHeight: "var(--touch-target-min)" }}
+        >
+          <Calendar size={16} aria-hidden /> Schedule a Conversation
+        </a>
+        <button
+          onClick={onLaunchJeffOS}
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
+          style={{ minHeight: "var(--touch-target-min)" }}
+        >
+          Launch JeffOS →
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2 pt-1">
+        {TRUST_INDICATORS.map((t) => (
+          <CodeChip key={t}>{t}</CodeChip>
+        ))}
+      </div>
+    </header>
+  )
+}
+
+/* ----------------------------- Current Impact ----------------------------- */
 export function CurrentImpact() {
   return (
-    <SectionCard title="Current Impact">
-      <ul className="space-y-2 text-sm">
-        {CURRENT_IMPACT.map((line, i) => (
-          <li key={i} className="flex gap-2">
-            <span aria-hidden>•</span>
-            <span>{line}</span>
+    <SectionShell title="Current Impact">
+      <ul className="space-y-4">
+        {CURRENT_IMPACT.map((item, i) => (
+          <li key={i} className="flex items-baseline gap-3">
+            {item.metric ? (
+              <span className="shrink-0 font-mono text-sm font-medium text-foreground">{item.metric}</span>
+            ) : (
+              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-foreground/40" aria-hidden />
+            )}
+            <span className="text-[15px] leading-relaxed">{item.text}</span>
           </li>
         ))}
       </ul>
-    </SectionCard>
+    </SectionShell>
   )
 }
 
+/* ------------------------- Architecture Highlights ------------------------ */
 export function ArchitectureHighlights() {
   return (
-    <SectionCard title="Architecture Highlights">
-      <dl className="grid gap-3 sm:grid-cols-2">
+    <SectionShell title="Architecture Highlights">
+      <div className="grid gap-4 sm:grid-cols-2">
         {ARCHITECTURE_HIGHLIGHTS.map((h) => (
-          <div key={h.label}>
-            <dt className="text-sm font-medium">{h.label}</dt>
-            <dd className="text-sm text-muted-foreground">{h.detail}</dd>
-          </div>
-        ))}
-      </dl>
-    </SectionCard>
-  )
-}
-
-export function OpenTo() {
-  return (
-    <SectionCard title="Open To">
-      <dl className="space-y-1 text-sm">
-        <div><dt className="inline font-medium">Roles: </dt><dd className="inline text-muted-foreground">{OPEN_TO.roles}</dd></div>
-        <div><dt className="inline font-medium">Focus: </dt><dd className="inline text-muted-foreground">{OPEN_TO.focus}</dd></div>
-        <div><dt className="inline font-medium">Engagement: </dt><dd className="inline text-muted-foreground">{OPEN_TO.engagement}</dd></div>
-        <div><dt className="inline font-medium">Work mode: </dt><dd className="inline text-muted-foreground">{OPEN_TO.workMode}</dd></div>
-        {/* Aspirational direction — explicitly labeled, NOT claimed experience. */}
-        <div><dt className="inline font-medium">Targeting: </dt><dd className="inline text-muted-foreground">{OPEN_TO.targeting}</dd></div>
-      </dl>
-      <p className="mt-2 inline-flex items-center gap-2 text-sm">
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: "var(--color-live)" }} aria-hidden />
-        {OPEN_TO.status}
-      </p>
-    </SectionCard>
-  )
-}
-
-export function Skills() {
-  return (
-    <SectionCard title="Skills">
-      <div className="space-y-3">
-        {SKILLS.map((g) => (
-          <div key={g.group}>
-            <p className="text-sm font-medium">{g.group}</p>
-            <div className="mt-1 flex flex-wrap gap-1.5">
-              {g.items.map((s) => (
-                <span key={s} className="rounded bg-muted px-2 py-0.5 text-xs">{s}</span>
-              ))}
-            </div>
-          </div>
+          <Card key={h.title}>
+            <h3 className="text-base font-medium">{h.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{h.detail}</p>
+          </Card>
         ))}
       </div>
-    </SectionCard>
+    </SectionShell>
   )
 }
 
+/* ------------------------------ Featured Work ----------------------------- */
+export function FeaturedWork() {
+  return (
+    <SectionShell title="Featured Work">
+      <div className="space-y-4">
+        {FEATURED_WORK.map((w) => (
+          <Card key={w.slug}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-medium">{w.name}</h3>
+                <p className="text-sm text-muted-foreground">{w.summary}</p>
+              </div>
+            </div>
+            <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field label="Problem">{w.problem}</Field>
+              <Field label="Constraints">{w.constraints}</Field>
+              <Field label="Architecture">{w.architecture}</Field>
+              <Field label="Solution">{w.solution}</Field>
+            </dl>
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="text-sm"><span className="font-medium">Outcome — </span><span className="text-muted-foreground">{w.outcome}</span></p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {w.tech.map((t) => <CodeChip key={t}>{t}</CodeChip>)}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </SectionShell>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 text-sm leading-relaxed">{children}</dd>
+    </div>
+  )
+}
+
+/* ------------------------------- Experience ------------------------------- */
 export function ExperienceTimeline() {
   return (
-    <SectionCard title="Experience">
-      <ol className="space-y-4">
+    <SectionShell title="Experience">
+      <ol className="space-y-5">
         {EXPERIENCE.map((e, i) => (
           <li key={i} className="relative pl-5">
             <span
@@ -171,14 +198,14 @@ export function ExperienceTimeline() {
               )}
             </div>
             <p className="text-xs text-muted-foreground">{e.org} · {e.period}</p>
-            <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-muted-foreground">
+            <ul className="mt-1.5 list-disc space-y-1 pl-4 text-sm text-muted-foreground">
               {e.bullets.map((b, j) => <li key={j}>{b}</li>)}
             </ul>
           </li>
         ))}
       </ol>
 
-      <h3 className="mt-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Education</h3>
+      <h3 className="mt-6 mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Education</h3>
       <ul className="space-y-1 text-sm">
         {EDUCATION.map((ed, i) => (
           <li key={i} className="flex flex-wrap justify-between gap-2">
@@ -187,32 +214,52 @@ export function ExperienceTimeline() {
           </li>
         ))}
       </ul>
-    </SectionCard>
+    </SectionShell>
   )
 }
 
-export function Insights() {
+/* ------------------------------ Available For ----------------------------- */
+export function AvailableFor() {
   return (
-    <SectionCard title="Insights">
-      {INSIGHTS.length === 0 ? (
-        <div className="text-sm text-muted-foreground">
-          <p>Writing on backend engineering, Supabase architecture, and HealthTech data. Coming soon.</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {INSIGHTS_CATEGORIES.map((c) => (
-              <span key={c} className="rounded bg-muted px-2 py-0.5 text-xs">{c}</span>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {INSIGHTS.map((a) => (
-            <a key={a.href} href={a.href} className="rounded-lg border border-border p-3 text-sm">
-              <span className="text-xs text-muted-foreground">{a.category}</span>
-              <p className="font-medium">{a.title}</p>
-            </a>
-          ))}
-        </div>
-      )}
-    </SectionCard>
+    <SectionShell title="Available For">
+      <div className="flex flex-wrap gap-2">
+        {AVAILABLE_FOR.map((r) => (
+          <span key={r} className="rounded-lg border border-border px-3 py-1.5 text-sm">{r}</span>
+        ))}
+      </div>
+    </SectionShell>
+  )
+}
+
+/* ----------------------------- JeffOS callout ----------------------------- */
+export function JeffOSCallout({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+  return (
+    <SectionShell>
+      <Card className="flex flex-col items-start gap-3">
+        <h2 className="text-lg font-medium">Built this operating-system-style portfolio from scratch.</h2>
+        <p className="text-sm text-muted-foreground">Want to see how I think as an engineer?</p>
+        <button
+          onClick={onLaunchJeffOS}
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
+          style={{ minHeight: "var(--touch-target-min)" }}
+        >
+          Launch JeffOS <ArrowUpRight size={16} aria-hidden />
+        </button>
+      </Card>
+    </SectionShell>
+  )
+}
+
+/* -------------------------- secondary résumé CTA -------------------------- */
+export function ResumeDownloadButton() {
+  return (
+    <a
+      href={IDENTITY.resumeUrl}
+      download
+      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm"
+      style={{ minHeight: "var(--touch-target-min)" }}
+    >
+      <Download size={16} aria-hidden /> Download Résumé
+    </a>
   )
 }
