@@ -1,10 +1,17 @@
-import { Calendar, ArrowUpRight } from "lucide-react"
+import { Calendar, ArrowUpRight, FolderGit2 } from "lucide-react"
 import {
   IDENTITY,
   TRUST_INDICATORS,
+  STAT_BAND,
   CURRENT_IMPACT,
+  CURRENT_IMPACT_LEAD,
+  CURRENT_IMPACT_CLOSING,
   ARCHITECTURE_HIGHLIGHTS,
   FEATURED_WORK,
+  FEATURED_STATEMENT,
+  WHY_HIRE,
+  WHY_HIRE_SOLVES,
+  WHY_HIRE_CLOSING,
   AVAILABLE_FOR,
   EXPERIENCE,
   EDUCATION,
@@ -60,19 +67,22 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 }
 
 /* --------------------------------- Hero ----------------------------------- */
+function scrollToId(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+}
+
 export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
   return (
     <header className="flex flex-col gap-6 py-4">
       <div className="space-y-4">
-        <h1 className="max-w-[18ch] text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+        <h1 className="max-w-[20ch] text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
           {IDENTITY.headline}
         </h1>
-        <p className="max-w-prose text-base text-muted-foreground">
-          {IDENTITY.title} specializing in {IDENTITY.subtitle}
-        </p>
+        <p className="max-w-prose text-base text-muted-foreground">{IDENTITY.subtitle}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Primary */}
         <a
           href={scheduleHref()}
           target={CONTACT.schedulerUrl ? "_blank" : undefined}
@@ -82,10 +92,18 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
         >
           <Calendar size={16} aria-hidden /> Schedule a Conversation
         </a>
+        {/* Secondary */}
         <button
-          onClick={onLaunchJeffOS}
+          onClick={() => scrollToId("work")}
           className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
           style={{ minHeight: "var(--touch-target-min)" }}
+        >
+          <FolderGit2 size={16} aria-hidden /> View Projects
+        </button>
+        {/* Tertiary — quiet, never competes with Schedule */}
+        <button
+          onClick={onLaunchJeffOS}
+          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           Launch JeffOS →
         </button>
@@ -100,22 +118,43 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
   )
 }
 
+/* ----------------------------- Proof of Impact ---------------------------- */
+export function StatBand() {
+  return (
+    <section id="proof" className="scroll-mt-20">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-5">
+        {STAT_BAND.map((s) => (
+          <div key={s.label} className="flex flex-col gap-1 bg-background p-4">
+            <span className="font-mono text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-xl">
+              {s.value}
+            </span>
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 /* ----------------------------- Current Impact ----------------------------- */
 export function CurrentImpact() {
   return (
     <SectionShell id="impact" title="Current Impact">
-      <ul className="space-y-4">
-        {CURRENT_IMPACT.map((item, i) => (
-          <li key={i} className="flex items-baseline gap-3">
-            {item.metric ? (
-              <span className="shrink-0 font-mono text-sm font-medium text-foreground">{item.metric}</span>
-            ) : (
-              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-foreground/40" aria-hidden />
+      <p className="mb-6 max-w-prose text-lg leading-relaxed">{CURRENT_IMPACT_LEAD}</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {CURRENT_IMPACT.map((item) => (
+          <Card key={item.title}>
+            <h3 className="text-sm font-semibold">{item.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.detail}</p>
+            {item.codes && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {item.codes.map((c) => <CodeChip key={c}>{c}</CodeChip>)}
+              </div>
             )}
-            <span className="text-[15px] leading-relaxed">{item.text}</span>
-          </li>
+          </Card>
         ))}
-      </ul>
+      </div>
+      <p className="mt-4 text-sm text-muted-foreground">{CURRENT_IMPACT_CLOSING}</p>
     </SectionShell>
   )
 }
@@ -128,10 +167,61 @@ export function ArchitectureHighlights() {
         {ARCHITECTURE_HIGHLIGHTS.map((h) => (
           <Card key={h.title}>
             <h3 className="text-base font-medium">{h.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{h.detail}</p>
+            <dl className="mt-3 space-y-2">
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Problem</dt>
+                <dd className="text-sm leading-relaxed">{h.problem}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Architecture</dt>
+                <dd className="text-sm leading-relaxed">{h.architecture}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Business Impact</dt>
+                <dd className="text-sm leading-relaxed text-foreground">{h.impact}</dd>
+              </div>
+            </dl>
           </Card>
         ))}
       </div>
+    </SectionShell>
+  )
+}
+
+/* -------------------------- Featured Achievement -------------------------- */
+export function FeaturedAchievement() {
+  return (
+    <section className="border-y border-border py-10">
+      <p className="max-w-[32ch] text-2xl font-medium leading-snug tracking-tight sm:text-3xl">
+        {FEATURED_STATEMENT}
+      </p>
+      <button
+        onClick={() => scrollToId("work")}
+        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium"
+        style={{ color: "var(--color-hire)" }}
+      >
+        See how at BFLOW RCM <ArrowUpRight size={15} aria-hidden />
+      </button>
+    </section>
+  )
+}
+
+/* ----------------------------- Why Hire Jeffrey --------------------------- */
+export function WhyHire() {
+  return (
+    <SectionShell id="why" title="Why Hire Jeffrey">
+      <div className="grid gap-4 sm:grid-cols-3">
+        {WHY_HIRE.map((w) => (
+          <Card key={w.title}>
+            <h3 className="text-sm font-semibold">{w.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{w.detail}</p>
+          </Card>
+        ))}
+      </div>
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {WHY_HIRE_SOLVES.map((s) => <CodeChip key={s}>{s}</CodeChip>)}
+      </div>
+      <p className="mt-6 max-w-prose text-lg font-medium leading-snug">{WHY_HIRE_CLOSING}</p>
     </SectionShell>
   )
 }
@@ -142,12 +232,17 @@ export function FeaturedWork() {
     <SectionShell id="work" title="Featured Work">
       <div className="space-y-4">
         {FEATURED_WORK.map((w) => (
-          <Card key={w.slug}>
+          <Card key={w.slug} className={w.flagship ? "border-foreground/25" : ""}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-lg font-medium">{w.name}</h3>
                 <p className="text-sm text-muted-foreground">{w.summary}</p>
               </div>
+              {w.flagship && (
+                <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase" style={{ background: "var(--color-hire)", color: "var(--color-hire-foreground)" }}>
+                  Flagship
+                </span>
+              )}
             </div>
             <dl className="mt-4 grid gap-3 sm:grid-cols-2">
               <Field label="Problem">{w.problem}</Field>
@@ -236,14 +331,23 @@ export function JeffOSCallout({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }
   return (
     <SectionShell>
       <Card className="flex flex-col items-start gap-3">
-        <h2 className="text-lg font-medium">Built this operating-system-style portfolio from scratch.</h2>
-        <p className="text-sm text-muted-foreground">Want to see how I think as an engineer?</p>
+        <h2 className="text-lg font-medium">This entire site is an operating system I built from scratch.</h2>
+        <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">
+          Windowing, realtime, a security-audited Supabase backend, tracked migrations, PWA — the
+          same rigor I bring to healthcare systems, turned on my own portfolio. It demonstrates
+          systems thinking, frontend architecture, performance engineering, and platform design.
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {["Systems Thinking", "Frontend Architecture", "Performance Engineering", "Product Design", "Platform Design"].map((t) => (
+            <CodeChip key={t}>{t}</CodeChip>
+          ))}
+        </div>
         <button
           onClick={onLaunchJeffOS}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
+          className="mt-1 inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
           style={{ minHeight: "var(--touch-target-min)" }}
         >
-          Launch JeffOS <ArrowUpRight size={16} aria-hidden />
+          Want to see how I think as an engineer? Launch JeffOS <ArrowUpRight size={16} aria-hidden />
         </button>
       </Card>
     </SectionShell>

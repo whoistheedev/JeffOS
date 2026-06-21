@@ -1,11 +1,13 @@
 /**
  * Recruiter Mode — single source of truth for all copy.
  *
- * Executive positioning: a systems engineer who builds business-critical
- * healthcare infrastructure. EDI / RCM / HealthTech / multi-tenant work is REAL
- * and current (reflected on Upwork/LinkedIn; the PDF CV undersells it).
+ * Positioning: a systems engineer building AI-powered healthcare
+ * revenue-cycle infrastructure at BFLOW Solutions. EDI / RCM / multi-tenant /
+ * AI-assisted automation is REAL, current work (reflected on Upwork/LinkedIn;
+ * the PDF CV undersells it). All claims are verified.
  *
- * All claims are verified real work.
+ * Anchor: BFLOW Solutions appears in hero, current impact, experience, and
+ * case studies — the strongest credibility signal.
  */
 
 export const CONTACT = {
@@ -21,63 +23,116 @@ export const CONTACT = {
 
 export const IDENTITY = {
   name: "Jeffrey James Idodo",
-  /** The narrative headline — systems, not frameworks. */
-  headline: "Building the systems behind healthcare operations.",
+  /** The narrative headline — AI-powered RCM, not frameworks. */
+  headline: "Building AI-Powered Revenue Cycle Management Systems",
   title: "Senior Software Engineer",
+  org: "BFLOW Solutions",
   subtitle:
-    "EDI pipelines · healthcare automation · multi-tenant SaaS architecture · scalable business systems.",
-  /** The one-line positioning. */
+    "Senior Software Engineer at BFLOW Solutions — modernizing healthcare operations through AI-assisted automation, EDI infrastructure, and scalable multi-tenant platforms.",
+  /** Short sidebar line. */
   tagline:
-    "I design and build the systems that move critical business operations — healthcare, revenue cycle, EDI infrastructure, multi-tenant SaaS, Supabase architecture.",
+    "AI-assisted healthcare automation · revenue cycle management · EDI infrastructure · multi-tenant Supabase architecture.",
 }
 
 /** Hero trust indicators (mono chips). */
 export const TRUST_INDICATORS = [
-  "Healthcare Systems",
-  "EDI Infrastructure",
-  "Supabase Architecture",
-  "Multi-Tenant Platforms",
+  "AI-Powered RCM",
+  "EDI 837/835/277/999",
+  "Multi-Tenant",
+  "HIPAA-Aware",
 ]
 
 /**
- * Current Impact — what Jeffrey is doing TODAY, executive altitude.
- * `metric` renders as a mono chip; `text` is the outcome statement.
+ * Proof of Impact — the stat band. Big, credible figures (not vanity metrics).
+ * `value` is the headline number/phrase; `label` is the terse descriptor.
  */
-export const CURRENT_IMPACT: { metric?: string; text: string }[] = [
-  { metric: "50+", text: "Leading migration of healthcare databases into a unified multi-tenant platform." },
-  { text: "Building HIPAA-aware healthcare workflows." },
-  { metric: "837·835·277·999", text: "Designing EDI pipelines supporting core healthcare transaction sets." },
-  { text: "Architecting healthcare revenue-cycle systems — claims, eligibility, payments, denials, reporting." },
-  { text: "Improving operational scalability and data integrity across tenants." },
+export const STAT_BAND: { value: string; label: string }[] = [
+  { value: "50+", label: "Healthcare databases" },
+  { value: "837·835·277·999", label: "EDI workflows" },
+  { value: "AI-Powered", label: "RCM automation" },
+  { value: "Multi-Tenant", label: "Architecture" },
+  { value: "HIPAA-Aware", label: "Systems" },
 ]
 
-/** Architecture Highlights — 4 capability cards. */
-export const ARCHITECTURE_HIGHLIGHTS: { title: string; detail: string; caseStudy?: string }[] = [
+/**
+ * Current Impact — what Jeffrey is building TODAY at BFLOW, executive altitude.
+ * A lead sentence + a 2×2 grid of outcome cells.
+ */
+export const CURRENT_IMPACT_LEAD =
+  "At BFLOW Solutions, I build the AI-powered systems that run healthcare revenue-cycle operations — automating claims, modernizing legacy platforms, and scaling a multi-tenant architecture dozens of practices depend on."
+
+export const CURRENT_IMPACT: { title: string; detail: string; codes?: string[] }[] = [
+  { title: "AI-powered RCM automation", detail: "Claims, eligibility, denials, and reconciliation driven by AI-assisted workflows." },
+  { title: "EDI transaction infrastructure", detail: "Core healthcare transaction sets ingested and turned into operational flows.", codes: ["837", "835", "277", "999"] },
+  { title: "Legacy platform modernization", detail: "Consolidating fragmented healthcare systems into one modern platform." },
+  { title: "Multi-tenant architecture", detail: "RLS-isolated tenancy so 50+ practices share infrastructure, never data." },
+]
+
+export const CURRENT_IMPACT_CLOSING = "Built for scale, data integrity, and audit from day one."
+
+/**
+ * Architecture Highlights — outcome cards (Problem · Architecture · Business Impact).
+ */
+export const ARCHITECTURE_HIGHLIGHTS: {
+  title: string
+  problem: string
+  architecture: string
+  impact: string
+  caseStudy?: string
+}[] = [
   {
-    title: "Multi-Tenant Architecture",
-    detail:
-      "Consolidating dozens of isolated healthcare systems into a unified architecture using Supabase, RLS, and modern application patterns.",
-    caseStudy: "multi-tenant-migration",
-  },
-  {
-    title: "EDI Processing Infrastructure",
-    detail:
-      "Building automated claims-processing pipelines that transform healthcare transactions (837/835/277/999) into operational workflows.",
-    caseStudy: "edi-automation",
-  },
-  {
-    title: "Healthcare Revenue Cycle Systems",
-    detail:
-      "Designing systems that connect claims, eligibility, payments, denials, and reporting.",
+    title: "AI-Powered Revenue Cycle Platform",
+    problem: "Revenue-cycle work is manual, slow, and error-prone — claims, denials, and reconciliation eat staff hours.",
+    architecture: "AI-assisted automation over a Supabase backend; event-driven pipelines; server-authoritative Edge Functions.",
+    impact: "Less manual touch, faster claim-to-cash, fewer denials slipping through.",
     caseStudy: "bflow-rcm",
   },
   {
-    title: "Supabase Architecture",
-    detail:
-      "Realtime systems, storage, Edge Functions, RLS, observability, and scalability planning.",
-    caseStudy: "jeffos",
+    title: "Healthcare Claims Automation",
+    problem: "Claims arrive as opaque EDI files with no automated path into operations.",
+    architecture: "AI-assisted parsing + normalization of 837/835/277/999 into structured, auditable workflows.",
+    impact: "Claims processed faster and more accurately, with a full audit trail.",
+    caseStudy: "edi-automation",
+  },
+  {
+    title: "EDI Processing Infrastructure",
+    problem: "Healthcare transactions must be exchanged reliably and compliantly across payers.",
+    architecture: "Ingestion → normalization → reconciliation pipelines on serverless Edge Functions; secrets off-client.",
+    impact: "Reliable, compliant transaction exchange operations can trust.",
+    caseStudy: "edi-automation",
+  },
+  {
+    title: "Multi-Tenant Healthcare Architecture",
+    problem: "Dozens of isolated systems duplicate effort and fragment data.",
+    architecture: "One platform, Supabase RLS tenant isolation, tracked migrations, least-privilege access.",
+    impact: "50+ practices on shared infrastructure with provable data isolation — scales without re-architecting.",
+    caseStudy: "multi-tenant-migration",
   },
 ]
+
+/** Featured Achievement — the one quotable statement. */
+export const FEATURED_STATEMENT =
+  "Helping modernize healthcare revenue-cycle operations — through AI-assisted automation, EDI infrastructure, and multi-tenant platform architecture."
+
+/** Why Hire Jeffrey — problems he removes (conversion closer). */
+export const WHY_HIRE: { title: string; detail: string }[] = [
+  { title: "He builds AI-powered RCM, end to end", detail: "Claims, denials, eligibility, reconciliation — automated, not just digitized." },
+  { title: "He speaks healthcare and infrastructure", detail: "EDI, RCM, HIPAA constraints, multi-tenant scale — no translation layer between domain and code." },
+  { title: "He modernizes without breaking operations", detail: "Legacy consolidation and migrations that ship audit-ready: RLS, tracked migrations, observability." },
+]
+
+export const WHY_HIRE_SOLVES = [
+  "AI-Powered RCM",
+  "Healthcare Automation",
+  "EDI Infrastructure",
+  "Revenue-Cycle Optimization",
+  "Multi-Tenant SaaS",
+  "Platform Modernization",
+  "Workflow Automation",
+]
+
+export const WHY_HIRE_CLOSING =
+  "If your healthcare platform needs AI-driven automation that scales and survives an audit — that's the work I do."
 
 /**
  * Featured Work — case-study format (Problem · Constraints · Architecture ·
@@ -93,17 +148,19 @@ export const FEATURED_WORK: {
   solution: string
   outcome: string
   tech: string[]
+  flagship?: boolean
 }[] = [
   {
     slug: "bflow-rcm",
     name: "BFLOW RCM Platform",
-    summary: "Revenue-cycle automation for healthcare operations.",
+    summary: "AI-powered revenue-cycle automation for healthcare operations.",
     problem: "Healthcare revenue-cycle workflows were manual, fragmented, and error-prone across claims, payments, and denials.",
-    constraints: "HIPAA-aware data handling; multi-tenant isolation; auditability; integration with existing healthcare transaction formats.",
-    architecture: "Multi-tenant Supabase (RLS isolation), Edge Functions for server-authoritative processing, event-driven pipelines, signed-URL file handling.",
-    solution: "Automated the revenue cycle end-to-end — claims → eligibility → payments → denials → reporting — as connected, auditable workflows.",
-    outcome: "Reduced manual touch and rework; improved data integrity and operational scalability across tenants.",
-    tech: ["Supabase", "PostgreSQL", "RLS", "Edge Functions", "Node.js", "EDI"],
+    constraints: "HIPAA-aware data handling; multi-tenant isolation; auditability; integration with existing EDI transaction formats.",
+    architecture: "AI-assisted automation on a multi-tenant Supabase backend (RLS isolation), server-authoritative Edge Functions, and event-driven EDI pipelines.",
+    solution: "Automated the revenue cycle end-to-end — claims → eligibility → payments → denials → reporting — with AI-assisted workflows over connected, auditable data.",
+    outcome: "Less manual touch and rework; faster claim-to-cash; improved data integrity and operational scale across tenants.",
+    tech: ["AI/LLM", "Supabase", "PostgreSQL", "RLS", "Edge Functions", "EDI"],
+    flagship: true,
   },
   {
     slug: "multi-tenant-migration",
@@ -166,11 +223,12 @@ export const EXPERIENCE: {
     current: true,
     period: "Dec 2025 – Present",
     role: "Senior Software Engineer",
-    org: "BFlow Solutions · Remote",
+    org: "BFLOW Solutions · Remote",
     bullets: [
-      "Architecting healthcare revenue-cycle systems and EDI pipelines (837/835/277/999).",
+      "Building AI-powered revenue-cycle automation — claims, denials, eligibility, reconciliation.",
+      "EDI transaction infrastructure — 837/835/277/999 into operational workflows.",
       "Leading a multi-tenant migration of 50+ healthcare databases onto Supabase with RLS isolation.",
-      "Owning HIPAA-aware workflows, secure data layers (RLS + RBAC), and serverless Edge processing.",
+      "HIPAA-aware secure data layers (RLS + RBAC) and serverless Edge processing.",
     ],
   },
   {

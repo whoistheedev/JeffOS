@@ -5,9 +5,12 @@ import { useRecruiterTheme } from "./useRecruiterTheme"
 import ErrorBoundary from "../components/ErrorBoundary"
 import {
   Hero,
+  StatBand,
   CurrentImpact,
   ArchitectureHighlights,
+  FeaturedAchievement,
   FeaturedWork,
+  WhyHire,
   ExperienceTimeline,
   AvailableFor,
   JeffOSCallout,
@@ -73,8 +76,8 @@ const NAV = [
   { id: "impact", label: "Current Impact" },
   { id: "architecture", label: "Architecture" },
   { id: "work", label: "Featured Work" },
+  { id: "why", label: "Why Hire" },
   { id: "experience", label: "Experience" },
-  { id: "available", label: "Available For" },
   { id: "contact", label: "Contact" },
 ]
 
@@ -87,16 +90,17 @@ function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   return (
     <aside className="flex flex-col gap-8">
       <div>
-        <p className="text-xs text-muted-foreground">Jeff · File · View · Help</p>
-        <h1 className="mt-4 text-3xl font-semibold leading-[1.1] tracking-tight">
+        <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight">
           {IDENTITY.name}
         </h1>
-        <p className="mt-2 text-sm font-medium">{IDENTITY.title}</p>
-        <p className="text-sm text-muted-foreground">{IDENTITY.subtitle}</p>
+        <p className="mt-2 text-sm font-medium">
+          {IDENTITY.title} · {IDENTITY.org}
+        </p>
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{IDENTITY.tagline}</p>
       </div>
 
       <div className="flex flex-col gap-2">
+        {/* Primary */}
         <a
           href={scheduleHref()}
           target={CONTACT.schedulerUrl ? "_blank" : undefined}
@@ -106,12 +110,20 @@ function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
         >
           <Calendar size={16} aria-hidden /> Schedule a Conversation
         </a>
+        {/* Secondary */}
         <button
-          onClick={onLaunchJeffOS}
+          onClick={() => scrollTo("work")}
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
           style={{ minHeight: "var(--touch-target-min)" }}
         >
-          Launch JeffOS <ArrowUpRight size={15} aria-hidden />
+          <FolderGit2 size={16} aria-hidden /> View Projects
+        </button>
+        {/* Tertiary — quiet */}
+        <button
+          onClick={onLaunchJeffOS}
+          className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Launch JeffOS <ArrowUpRight size={14} aria-hidden />
         </button>
       </div>
 
@@ -172,9 +184,12 @@ function ContactSection() {
 function ContentColumn({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
   return (
     <div className="space-y-14">
+      <StatBand />
       <CurrentImpact />
       <ArchitectureHighlights />
+      <FeaturedAchievement />
       <FeaturedWork />
+      <WhyHire />
       <ExperienceTimeline />
       <AvailableFor />
       <JeffOSCallout onLaunchJeffOS={onLaunchJeffOS} />
@@ -194,6 +209,13 @@ function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) 
         </div>
         {/* Scrolling content */}
         <div>
+          {/* Headline lead — the AI-RCM statement the sidebar identity supports */}
+          <div className="mb-10">
+            <h2 className="max-w-[20ch] text-4xl font-semibold leading-[1.05] tracking-tight">
+              {IDENTITY.headline}
+            </h2>
+            <p className="mt-3 max-w-prose text-base text-muted-foreground">{IDENTITY.subtitle}</p>
+          </div>
           <ContentColumn onLaunchJeffOS={onLaunchJeffOS} />
           <RecruiterFooter />
         </div>
@@ -242,8 +264,11 @@ function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
         {tab === "home" && (
           <div className="space-y-12">
             <Hero onLaunchJeffOS={onLaunchJeffOS} />
+            <StatBand />
             <CurrentImpact />
             <ArchitectureHighlights />
+            <FeaturedAchievement />
+            <WhyHire />
             <AvailableFor />
             <JeffOSCallout onLaunchJeffOS={onLaunchJeffOS} />
             <RecruiterFooter />
