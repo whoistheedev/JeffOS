@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react"
+import { Briefcase } from "lucide-react"
 import RecruiterMode from "./recruiter/RecruiterMode"
 import ErrorBoundary from "./components/ErrorBoundary"
 
@@ -29,7 +30,7 @@ export default function RootRouter() {
     setLaunched(true)
   }
 
-  const exitToResume = () => {
+  const exitToRecruiter = () => {
     try {
       localStorage.removeItem(LAUNCH_KEY)
     } catch {
@@ -55,7 +56,7 @@ export default function RootRouter() {
         <p className="text-sm text-muted-foreground">JeffOS hit a snag.</p>
         <div className="flex gap-2">
           <button onClick={reset} className="rounded-md bg-foreground px-4 py-2 text-sm text-background">Try again</button>
-          <button onClick={exitToResume} className="rounded-md border border-border px-4 py-2 text-sm">← Exit to Résumé</button>
+          <button onClick={exitToRecruiter} className="inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm"><Briefcase size={14} aria-hidden /> Recruiter Mode</button>
         </div>
       </div>
     )}>
@@ -66,10 +67,11 @@ export default function RootRouter() {
         {/* Highest layer (above menus/popovers/toasts) and placed at top-LEFT,
             clear of the JeffOS status bar (top-right) and dock (bottom-center). */}
         <button
-          onClick={exitToResume}
-          className="fixed left-2 top-7 z-[5000] rounded-full bg-black/75 px-3 py-1 text-xs text-white shadow-lg hover:bg-black/90"
+          onClick={exitToRecruiter}
+          aria-label="Back to Recruiter Mode"
+          className="fixed left-2 top-7 z-[5000] inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-xs text-white shadow-lg hover:bg-black/90"
         >
-          ← Exit to Résumé
+          <Briefcase size={13} aria-hidden /> Recruiter Mode
         </button>
       </div>
     </ErrorBoundary>

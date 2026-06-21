@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
-import { Home, FolderGit2, Clock, Mail, Calendar, Github, Linkedin, ArrowUpRight } from "lucide-react"
+import { useState } from "react"
+import { Home, FolderGit2, Clock, Mail, Calendar, Github, Linkedin, ArrowUpRight, Sun, Moon } from "lucide-react"
 import { useFormFactor } from "../hooks/useFormFactor"
+import { useRecruiterTheme } from "./useRecruiterTheme"
 import ErrorBoundary from "../components/ErrorBoundary"
 import {
   Hero,
@@ -29,32 +30,41 @@ import { IDENTITY, CONTACT, TRUST_INDICATORS } from "./content"
  */
 export default function RecruiterMode({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
   const formFactor = useFormFactor()
+  // User-controllable dark mode (defaults to OS preference). Scoped to Recruiter
+  // Mode so it never fights JeffOS theming.
+  const { isDark, toggle } = useRecruiterTheme()
 
-  // Dark mode follows the OS preference, scoped to while Recruiter Mode is
-  // mounted so it never fights the JeffOS holiday-theme wallpaper system.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)")
-    const apply = () => document.documentElement.classList.toggle("dark", mq.matches)
-    apply()
-    mq.addEventListener("change", apply)
-    return () => {
-      mq.removeEventListener("change", apply)
-      document.documentElement.classList.remove("dark")
-    }
-  }, [])
+  const shared = { onLaunchJeffOS, isDark, toggleTheme: toggle }
 
   return (
     <ErrorBoundary label="Recruiter Mode">
       {formFactor === "mobile" ? (
-        <RecruiterMobile onLaunchJeffOS={onLaunchJeffOS} />
+        <RecruiterMobile {...shared} />
       ) : formFactor === "tablet" ? (
-        <RecruiterTablet onLaunchJeffOS={onLaunchJeffOS} />
+        <RecruiterTablet {...shared} />
       ) : (
-        <RecruiterDesktop onLaunchJeffOS={onLaunchJeffOS} />
+        <RecruiterDesktop {...shared} />
       )}
     </ErrorBoundary>
   )
 }
+
+/** Reusable dark-mode toggle icon button. */
+function ThemeToggle({ isDark, toggleTheme, className = "" }: { isDark: boolean; toggleTheme: () => void; className?: string }) {
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Light mode" : "Dark mode"}
+      className={"inline-flex items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-foreground " + className}
+      style={{ width: 36, height: 36 }}
+    >
+      {isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
+    </button>
+  )
+}
+
+type LayoutProps = { onLaunchJeffOS: () => void; isDark: boolean; toggleTheme: () => void }
 
 const scheduleHref = () =>
   CONTACT.schedulerUrl ?? `mailto:${CONTACT.email}?subject=Let's%20talk`
@@ -73,7 +83,7 @@ function scrollTo(id: string) {
 }
 
 /* -------------------------------- Sidebar -------------------------------- */
-function Sidebar({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   return (
     <aside className="flex flex-col gap-8">
       <div>
@@ -125,10 +135,13 @@ function Sidebar({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
         ))}
       </div>
 
-      <div className="flex gap-4 text-muted-foreground">
-        <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-foreground"><Linkedin size={18} /></a>
-        <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-foreground"><Github size={18} /></a>
-        <a href={`mailto:${CONTACT.email}`} aria-label="Email" className="hover:text-foreground"><Mail size={18} /></a>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4 text-muted-foreground">
+          <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-foreground"><Linkedin size={18} /></a>
+          <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-foreground"><Github size={18} /></a>
+          <a href={`mailto:${CONTACT.email}`} aria-label="Email" className="hover:text-foreground"><Mail size={18} /></a>
+        </div>
+        <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
       </div>
     </aside>
   )
@@ -171,13 +184,13 @@ function ContentColumn({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 }
 
 /* --------------------------------- Desktop -------------------------------- */
-function RecruiterDesktop({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto grid max-w-6xl grid-cols-[20rem_minmax(0,1fr)] gap-12 px-8 py-12 xl:gap-16">
         {/* Sticky identity rail */}
         <div className="sticky top-12 h-fit max-h-[calc(100vh-6rem)] overflow-y-auto">
-          <Sidebar onLaunchJeffOS={onLaunchJeffOS} />
+          <Sidebar onLaunchJeffOS={onLaunchJeffOS} isDark={isDark} toggleTheme={toggleTheme} />
         </div>
         {/* Scrolling content */}
         <div>
@@ -190,10 +203,13 @@ function RecruiterDesktop({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 }
 
 /* --------------------------------- Tablet --------------------------------- */
-function RecruiterTablet({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+function RecruiterTablet({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-2xl px-6 py-10">
+        <div className="mb-3 flex justify-end">
+          <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
+        </div>
         <div className="mb-12">
           <Hero onLaunchJeffOS={onLaunchJeffOS} />
         </div>
@@ -207,7 +223,7 @@ function RecruiterTablet({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 /* --------------------------------- Mobile --------------------------------- */
 type Tab = "home" | "projects" | "experience" | "contact"
 
-function RecruiterMobile({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   const [tab, setTab] = useState<Tab>("home")
   const tabs: { id: Tab; label: string; icon: typeof Home }[] = [
     { id: "home", label: "Home", icon: Home },
@@ -218,7 +234,11 @@ function RecruiterMobile({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
 
   return (
     <div className="flex h-[100dvh] flex-col bg-background text-foreground">
-      <div className="flex-1 overflow-y-auto px-5 pt-[max(1.25rem,var(--space-safe-top))] pb-24">
+      {/* Top bar: theme toggle always reachable */}
+      <div className="flex justify-end px-5 pt-[max(0.75rem,var(--space-safe-top))]">
+        <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
+      </div>
+      <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24">
         {tab === "home" && (
           <div className="space-y-12">
             <Hero onLaunchJeffOS={onLaunchJeffOS} />
