@@ -91,7 +91,10 @@ export default function RootRouter() {
           Recruiter Mode front door (which must paint instantly). */}
       <BootLoader>
         <div className="relative h-screen w-screen overflow-hidden">
-          <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading JeffOS…</div>}>
+          {/* No "Loading JeffOS…" text — the LaunchVeil already covers the
+              entry beat, and the chunk loads fast; a bare transparent fallback
+              avoids a flash of loading copy. */}
+          <Suspense fallback={<div className="h-screen w-screen" />}>
             <JeffOS />
           </Suspense>
           {/* Smooth the Recruiter→JeffOS aesthetic cut on a fresh launch (the

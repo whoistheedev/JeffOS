@@ -14,15 +14,14 @@ type AppSurfaceProps = {
 function DefaultSurfaceFallback() {
   return (
     <div
-      className="flex h-full w-full items-center justify-center gap-3 bg-white text-sm text-gray-500"
+      className="flex h-full w-full items-center justify-center bg-white"
       role="status"
-      aria-live="polite"
+      aria-label="Loading"
     >
       <span
-        className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 motion-reduce:animate-none"
+        className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 motion-reduce:animate-none"
         aria-hidden="true"
       />
-      Loading…
     </div>
   )
 }

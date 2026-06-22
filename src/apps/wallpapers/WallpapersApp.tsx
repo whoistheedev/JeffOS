@@ -117,7 +117,7 @@ export default function WallpapersApp() {
         className={
           isMobile
             ? "shrink-0 border-b border-gray-400/40 flex flex-row items-center justify-center gap-4 px-4 py-3 relative"
-            : "w-1/3 min-w-[220px] border-r border-gray-400/40 flex flex-col items-center justify-center relative"
+            : "w-[200px] shrink-0 border-r border-gray-400/40 flex flex-col items-center justify-center px-3 relative"
         }
       >
         <div
@@ -185,9 +185,9 @@ export default function WallpapersApp() {
         {/* Loading skeleton (W5) — a shimmer grid while storage.list resolves,
             so the grid never flashes empty. */}
         {loading && (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))" }}>
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-24 rounded-lg bg-white/30 animate-pulse border border-white/40" />
+              <div key={i} className="aspect-[16/10] rounded-lg bg-white/30 animate-pulse border border-white/40" />
             ))}
           </div>
         )}
@@ -217,7 +217,14 @@ export default function WallpapersApp() {
                 <div className="h-px flex-1 bg-gradient-to-r from-gray-300/60 to-transparent ml-3" />
               </div>
 
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+              {/* Auto-fill grid keyed to the ACTUAL container width, not the
+                  viewport — Tailwind's md:grid-cols-5 forced 5 tiny clipped
+                  columns inside a small window regardless of how wide the window
+                  was. Now thumbnails are ~120px min and reflow to fit. */}
+              <div
+                className="grid gap-3"
+                style={{ gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))" }}
+              >
                 {wallpapers.map((wp) => {
                   const isPreview = preview?.id === wp.id
                   const isCurrent = prefsWallpaper?.id === wp.id
@@ -240,7 +247,7 @@ export default function WallpapersApp() {
                         src={renderImage(wp.full, { width: 256, quality: 65, resize: "cover" })}
                         alt={wp.name}
                         loading="lazy"
-                        className="w-full h-24 object-cover transition-all group-hover:brightness-110"
+                        className="w-full aspect-[16/10] object-cover transition-all group-hover:brightness-110"
                         draggable={false}
                       />
                       <div
