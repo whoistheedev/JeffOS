@@ -1,4 +1,5 @@
 import React from "react"
+import { displayVersion, shortSha, buildTimestamp } from "../../lib/version"
 
 export default function AboutThisMac() {
   return (
@@ -10,7 +11,7 @@ export default function AboutThisMac() {
 
       {/* Title */}
       <h1 className="text-lg font-bold mt-2 tracking-tight">Jeff OS X</h1>
-      <p className="text-[11px] mt-0.5 text-gray-700">Version 1.0.0</p>
+      <p className="text-[11px] mt-0.5 text-gray-700">{displayVersion()}</p>
 
       {/* Specs (inline, authentic Aqua style) */}
       <div className="mt-5 w-[80%] text-[11px]">
@@ -22,9 +23,18 @@ export default function AboutThisMac() {
           <span className="font-semibold">Memory</span>
           <span>Unlimited Tabs in Chrome</span>
         </div>
-        <div className="flex justify-between py-1">
+        <div className="flex justify-between border-b border-gray-300 py-1">
           <span className="font-semibold">Startup Disk</span>
           <span>Coffee + Lo-Fi Beats</span>
+        </div>
+        {/* Real deployment version (PWA_AUTO_UPDATE_ARCHITECTURE.md §3). */}
+        <div className="flex justify-between border-b border-gray-300 py-1">
+          <span className="font-semibold">Git SHA</span>
+          <span className="font-mono">{shortSha()}</span>
+        </div>
+        <div className="flex justify-between py-1">
+          <span className="font-semibold">Build</span>
+          <span>{buildTimestamp()}</span>
         </div>
       </div>
 
