@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react"
 import { Briefcase } from "lucide-react"
 import RecruiterMode from "./recruiter/RecruiterMode"
 import ErrorBoundary from "./components/ErrorBoundary"
+import { commandBus } from "./lib/commandBus"
 
 /**
  * RootRouter (Phase 6) — Recruiter Mode is the DEFAULT first paint; JeffOS (the
@@ -46,6 +47,14 @@ export default function RootRouter() {
     return () => document.documentElement.classList.remove("jeffos-active")
   }, [launched])
 
+  // Exit to Recruiter Mode is triggered from the JeffOS Apple menu (authentic
+  // location) via the command bus — no floating modern pill on the desktop.
+  useEffect(() => {
+    const handler = () => exitToRecruiter()
+    commandBus.on("recruiter.exit", handler)
+    return () => commandBus.off("recruiter.exit", handler)
+  }, [])
+
   if (!launched) {
     return <RecruiterMode onLaunchJeffOS={launch} />
   }
@@ -64,15 +73,8 @@ export default function RootRouter() {
         <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading JeffOS…</div>}>
           <JeffOS />
         </Suspense>
-        {/* Highest layer (above menus/popovers/toasts) and placed at top-LEFT,
-            clear of the JeffOS status bar (top-right) and dock (bottom-center). */}
-        <button
-          onClick={exitToRecruiter}
-          aria-label="Back to Recruiter Mode"
-          className="fixed left-2 top-7 z-[5000] inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-xs text-white shadow-lg hover:bg-black/90"
-        >
-          <Briefcase size={13} aria-hidden /> Recruiter Mode
-        </button>
+        {/* Exit lives in the Apple menu ( → Exit to Recruiter Mode); no
+            floating desktop pill (authenticity — see TIGER_AUTHENTICITY_REVIEW). */}
       </div>
     </ErrorBoundary>
   )

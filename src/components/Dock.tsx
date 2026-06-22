@@ -92,24 +92,30 @@ function DockItem({ icon, minimized, winId, onClick, mouseX, scaleFactor }: Dock
           scale,
         }}
         className="relative focus:outline-none touch-manipulation"
-        whileTap={{ scale: 0.95 }}
       >
         <AppIconRenderer icon={icon} size="dock" />
+        {/* Tiger running indicator: a small black triangle under the icon,
+            not the modern colored dot. (Replaces blue/orange dots.) */}
         {winId && (
           <motion.div
             layoutId={`dot-${icon.id}`}
-            className={`absolute -bottom-1 left-1/2 -translate-x-1/2 
-                        w-1.5 h-1.5 rounded-full ${
-                          minimized ? "bg-orange-400" : "bg-blue-500"
-                        }`}
+            className="absolute -bottom-[3px] left-1/2 -translate-x-1/2"
             style={{ scale: dotScale, y: dotY }}
-            animate={minimized ? { opacity: [0.4, 1, 0.4] } : { opacity: 1 }}
-            transition={
-              minimized
-                ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                : { type: "spring", stiffness: 300, damping: 25 }
-            }
-          />
+            animate={{ opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            aria-hidden
+          >
+            <div
+              style={{
+                width: 0,
+                height: 0,
+                borderLeft: "4px solid transparent",
+                borderRight: "4px solid transparent",
+                borderBottom: "5px solid rgba(20,20,20,0.85)",
+                filter: "drop-shadow(0 1px 0 rgba(255,255,255,0.45))",
+              }}
+            />
+          </motion.div>
         )}
       </motion.button>
     </motion.div>
@@ -175,15 +181,22 @@ export default function Dock() {
     <motion.nav
       aria-label="Dock"
       className="
-        fixed bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 
-        flex flex-row gap-2 sm:gap-4 px-3 sm:px-6 
-        items-end rounded-2xl border border-gray-300/40 shadow-lg 
-        select-none z-50 justify-center py-1 sm:py-2
+        fixed bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2
+        flex flex-row gap-2 sm:gap-4 px-3 sm:px-6
+        items-end rounded-2xl select-none z-50 justify-center py-1 sm:py-2
         w-[94vw] sm:w-auto max-w-[min(100%,680px)]
-        bg-[rgba(255,255,255,0.35)] backdrop-blur-md
-        dark:bg-[rgba(40,40,40,0.35)] dark:border-gray-600/40
-        transition-all duration-300 ease-out
+        backdrop-blur-xl transition-all duration-300 ease-out
       "
+      style={{
+        // Tiger Aqua glass shelf: frosted white with a bright top gloss, a
+        // subtle reflective lower band, and a glassy front lip — not a flat
+        // dark slab. (Stays glassy-white regardless of Recruiter dark mode.)
+        background:
+          "linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.32) 48%, rgba(225,232,240,0.30) 52%, rgba(255,255,255,0.45) 100%)",
+        border: "1px solid rgba(255,255,255,0.6)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.35)",
+      }}
       onMouseMove={(e) => setMouseX(e.clientX)}
       onMouseLeave={() => setMouseX(null)}
     >

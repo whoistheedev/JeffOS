@@ -20,6 +20,7 @@ import { AppIconRenderer } from "./AppIconRenderer"
 import { openAboutApp } from "../helpers/openAboutApp"
 import { finderMenus } from "../config/menus/finderMenus"
 import { appsMenus } from "../config/menus/appsMenus"
+import { commandBus } from "../lib/commandBus"
 import type { AppMenus, MenuItemEntry } from "../types"
 
 
@@ -200,6 +201,12 @@ export default function StatusBar() {
             sideOffset={4}
           >
             <MenuItem onClick={openAboutThisMac}>About This Mac</MenuItem>
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            {/* Exit to Recruiter Mode lives in the Apple menu (where Log Out /
+                Shut Down sat in Tiger) — not a floating modern pill. */}
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>
+              Exit to Recruiter Mode
+            </MenuItem>
             <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
             {Object.values(apps).map((app) => {
               const icon = desktopIcons.find((i) => i.id === app.id)

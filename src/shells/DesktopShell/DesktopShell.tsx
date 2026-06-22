@@ -2,8 +2,6 @@ import StatusBar from "../../components/StatusBar"
 import Desktop from "../../components/Desktop"
 import Dock from "../../components/Dock"
 import WindowManager from "../../components/WindowManager"
-import SocialsWidget from "../../components/SocialsWidget"
-import { VisitorsWidget } from "../../components/VisitorsWidget"
 import { KeyboardHelp } from "../../components/KeyboardHelp"
 
 /**
@@ -22,23 +20,9 @@ export default function DesktopShell() {
       <WindowManager />
       <Dock />
 
-      {/* 🌍 Widgets visible on tablets and desktops only */}
-      <div
-        className="
-          hidden sm:flex
-          absolute bottom-4 left-0 w-full
-          justify-between items-center
-          px-6
-          pointer-events-none
-        "
-      >
-        <div className="pointer-events-auto">
-          <VisitorsWidget />
-        </div>
-        <div className="pointer-events-auto">
-          <SocialsWidget />
-        </div>
-      </div>
+      {/* Visitor counter + socials widgets were removed from the JeffOS desktop
+          for Tiger authenticity (modern web chrome on the OS surface). They
+          live in Recruiter Mode. See TIGER_AUTHENTICITY_REVIEW §7/§9. */}
 
       <KeyboardHelp />
     </div>

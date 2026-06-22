@@ -296,10 +296,10 @@ export default function Window({ id, title }: Props) {
             enableResizing={isResizable}
             dragHandleClassName="titlebar"
             disableDragging={window.innerWidth < 480} // prevent accidental drags on phones
-            className={`rounded-md overflow-hidden ${
-              isActive ? "shadow-xl" : "shadow"
-            }`}
+            className="overflow-hidden"
             style={{
+              // Tiger windows have tight top corners (~6px), not modern rounding.
+              borderRadius: "6px 6px 0 0",
               backgroundImage: `
                 linear-gradient(to bottom, #f4f4f4, #b0b0b0),
                 repeating-linear-gradient(
@@ -311,7 +311,13 @@ export default function Window({ id, title }: Props) {
               `,
               backgroundBlendMode: "overlay, overlay, normal",
               backgroundSize: "auto, 1px, 150px",
-              border: isActive ? "1px solid #555" : "1px solid #777",
+              border: isActive ? "1px solid #555" : "1px solid #888",
+              // Active windows cast a much heavier shadow than background ones
+              // (Tiger hallmark); inactive chrome reads dimmer.
+              boxShadow: isActive
+                ? "0 18px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)"
+                : "0 6px 16px rgba(0,0,0,0.22)",
+              opacity: isActive ? 1 : 0.97,
               touchAction: "none",
             }}
             onDrag={(_, d) => {

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { useStore } from "../../store"
-import { Button } from "../../components/ui/button"
 import { Dialog, DialogContent } from "../../components/ui/dialog"
 import * as ContextMenu from "@radix-ui/react-context-menu"
 import { LayoutGrid, List, Columns, ChevronLeft, ChevronRight } from "lucide-react"
@@ -182,61 +181,79 @@ export default function Finder() {
                       bg-gradient-to-b from-gray-200 to-gray-300 
                       border-b border-gray-400 shadow-inner">
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
+          {/* Tiger graphite oval nav buttons */}
+          <button
             onClick={handleBack}
             disabled={historyIndex === 0}
-            className="rounded-md border border-gray-400 bg-white/90 shadow-sm 
-                       hover:bg-gray-50 data-[disabled]:opacity-40"
+            aria-label="Back"
+            className="flex h-6 w-7 items-center justify-center rounded-full text-gray-700 disabled:opacity-35"
+            style={{
+              background: "linear-gradient(to bottom, #fdfdfd, #d2d2d2)",
+              border: "1px solid #9a9a9a",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 1px rgba(0,0,0,0.15)",
+            }}
           >
             <ChevronLeft size={14} />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
+          </button>
+          <button
             onClick={handleForward}
             disabled={historyIndex === history.length - 1}
-            className="rounded-md border border-gray-400 bg-white/90 shadow-sm 
-                       hover:bg-gray-50 data-[disabled]:opacity-40"
+            aria-label="Forward"
+            className="flex h-6 w-7 items-center justify-center rounded-full text-gray-700 disabled:opacity-35"
+            style={{
+              background: "linear-gradient(to bottom, #fdfdfd, #d2d2d2)",
+              border: "1px solid #9a9a9a",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 1px rgba(0,0,0,0.15)",
+            }}
           >
             <ChevronRight size={14} />
-          </Button>
-          <div className="flex gap-1 ml-2 bg-white rounded-md border border-gray-400 shadow-inner">
-            <Button
-              size="sm"
-              variant={view === "icon" ? "default" : "ghost"}
-              className="rounded-none px-2 py-1"
-              onClick={() => setView("icon")}
-            >
-              <LayoutGrid size={14} />
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "list" ? "default" : "ghost"}
-              className="rounded-none px-2 py-1"
-              onClick={() => setView("list")}
-            >
-              <List size={14} />
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "column" ? "default" : "ghost"}
-              className="rounded-none px-2 py-1"
-              onClick={() => setView("column")}
-            >
-              <Columns size={14} />
-            </Button>
+          </button>
+          {/* Tiger glossy segmented capsule for view modes */}
+          <div
+            className="ml-2 flex overflow-hidden rounded-full"
+            style={{ border: "1px solid #9a9a9a", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            {([
+              ["icon", LayoutGrid],
+              ["list", List],
+              ["column", Columns],
+            ] as const).map(([mode, Icon], i) => {
+              const activeView = view === mode
+              return (
+                <button
+                  key={mode}
+                  onClick={() => setView(mode)}
+                  aria-label={`${mode} view`}
+                  aria-pressed={activeView}
+                  className="flex h-6 w-8 items-center justify-center text-gray-700"
+                  style={{
+                    background: activeView
+                      ? "linear-gradient(to bottom, #9db8e0, #5c7fc0)"
+                      : "linear-gradient(to bottom, #fcfcfc, #d6d6d6)",
+                    color: activeView ? "#fff" : "#444",
+                    borderLeft: i > 0 ? "1px solid #9a9a9a" : "none",
+                    boxShadow: activeView ? "inset 0 1px 2px rgba(0,0,0,0.3)" : "inset 0 1px 0 rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <Icon size={14} />
+                </button>
+              )
+            })}
           </div>
         </div>
+        {/* Tiger recessed Aqua search capsule */}
         <input
           aria-label="Spotlight Search"
           type="search"
           placeholder="Search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-2 py-1 text-xs border border-gray-400 rounded-md 
-                     bg-white/95 shadow-inner outline-none focus:ring-1 focus:ring-blue-400"
+          className="px-3 py-1 text-xs rounded-full outline-none"
+          style={{
+            background: "#fff",
+            border: "1px solid #9a9a9a",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.18)",
+          }}
         />
       </div>
 

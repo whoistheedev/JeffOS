@@ -24,6 +24,16 @@ html, body {
   min-height: 100%;
 }
 
+/* Tiger authenticity: the whole OS shell uses Lucida Grande — Tiger's system
+   font — when JeffOS is active. Recruiter Mode (no .jeffos-active) keeps the
+   clean modern system stack on purpose. This is the single highest-impact
+   authenticity change (see TIGER_AUTHENTICITY_REVIEW §1/§2). */
+html.jeffos-active,
+html.jeffos-active body {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 /* -------------------------------------------------------
    Design Tokens (shadcn-style) via @theme inline
 --------------------------------------------------------*/
