@@ -27,14 +27,17 @@ export const appsMenus: Record<string, AppMenus> = {
     Help: [{ label: "Guestbook Help" }],
   },
 
-  piano: {
+  // Keyed by AppId ("synth"), not the display name — the menu bar looks these
+  // up via appsMenus[activeAppKey]. Previously keyed "piano", which never
+  // matched the "synth" AppId, so Synth silently fell back to Finder's menus.
+  synth: {
     File: [{ label: "New Session", shortcut: "⌘N" }],
     Edit: [{ label: "Undo Note", shortcut: "⌘Z" }],
     Controls: [
       { label: "Play", shortcut: "␣" },
       { label: "Stop" },
     ],
-    Help: [{ label: "Piano Help" }],
+    Help: [{ label: "Synth Help" }],
   },
 
   explorer: {
@@ -60,14 +63,16 @@ export const appsMenus: Record<string, AppMenus> = {
     Help: [{ label: "Control Panel Help" }],
   },
 
-  ipod: {
+  // Keyed by AppId ("itunes"), not "ipod" — otherwise iTunes fell back to
+  // Finder's menus when focused.
+  itunes: {
     Controls: [
       { label: "Play/Pause", shortcut: "␣" },
       { label: "Next Track", shortcut: "⌘→" },
       { label: "Previous Track", shortcut: "⌘←" },
     ],
     View: [{ label: "Now Playing" }, { label: "Library" }],
-    Help: [{ label: "iPod Help" }],
+    Help: [{ label: "iTunes Help" }],
   },
 
   calendar: {
