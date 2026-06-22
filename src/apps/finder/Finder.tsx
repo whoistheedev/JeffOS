@@ -176,10 +176,24 @@ export default function Finder() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-3 py-1.5 
-                      bg-gradient-to-b from-gray-200 to-gray-300 
-                      border-b border-gray-400 shadow-inner">
+      {/* Toolbar — authentic Tiger brushed metal: a vertical light→dark gradient
+          with a fine horizontal pinstripe (the "brushed" grain) layered on top.
+          Tiger Finder was brushed metal throughout, not a flat gradient (§5). */}
+      <div
+        className="flex items-center justify-between px-3 py-1.5 border-b border-gray-400 shadow-inner"
+        style={{
+          backgroundImage: `
+            repeating-linear-gradient(
+              0deg,
+              rgba(255,255,255,0.0) 0px,
+              rgba(255,255,255,0.35) 1px,
+              rgba(0,0,0,0.03) 2px,
+              rgba(0,0,0,0.0) 3px
+            ),
+            linear-gradient(to bottom, #e8e8e8, #c9c9c9)
+          `,
+        }}
+      >
         <div className="flex items-center gap-2">
           {/* Tiger graphite oval nav buttons */}
           <button
