@@ -3,7 +3,10 @@ import { AnimatePresence, motion } from "framer-motion"
 import { GameLibrary } from "./components/GameLibrary"
 import { EmulatorFrame } from "./components/EmulatorFrame"
 import { Toolbar } from "./components/Toolbar"
+import { Leaderboard } from "./components/Leaderboard"
 import { supabase } from "../../lib/supabase"
+import { useStore } from "../../store"
+import { recordGamePlay } from "../../lib/gameSession"
 import { brushedMetal } from "../../lib/aquaSkin"
 
 export interface GameItem {
@@ -55,6 +58,32 @@ export default function EmulatorApp() {
   const [started, setStarted] = useState(false)
   const [shader, setShader] = useState("crt-mattias.glslp")
   const [loading, setLoading] = useState(true)
+  const [showBoard, setShowBoard] = useState(false)
+  const anonId = useStore((s) => s.anonId)
+
+  // Launch a game = record a "play" (game-start) + show the emulator. The
+  // leaderboard ranks games by play count (EmulatorJS can't report scores).
+  const launchGame = useCallback(
+    (game: GameItem) => {
+      recordGamePlay(anonId, game.title)
+      setSelected(game)
+      setStarted(true)
+    },
+    [anonId]
+  )
+
+  // `L` toggles the Most Played board (matches KeyboardHelp).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "l" && !e.metaKey && !e.ctrlKey) {
+        const el = document.activeElement
+        if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) return
+        setShowBoard((s) => !s)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [])
 
   const normalize = (str: string) =>
     str.toLowerCase().replace(/\s+/g, "").replace(/[()]/g, "")
@@ -148,6 +177,7 @@ export default function EmulatorApp() {
   }, [loadGames])
 
   return (
+    <div className="relative w-full h-full">
     <AnimatePresence mode="wait">
       {!started ? (
         <motion.div
@@ -182,10 +212,7 @@ export default function EmulatorApp() {
             <GameLibrary
               games={games}
               loaded={!loading}
-              onSelect={(game) => {
-                setSelected(game)
-                setStarted(true)
-              }}
+              onSelect={launchGame}
             />
           )}
         </motion.div>
@@ -215,5 +242,13 @@ export default function EmulatorApp() {
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Most Played board — toggled by the `L` key. */}
+    <Leaderboard
+      open={showBoard}
+      onClose={() => setShowBoard(false)}
+      titleFor={(gid) => games.find((g) => g.title === gid)?.title ?? gid}
+    />
+    </div>
   )
 }
