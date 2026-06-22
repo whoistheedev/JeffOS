@@ -3,7 +3,9 @@
 > **Lens:** product/UX + interaction design + Apple-platform historian.
 > **Thesis under test:** JeffOS is **macOS Tiger**; the desktop nails that. **Mobile should feel like an iPhone running that same era's aesthetic** — i.e. *iPhone OS 1–3* (the touch sibling of Tiger/Leopard) — **not** a Tiger desktop shrunk onto a phone.
 > **Method:** drove the live build end-to-end at **1440×900 (desktop)** and **390×844 / iPhone 13 (mobile)** through the full journey: Recruiter landing → tabs → "Launch JeffOS" → boot → desktop/springboard → open an app. Evidence captured as screenshots. **0 console errors** on both form factors.
-> **Scope:** audit + high-level design. No code changed in this pass.
+> **Scope:** audit + high-level design.
+>
+> **Update — §5 implemented.** The core finding (mobile JeffOS = a Tiger desktop shrunk onto a phone) has since been built out as the **JeffOS Mobile Springboard** (`MobileShell` no longer delegates to `DesktopShell`). On a phone you now get an iPhone-OS-era home screen: an Aqua status bar (not the Mac menu bar), a Springboard grid of glossy app tiles, a fixed dock (Finder · Safari · Spotlight · Recruiter), and apps that open full-screen with a real `‹ Home` nav bar — all reusing the existing app registry, icons, Fuse Spotlight, and system sounds. Verified live on iPhone 13 (launch → grid → open app → Home → Spotlight → exit to Recruiter), 0 console errors. The §3 transition polish remains open.
 
 ---
 
