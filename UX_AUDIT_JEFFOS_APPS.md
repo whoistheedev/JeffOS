@@ -49,7 +49,7 @@ The mobile Springboard now hosts every app full-screen. Apps were authored for t
 
 ## Cross-cutting observations (not fixed here)
 
-- 🟢 **Tiger-skin consistency:** Finder/iTunes/menu bar got the wet-Aqua/brushed-metal treatment; **Games, Wallpapers, Synth, and the Guestbook composer still wear an older generic-glass/blue-gel skin.** They're the most "modern-looking" surfaces in the OS. A skin pass would raise visual consistency.
+- ✅ **Tiger-skin consistency — DONE.** Introduced a shared `src/lib/aquaSkin.ts` (brushed metal, glossy Aqua controls, the wet-blue gel button, recessed wells, Lucida Grande) and applied it to **Games** (brushed-metal library panel + glossy cards + Aqua Quit button), **Wallpapers** (Aqua "Set Desktop Picture"), **Synth** (brushed-metal header + Aqua wave buttons, active = wet blue), and the **Guestbook composer** (brushed-metal bar + Aqua Send). These were the most "modern-looking" surfaces in the OS; they now match the 94/100 desktop. Future apps can import the same tokens to stay Tiger-correct by default.
 - 🟢 **Buy Me a Coffee is a 35-line stub** — a centered link in a large empty area. Functional; could be fleshed out (a proper card, QR, supporter note) or left minimal by choice.
 - 🟡 **iCal** wasn't re-captured on mobile (flaky automated tap); its month grid is self-contained and low-risk, but a manual 390px confirm is worth doing.
 - 🟢 **Empty/loading states:** added to Games & Wallpapers; the other data-backed apps (iTunes track list, Guestbook) could use the same treatment for parity.

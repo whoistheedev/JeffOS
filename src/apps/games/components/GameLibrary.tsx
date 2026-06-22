@@ -1,5 +1,6 @@
 import type { GameItem } from "../EmulatorApp"
 import { thumbUrl } from "../../../lib/imageUrl"
+import { brushedMetal, tigerFont } from "../../../lib/aquaSkin"
 
 /**
  * GameLibrary — PRESENTATIONAL only (Phase 1 perf).
@@ -21,13 +22,11 @@ export function GameLibrary({
   // ✨ shimmer-only loader (never shows any text)
   if (!loaded) {
     return (
-      <div className="relative flex flex-wrap justify-center gap-6 p-6 w-full h-full 
-                      bg-gradient-to-b from-[#e7e7e7] to-[#bcbec1] 
-                      dark:from-[#2c2c2e] dark:to-[#1a1a1c] overflow-auto">
+      <div className="relative flex flex-wrap justify-center gap-6 p-6 w-full h-full overflow-auto" style={brushedMetal}>
         {[...Array(10)].map((_, i) => (
           <div
             key={i}
-            className="relative w-72 h-44 rounded-xl bg-white/10 dark:bg-white/5 overflow-hidden animate-pulse"
+            className="relative w-72 h-44 rounded-lg bg-white/40 border border-white/50 overflow-hidden animate-pulse"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shine_1.8s_linear_infinite]" />
           </div>
@@ -42,19 +41,17 @@ export function GameLibrary({
     )
   }
 
-  // 🎮 Game Library
+  // 🎮 Game Library — Tiger brushed-metal panel (matches Finder/iTunes).
   return (
     <div
-      className="flex flex-col w-full h-full
-                 bg-gradient-to-b from-[#e7e7e7] to-[#bcbec1]
-                 dark:from-[#2c2c2e] dark:to-[#1a1a1c]
-                 p-6 overflow-auto text-black dark:text-white backdrop-blur-xl"
+      className="flex flex-col w-full h-full p-6 overflow-auto text-black"
+      style={{ ...brushedMetal, fontFamily: tigerFont }}
     >
       <div className="text-center mb-6">
-        <h2 className="font-semibold text-sm text-zinc-700 dark:text-zinc-300 tracking-wide">
+        <h2 className="font-semibold text-[13px] text-zinc-800 tracking-wide">
           Game Library
         </h2>
-        <div className="mx-auto mt-1 w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-400/80 to-transparent rounded-full" />
+        <div className="mx-auto mt-1 w-16 h-px bg-gradient-to-r from-transparent via-zinc-500/50 to-transparent" />
       </div>
 
       {/* Empty state (UX_AUDIT G3) — explicit, not a blank area under the header. */}
@@ -70,10 +67,10 @@ export function GameLibrary({
           <button
             key={g.url}
             onClick={() => onSelect(g)}
-            className="group relative rounded-xl overflow-hidden w-full
-                       bg-white/30 dark:bg-white/10 border border-white/40 dark:border-white/15
-                       shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_12px_rgba(0,0,0,0.3)]
-                       hover:scale-[1.02] hover:shadow-[0_12px_24px_rgba(0,0,0,0.35)]
+            className="group relative rounded-lg overflow-hidden w-full
+                       border border-[#8d8d8d] bg-white
+                       shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_5px_rgba(0,0,0,0.3)]
+                       hover:scale-[1.02] hover:shadow-[0_8px_18px_rgba(0,0,0,0.35)]
                        transition-all duration-200 ease-out"
           >
             <img

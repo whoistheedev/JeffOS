@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import AppleKnob from "./AppleKnob"
 import { SynthCore, type ADSR } from "./SynthCore"
+import { brushedMetal, aquaControl, aquaBlueButton } from "../../lib/aquaSkin"
 
 // --- Note Data ---
 interface NoteData {
@@ -175,8 +176,8 @@ export default function Synth() {
       bg-[linear-gradient(135deg,#7d7d7d_0%,#b3b3b3_25%,#a1a1a1_50%,#888_75%,#777_100%)]
       border border-neutral-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.6),0_8px_14px_rgba(0,0,0,0.7)] w-full h-full"
     >
-      {/* HEADER */}
-      <div className="flex flex-wrap items-center justify-between gap-y-2 px-4 py-2 bg-gradient-to-b from-neutral-100 to-neutral-300 border-b border-neutral-500">
+      {/* HEADER — Tiger brushed metal, matching Finder/iTunes toolbars. */}
+      <div className="flex flex-wrap items-center justify-between gap-y-2 px-4 py-2 border-b border-neutral-500" style={brushedMetal}>
         {/* POWER */}
         <div className="flex items-center gap-3 text-neutral-700 font-semibold">
           <motion.div
@@ -222,11 +223,8 @@ export default function Synth() {
                 key={w}
                 onClick={() => setWave(w)}
                 disabled={!power}
-                className={`px-2 py-1 text-xs border border-neutral-400 transition-all ${
-                  wave === w && power
-                    ? "bg-neutral-700 text-white shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]"
-                    : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
-                } disabled:opacity-50`}
+                className="px-2.5 py-1 text-xs rounded transition-all disabled:opacity-50"
+                style={wave === w && power ? aquaBlueButton : aquaControl}
               >
                 {w}
               </button>

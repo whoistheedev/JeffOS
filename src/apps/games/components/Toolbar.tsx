@@ -1,5 +1,6 @@
 import React from "react"
 import { Power, Monitor, Palette } from "lucide-react"
+import { aquaBlueButton } from "../../../lib/aquaSkin"
 
 export function Toolbar({
   title,
@@ -28,14 +29,8 @@ export function Toolbar({
         {/* Quit → back to Library. Labelled, not a bare power icon. */}
         <button
           onClick={onQuit}
-          className="
-            flex items-center gap-1.5 px-3 rounded-md
-            bg-gradient-to-b from-[#8cbcff] to-[#2b82d6]
-            shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.4)]
-            hover:brightness-110 active:scale-[0.97] transition
-            text-[12px] font-medium
-          "
-          style={{ minHeight: "var(--touch-target-min, 44px)" }}
+          className="flex items-center gap-1.5 px-3 rounded-md hover:brightness-110 active:scale-[0.97] transition text-[12px] font-medium"
+          style={{ ...aquaBlueButton, minHeight: "var(--touch-target-min, 44px)" }}
           title="Quit to Library"
         >
           <Power size={14} strokeWidth={1.75} /> Quit
