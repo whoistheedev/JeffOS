@@ -135,7 +135,8 @@ export function Hero({
         onClick={onLaunchJeffOS}
         className="-mt-1 max-w-prose text-left text-[13px] leading-relaxed text-muted-foreground"
       >
-        PS — this whole site is a <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+        PS — this whole site is an OS I built from scratch:{" "}
+        <span className="font-medium text-foreground">macOS Tiger on desktop, iPhone-era JeffOS on mobile</span>.{" "}
         <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
           Take it for a spin →
         </span>

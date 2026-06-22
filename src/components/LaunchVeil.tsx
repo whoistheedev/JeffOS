@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react"
+import { bootedThisSession } from "./BootLoader"
 
 /**
- * LaunchVeil — a brief fade-through-black veil shown each time the user enters
- * JeffOS from Recruiter Mode. It softens the otherwise abrupt cut from the 2026
- * minimalist Recruiter document to the 2005 Aqua desktop, and reads as an
- * intentional "Starting JeffOS…" beat rather than a jarring swap.
+ * LaunchVeil — a brief fade-through-black "Starting JeffOS…" beat that softens
+ * the cut from the minimalist Recruiter document to the Aqua desktop.
  *
- * Distinct from the first-visit Tiger boot screen (components/BootLoader.tsx):
- * the boot plays once and is the headline first impression; this veil plays on
- * *every* launch (including returns, where the boot is skipped) and is short.
- * On a first visit the boot screen (z-9000) sits above this, so they don't
- * conflict.
+ * Shown ONLY on launches where the Tiger boot screen did NOT play (return
+ * visits). On a FIRST launch the boot screen already covers the entry beat, so
+ * showing the veil too would double-gate (boot ~3s + veil ~1s over the visible
+ * OS). `bootedThisSession` (set by BootLoader) tells us which case we're in.
  *
  * Self-dismissing: fades in, holds briefly, fades out, then unmounts.
  */
 export default function LaunchVeil() {
+  // Skip entirely if the boot screen played this session (no double-gate).
+  const bootPlaying = bootedThisSession
+
   const [opacity, setOpacity] = useState(1)
-  const [gone, setGone] = useState(false)
+  const [gone, setGone] = useState(bootPlaying) // start "gone" when boot is playing
 
   useEffect(() => {
+    if (bootPlaying) return // boot covers the entry beat; no veil
     const fade = setTimeout(() => setOpacity(0), 450) // hold, then fade out
     const done = setTimeout(() => setGone(true), 1050) // unmount after fade
     return () => {
       clearTimeout(fade)
       clearTimeout(done)
     }
-  }, [])
+  }, [bootPlaying])
 
   if (gone) return null
 

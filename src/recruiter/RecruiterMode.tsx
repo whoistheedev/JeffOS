@@ -218,8 +218,8 @@ function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) 
               onClick={onLaunchJeffOS}
               className="mt-4 max-w-prose text-left text-sm leading-relaxed text-muted-foreground"
             >
-              PS — this entire site is a{" "}
-              <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+              PS — this entire site is an OS I built from scratch:{" "}
+              <span className="font-medium text-foreground">macOS Tiger on desktop, iPhone-era JeffOS on mobile</span>.{" "}
               <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
                 Take it for a spin →
               </span>
