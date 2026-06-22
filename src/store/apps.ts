@@ -14,9 +14,7 @@ export type AppId =
   
   | "bmcoffee"
   | "terminal"
-  | "recruiter"
-  
-  
+
 
 export interface AppMeta {
   id: AppId
@@ -61,7 +59,6 @@ const APPS: Record<AppId, AppMeta> = {
   explorer: { id: "explorer", title: "iweb" },
   synth: { id: "synth", title: "Synth" },
   calendar: { id: "calendar", title: "ical" },
-    recruiter: { id: "recruiter", title: "iprojects" },
   itunes: { id: "itunes", title: "itunes" },
   terminal: { id: "terminal", title: "Terminal" },
    bmcoffee: { id: "bmcoffee", title: "Buy Me Coffee" },

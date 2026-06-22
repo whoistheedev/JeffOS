@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react"
 import { Briefcase } from "lucide-react"
 import RecruiterMode from "./recruiter/RecruiterMode"
 import ErrorBoundary from "./components/ErrorBoundary"
+import BootLoader from "./components/BootLoader"
 import { commandBus } from "./lib/commandBus"
 
 /**
@@ -28,6 +29,17 @@ export default function RootRouter() {
     } catch {
       /* ignore storage failures */
     }
+    // Best-effort preload of the JeffOS desktop wallpaper while the boot screen
+    // plays — never awaited, so a slow/hung fetch can't block the launch.
+    // Dynamic import (not a top-level one): store/prefs participates in a
+    // store<->prefs import cycle, and pulling it into this early-evaluated
+    // module statically triggers a TDZ "createPrefsSlice before initialization"
+    // crash. Importing at click time runs after the store is initialized.
+    void import("./store/prefs")
+      .then((m) => m.loadGlobalDefaultWallpaper())
+      .catch(() => {
+        /* best-effort */
+      })
     setLaunched(true)
   }
 
@@ -69,13 +81,17 @@ export default function RootRouter() {
         </div>
       </div>
     )}>
-      <div className="relative h-screen w-screen overflow-hidden">
-        <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading JeffOS…</div>}>
-          <JeffOS />
-        </Suspense>
-        {/* Exit lives in the Apple menu ( → Exit to Recruiter Mode); no
-            floating desktop pill (authenticity — see TIGER_AUTHENTICITY_REVIEW). */}
-      </div>
+      {/* Tiger boot screen plays here — on the JeffOS opt-in only, NOT on the
+          Recruiter Mode front door (which must paint instantly). */}
+      <BootLoader>
+        <div className="relative h-screen w-screen overflow-hidden">
+          <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading JeffOS…</div>}>
+            <JeffOS />
+          </Suspense>
+          {/* Exit lives in the Apple menu ( → Exit to Recruiter Mode); no
+              floating desktop pill (authenticity — see TIGER_AUTHENTICITY_REVIEW). */}
+        </div>
+      </BootLoader>
     </ErrorBoundary>
   )
 }

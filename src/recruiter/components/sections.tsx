@@ -71,10 +71,34 @@ function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
 }
 
-export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
+export function Hero({
+  onLaunchJeffOS,
+  onViewProjects,
+  showName = false,
+}: {
+  onLaunchJeffOS: () => void
+  /**
+   * Where "View Projects" goes. Defaults to in-page scroll to the Featured Work
+   * section (#work). On mobile, Featured Work lives behind the Projects tab and
+   * is NOT in the Home document, so the mobile layout passes a handler that
+   * switches tabs instead — otherwise the button is inert (see findings).
+   */
+  onViewProjects?: () => void
+  /**
+   * Show the person's name above the headline. The desktop sidebar always shows
+   * identity; mobile starts at the Hero, so mobile opts in to keep the name
+   * above the fold for recruiters.
+   */
+  showName?: boolean
+}) {
   return (
     <header className="flex flex-col gap-6 py-4">
       <div className="space-y-4">
+        {showName && (
+          <p className="text-sm font-medium text-muted-foreground">
+            {IDENTITY.name} · {IDENTITY.title}
+          </p>
+        )}
         <h1 className="max-w-[20ch] text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
           {IDENTITY.headline}
         </h1>
@@ -94,7 +118,7 @@ export function Hero({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }) {
         </a>
         {/* Secondary */}
         <button
-          onClick={() => scrollToId("work")}
+          onClick={() => (onViewProjects ? onViewProjects() : scrollToId("work"))}
           className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
           style={{ minHeight: "var(--touch-target-min)" }}
         >

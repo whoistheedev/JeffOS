@@ -54,13 +54,6 @@ export const appMenusRegistry: Record<string, AppMenus> = {
     Help: [{ label: "Explorer Help" }],
   },
 
-  recruiter: {
-    File: [{ label: "New Candidate", shortcut: "⌘N" }],
-    Edit: [{ label: "Copy Candidate", shortcut: "⌘C" }],
-    View: [{ label: "All Candidates" }],
-    Help: [{ label: "Recruiter Help" }],
-  },
-
   controlpanel: {
     File: [{ label: "New Preference", shortcut: "⌘N" }],
     Edit: [{ label: "Reset to Defaults" }],
