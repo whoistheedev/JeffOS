@@ -3,7 +3,9 @@
 > **Lens:** conversion-focused product/UX design.
 > **Problem statement (from the brief):** the "Launch JeffOS" affordance in Recruiter Mode is **too subtle** — the goal is to **sell JeffOS** as the portfolio's signature flex.
 > **Method:** audited all three entry points (sidebar, hero, mid-content callout) across desktop/tablet/mobile against the live render.
-> **Scope:** audit + high-level design. (Implementation can follow.)
+> **Scope:** audit + high-level design.
+>
+> **Update — Moves 1, 2, 4 implemented.** "Launch JeffOS" is promoted from a tertiary grey text link to a distinctive **OS-flavored CTA** (`LaunchJeffOSButton`): a dark glossy gel with Tiger **traffic-light dots** + the payoff subline *"Boot my macOS Tiger desktop — built from scratch."* It now sits as the **#2 element** (after Schedule) in the desktop sidebar and the mobile/tablet Hero — in the **first viewport** — and "View Projects" is demoted to the quiet text link. An above-the-fold **hook line** (*"PS — this whole site is a macOS Tiger desktop I built… Take it for a spin →"*) was added under the headline on desktop + mobile. Verified live (desktop 1440×900 + iPhone 13): CTA above the fold, tapping it launches JeffOS, 0 console errors. (Move 3 — a Tiger-desktop preview thumbnail in the mid-content callout — is the remaining optional polish.)
 
 ---
 
