@@ -57,6 +57,14 @@ export function GameLibrary({
         <div className="mx-auto mt-1 w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-400/80 to-transparent rounded-full" />
       </div>
 
+      {/* Empty state (UX_AUDIT G3) — explicit, not a blank area under the header. */}
+      {games.length === 0 && (
+        <div className="flex flex-1 flex-col items-center justify-center text-center text-zinc-600 dark:text-zinc-300">
+          <p className="text-sm font-medium">No games found</p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">The library is empty right now — check back soon.</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {games.map((g) => (
           <button

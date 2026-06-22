@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { supabase } from "../../lib/supabase"
 import { useStore } from "../../store"
 import { renderImage } from "../../lib/imageUrl"
+import { useFormFactor } from "../../hooks/useFormFactor"
 import { toast } from "sonner"
 
 type Wallpaper = {
@@ -17,6 +18,10 @@ const VALID_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "heic", "heif"]
 export default function WallpapersApp() {
   const [groups, setGroups] = useState<Record<string, Wallpaper[]>>({})
   const [preview, setPreview] = useState<Wallpaper | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const formFactor = useFormFactor()
+  const isMobile = formFactor === "mobile"
 
   const setWallpaper = useStore((s) => s.setWallpaper)
   const prefsWallpaper = useStore((s) => s.prefs.wallpaper)
@@ -55,6 +60,7 @@ export default function WallpapersApp() {
   // 🧠 Load wallpapers dynamically
   useEffect(() => {
     const loadWallpapers = async () => {
+      setLoading(true)
       const grouped: Record<string, Wallpaper[]> = {}
 
       const { data: folders } = await supabase.storage
@@ -86,26 +92,35 @@ export default function WallpapersApp() {
       }
 
       setGroups(grouped)
+      setLoading(false)
     }
 
-    loadWallpapers()
+    loadWallpapers().catch(() => setLoading(false))
   }, [])
 
   const current = prefsWallpaper?.full
 
   return (
     <div
-      className="h-full w-full grid grid-cols-12 overflow-hidden"
+      className={`h-full w-full overflow-hidden ${isMobile ? "flex flex-col" : "flex flex-row"}`}
       style={{
         background:
           "linear-gradient(to bottom, #d7d7d7 0%, #b9b9b9 40%, #9a9a9a 100%)",
         fontFamily: "'Lucida Grande','Helvetica Neue',sans-serif",
       }}
     >
-      {/* 📸 Left Sidebar - Preview */}
-      <div className="col-span-4 border-r border-gray-400/40 flex flex-col items-center justify-center relative">
+      {/* 📸 Preview pane — a left rail on desktop, a top banner on mobile.
+          The old fixed grid-cols-12 / col-span-4 layout squished into an
+          unusable column on a phone (UX_AUDIT_GAMES_WALLPAPERS W1). */}
+      <div
+        className={
+          isMobile
+            ? "shrink-0 border-b border-gray-400/40 flex flex-row items-center justify-center gap-4 px-4 py-3 relative"
+            : "w-1/3 min-w-[220px] border-r border-gray-400/40 flex flex-col items-center justify-center relative"
+        }
+      >
         <div
-          className="relative w-52 h-32 rounded-lg overflow-hidden shadow-inner border border-gray-400"
+          className={`relative shrink-0 rounded-lg overflow-hidden shadow-inner border border-gray-400 ${isMobile ? "w-32 h-20" : "w-52 h-32"}`}
           style={{
             background: "#ccc",
             boxShadow:
@@ -125,45 +140,67 @@ export default function WallpapersApp() {
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-sm text-gray-600">
+            <div className="flex items-center justify-center h-full text-[11px] text-gray-600 text-center px-2">
               No wallpaper selected
             </div>
           )}
         </div>
 
-        <button
-          className="mt-4 px-4 py-1.5 rounded-md text-sm font-semibold text-white 
-          bg-gradient-to-b from-[#5cb3ff] to-[#0b66c3]
-          hover:from-[#6cc3ff] hover:to-[#1a70ca]
-          active:scale-95 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.3)] transition-all"
-          onClick={() => {
-            if (!preview) {
-              toast.info("Select a wallpaper first")
-              return
-            }
-            setWallpaper({
-              id: preview.id,
-              full: preview.full,
-              folder: preview.folder,
-            })
-            toast.success(`Wallpaper set to ${preview.name}`)
-          }}
-        >
-          Set Desktop Picture
-        </button>
+        {/* Action + label: stacked under the preview on desktop, beside it on mobile. */}
+        <div className={isMobile ? "flex flex-col items-start gap-1" : "flex flex-col items-center"}>
+          <button
+            className={`px-4 py-2 rounded-md text-sm font-semibold text-white
+            bg-gradient-to-b from-[#5cb3ff] to-[#0b66c3]
+            hover:from-[#6cc3ff] hover:to-[#1a70ca]
+            active:scale-95 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.3)] transition-all ${isMobile ? "" : "mt-4"}`}
+            style={{ minHeight: "var(--touch-target-min)" }}
+            onClick={() => {
+              if (!preview) {
+                toast.info("Select a wallpaper first")
+                return
+              }
+              setWallpaper({
+                id: preview.id,
+                full: preview.full,
+                folder: preview.folder,
+              })
+              toast.success(`Wallpaper set to ${preview.name}`)
+            }}
+          >
+            Set Desktop Picture
+          </button>
 
-        {preview && (
-          <div className="mt-3 text-xs text-gray-700/80 max-w-[200px] text-center">
-            Previewing: <strong>{preview.name}</strong>
-          </div>
-        )}
+          {preview && (
+            <div className={`text-xs text-gray-700/80 max-w-[200px] ${isMobile ? "text-left" : "mt-3 text-center"}`}>
+              Previewing: <strong>{preview.name}</strong>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 🖼️ Wallpaper Grid */}
-      <div className="col-span-8 overflow-y-auto p-5 custom-scrollbar">
+      <div className="flex-1 min-w-0 overflow-y-auto p-5 custom-scrollbar">
         <h2 className="text-base font-semibold mb-4 text-gray-800 drop-shadow-sm">
           Desktop Pictures
         </h2>
+
+        {/* Loading skeleton (W5) — a shimmer grid while storage.list resolves,
+            so the grid never flashes empty. */}
+        {loading && (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="h-24 rounded-lg bg-white/30 animate-pulse border border-white/40" />
+            ))}
+          </div>
+        )}
+
+        {/* Empty state (W2) — explicit, not a blank area. */}
+        {!loading && Object.keys(groups).length === 0 && (
+          <div className="flex h-40 flex-col items-center justify-center text-center text-sm text-gray-600">
+            <p className="font-medium">No wallpapers found</p>
+            <p className="mt-1 text-xs text-gray-500">Check back later, or pick a different category.</p>
+          </div>
+        )}
 
         <AnimatePresence>
           {Object.entries(groups).map(([folder, wallpapers]) => (

@@ -23,47 +23,39 @@ export function Toolbar({
         shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_6px_rgba(0,0,0,0.35)]
       "
     >
-      {/* Left Controls */}
-      <div className="flex items-center gap-3">
-        {/* Quit Button */}
+      {/* Left Controls — labelled, with ≥44px touch targets (UX_AUDIT G2). */}
+      <div className="flex items-center gap-2">
+        {/* Quit → back to Library. Labelled, not a bare power icon. */}
         <button
           onClick={onQuit}
           className="
-            p-[5px] rounded-md 
+            flex items-center gap-1.5 px-3 rounded-md
             bg-gradient-to-b from-[#8cbcff] to-[#2b82d6]
             shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_1px_2px_rgba(0,0,0,0.4)]
             hover:brightness-110 active:scale-[0.97] transition
+            text-[12px] font-medium
           "
-          title="Quit"
+          style={{ minHeight: "var(--touch-target-min, 44px)" }}
+          title="Quit to Library"
         >
-          <Power size={12} strokeWidth={1.5} />
+          <Power size={14} strokeWidth={1.75} /> Quit
         </button>
 
-        {/* Shader Toggle */}
+        {/* Shader toggle — icon + the current mode label in one control. */}
         <button
           onClick={onShaderToggle}
           className="
-            p-[5px] rounded-md
+            flex items-center gap-1.5 px-3 rounded-md
             bg-white/15 hover:bg-white/25 active:bg-white/30
             border border-white/10 hover:border-white/20
-            transition
+            transition text-[12px] font-medium
           "
-          title="Toggle Shader"
+          style={{ minHeight: "var(--touch-target-min, 44px)" }}
+          title="Toggle display shader (CRT / LCD)"
         >
-          <Palette size={12} strokeWidth={1.5} />
+          <Palette size={14} strokeWidth={1.75} />
+          <span className="uppercase tracking-wide">{shader.includes("crt") ? "CRT" : "LCD"}</span>
         </button>
-
-        {/* Shader Label */}
-        <div
-          className="
-            px-2 py-[3px] rounded-md uppercase tracking-wide
-            text-[10px] font-medium text-zinc-200
-            bg-white/10 border border-white/10
-            shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]
-          "
-        >
-          {shader.includes("crt") ? "CRT" : "LCD"}
-        </div>
       </div>
 
       {/* Right Title */}
