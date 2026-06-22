@@ -31,9 +31,31 @@ export default function MobileShell() {
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden">
       {/* Wallpaper backdrop (navy fallback while it loads — never black). */}
+      {/* Blurred cover-fill behind the contained wallpaper (fills the bands). */}
+      {bg && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url("${bg}")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            filter: "blur(28px) brightness(0.85)",
+            transform: "scale(1.1)",
+          }}
+        />
+      )}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ background: "#1e2a44", backgroundImage: bg ? `url("${bg}")` : undefined, backgroundSize: "cover", backgroundPosition: "center" }}
+        className="absolute inset-0"
+        style={{
+          backgroundColor: bg ? "transparent" : "#1e2a44",
+          backgroundImage: bg ? `url("${bg}")` : undefined,
+          // contain → the whole wallpaper is always visible; blurred layer fills bands.
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
       />
 
       {/* Foreground UI */}
