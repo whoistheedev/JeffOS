@@ -2,7 +2,9 @@
 
 > **Objective:** assess the game-session / leaderboard architecture for correctness, integrity, and scale (10k → 100k → 1M+ players).
 > **Method:** read the client store, the tracked migrations, and — decisively — the **live database** (schema, indexes, RLS, row counts) + the **live Edge Functions** (`game-start`, `game-submit`) source.
-> **Scope:** investigation only — no code/DB changes.
+> **Scope:** investigation + **P0 fixes implemented** (see §6 below).
+>
+> **Update — P0 shipped & verified on the live backend:** C1 (anon access), C2 (CORS), C3 (score bounds), C4 (single-use + expiring sessions) are done. `game-start`/`game-submit` redeployed `verify_jwt:false` with CORS + token/score hardening; migration `20260622000002` added `used`/`expires_at` + indexes + a `cleanup_game_sessions()` function; follow-up `20260622000003` revoked anon EXECUTE on that function (advisor-flagged). Verified live: CORS preflight 200; anon start works; valid submit returns ranks; **replay → 401**; negative/overflow score + too-short duration → **422**; forged session → **401**; test rows cleaned; security advisor shows **no new warnings**. Still open (P1/P2): submit rate-limiting, `game_best` upsert + materialized top-N + edge cache, cron wiring for `cleanup_game_sessions`, UI wiring + removing the dead client store.
 > **Verdict up front:** the scoreboard is **currently non-functional and not wired**, and the server flow as written has **integrity holes and growth/cost problems** that would bite hard at scale. It needs a deliberate rebuild before it ships. Evidence below.
 
 ---
