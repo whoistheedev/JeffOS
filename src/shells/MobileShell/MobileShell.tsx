@@ -1,5 +1,6 @@
 import { useStore } from "../../store"
 import { wallpaperUrl as renderWallpaper } from "../../lib/imageUrl"
+import { useWallpaperFit } from "../../hooks/useWallpaperFit"
 import Spotlight from "../../components/Spotlight"
 import Dashboard from "../../components/Dashboard"
 import MobileStatusBar from "./MobileStatusBar"
@@ -27,18 +28,19 @@ import MobileAppHost from "./MobileAppHost"
 export default function MobileShell() {
   const wallpaper = useStore((s) => s.prefs.wallpaper)
   const bg = renderWallpaper(wallpaper?.full)
+  const fit = useWallpaperFit(bg)
 
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden">
-      {/* Wallpaper: the WHOLE picture, contained (never cropped), on the solid
-          Tiger "Aqua Blue" desktop fill — authentic Tiger "Fit to Screen", not a
-          modern blurred backdrop. */}
+      {/* Wallpaper: `cover` (fill) by default; `contain` (whole picture on the
+          solid Tiger "Aqua Blue" fill) only when the image aspect is wildly off
+          the phone's — authentic Tiger, never a modern blurred backdrop. */}
       <div
         className="absolute inset-0"
         style={{
           backgroundColor: "#4a6fab", // solid Tiger Aqua Blue fill
           backgroundImage: bg ? `url("${bg}")` : undefined,
-          backgroundSize: "contain",
+          backgroundSize: fit, // "cover" or "contain"
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
