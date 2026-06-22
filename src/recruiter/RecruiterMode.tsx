@@ -264,10 +264,18 @@ function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
 
   return (
     <div className="flex h-[100dvh] flex-col bg-background text-foreground">
-      {/* Top bar: identity (name) + theme toggle. Recruiters see who this is
-          above the fold without scrolling, mirroring the desktop sidebar. */}
-      <div className="flex items-center justify-between px-5 pt-[max(0.75rem,var(--space-safe-top))]">
-        <span className="text-sm font-semibold tracking-tight">{IDENTITY.name}</span>
+      {/* Sticky identity bar: name + role + theme toggle. Persists across all
+          tabs so a recruiter always sees who this is and what they do above the
+          fold — mirroring the desktop sticky sidebar. (The name lives here
+          rather than in the Hero so it stays visible on Projects/Experience/
+          Contact too, not just Home.) */}
+      <div className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-5 pt-[max(0.75rem,var(--space-safe-top))] pb-2 backdrop-blur">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold leading-tight tracking-tight">{IDENTITY.name}</p>
+          <p className="truncate text-xs leading-tight text-muted-foreground">
+            {IDENTITY.title} · {IDENTITY.org}
+          </p>
+        </div>
         <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
       </div>
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 pt-2 pb-24">
