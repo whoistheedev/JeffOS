@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { Toaster } from "sonner"
 import RootRouter from "./RootRouter"
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt"
 
 import { useStore } from "./store"
 import {
@@ -153,6 +154,8 @@ export default function App() {
       {/* Mounts sonner so existing app toasts (Recruiter/Guestbook/Wallpapers)
           actually render — there was no <Toaster> in the tree before. */}
       <Toaster position="bottom-center" richColors />
+      {/* Visible "Update available — Reload" toast when a new build deploys. */}
+      <PWAUpdatePrompt />
     </>
   )
 }
