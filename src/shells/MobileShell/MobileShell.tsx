@@ -30,6 +30,14 @@ export default function MobileShell() {
   const bg = renderWallpaper(wallpaper?.full)
   const fit = useWallpaperFit(bg)
 
+  // Is a foreground app open? (same rule as MobileAppHost: a non-minimized
+  // window on the focus stack). When it is, the Springboard sits behind a
+  // full-screen app — hide it from the a11y tree + keyboard traversal so screen
+  // readers/Tab don't reach the covered icons. (UX_AUDIT — a11y finding.)
+  const windows = useStore((s) => s.windows)
+  const focusStack = useStore((s) => s.focusStack)
+  const appOpen = [...focusStack].reverse().some((id) => windows[id] && !windows[id].minimized)
+
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden">
       {/* Wallpaper: `cover` (fill) by default; `contain` (whole picture on the
@@ -50,7 +58,11 @@ export default function MobileShell() {
       <div className="relative flex h-full flex-col">
         <MobileStatusBar title="JeffOS" />
         <div className="relative flex-1">
-          <Springboard />
+          {/* When an app is open, the Springboard is covered — make it inert +
+              aria-hidden so screen readers / keyboard Tab skip the hidden icons. */}
+          <div className="absolute inset-0" inert={appOpen ? true : undefined} aria-hidden={appOpen || undefined}>
+            <Springboard />
+          </div>
           {/* Full-screen foreground app (null when nothing is open). */}
           <MobileAppHost />
         </div>

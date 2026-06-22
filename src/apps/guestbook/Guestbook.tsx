@@ -144,7 +144,7 @@ useEffect(() => {
                   }`}
                 >
                   <motion.div
-                    className={`relative max-w-[70%] px-3 py-2 rounded-2xl text-[13px] leading-snug shadow-md backdrop-blur-md ${
+                    className={`relative max-w-[85%] sm:max-w-[75%] px-3 py-1.5 rounded-2xl text-[13px] leading-snug shadow-md backdrop-blur-md ${
                       isYou
                         ? "bg-gradient-to-b from-[#86c6ff]/80 to-[#4f9aff]/70 text-black rounded-br-none"
                         : "bg-gradient-to-b from-[#ffffff]/80 to-[#dcdcdc]/70 text-black rounded-bl-none"
