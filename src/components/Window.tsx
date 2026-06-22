@@ -84,16 +84,28 @@ export default function Window({ id, title }: Props) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
+    // On phones a floating ~90%×75% window is fiddly and reads as a broken
+    // desktop. Open near-full-screen instead (full width, full height below the
+    // menu bar) so apps behave like the full-screen sheets touch users expect —
+    // while still wearing the Aqua titlebar/chrome. Dragging is disabled at this
+    // width too (see react-rnd `disableDragging` below). MOBILE_STRATEGY.md §8.
+    const isPhone = vw < 480;
+
     // adaptive default for smaller devices
-    const baseWidth = Math.min(DEFAULT_SIZE.width, vw * 0.9);
-    const baseHeight = Math.min(DEFAULT_SIZE.height, vh * 0.75);
+    const baseWidth = isPhone ? vw : Math.min(DEFAULT_SIZE.width, vw * 0.9);
+    const baseHeight = isPhone
+      ? vh - 24 /* leave the 24px menu bar visible */
+      : Math.min(DEFAULT_SIZE.height, vh * 0.75);
 
     let width = baseWidth;
     let height = baseHeight;
-    let x = Math.max(10, Math.floor((vw - width) / 2));
-    let y = Math.max(20, Math.floor((vh - height) / 2));
+    let x = isPhone ? 0 : Math.max(10, Math.floor((vw - width) / 2));
+    let y = isPhone ? 24 : Math.max(20, Math.floor((vh - height) / 2));
 
-    if (remembered) {
+    // Remembered geometry is a desktop convenience; on phones always use the
+    // full-screen layout so a window dragged/resized on desktop doesn't reopen
+    // as a tiny off-screen box on a later mobile visit.
+    if (remembered && !isPhone) {
       ({ x, y, width, height } = remembered);
     }
 
@@ -158,10 +170,14 @@ export default function Window({ id, title }: Props) {
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const newWidth = Math.min(current.width, vw * 0.95);
-      const newHeight = Math.min(current.height, vh * 0.9);
-      const newX = Math.min(Math.max(0, current.x), vw - newWidth);
-      const newY = Math.min(Math.max(0, current.y), vh - newHeight);
+      const isPhone = vw < 480;
+
+      // On phones keep windows full-screen (below the menu bar) through rotation
+      // and keyboard show/hide; on larger screens, clamp into the viewport.
+      const newWidth = isPhone ? vw : Math.min(current.width, vw * 0.95);
+      const newHeight = isPhone ? vh - 24 : Math.min(current.height, vh * 0.9);
+      const newX = isPhone ? 0 : Math.min(Math.max(0, current.x), vw - newWidth);
+      const newY = isPhone ? 24 : Math.min(Math.max(0, current.y), vh - newHeight);
 
       storeApi.setState((state) => ({
         windows: {
@@ -169,7 +185,9 @@ export default function Window({ id, title }: Props) {
           [id]: { ...state.windows[id], x: newX, y: newY, width: newWidth, height: newHeight },
         },
       }));
-      saveMemory({ x: newX, y: newY, width: newWidth, height: newHeight });
+      // Don't persist the forced phone full-screen geometry into window memory —
+      // it would reopen as a full-bleed box on a later desktop visit.
+      if (!isPhone) saveMemory({ x: newX, y: newY, width: newWidth, height: newHeight });
     };
     handleResize();
     window.addEventListener("resize", handleResize);

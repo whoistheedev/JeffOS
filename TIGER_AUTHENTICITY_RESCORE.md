@@ -11,9 +11,9 @@
 
 JeffOS has crossed from **"strong homage"** into **"convincing web recreation of Mac OS X Tiger."** The original review's central diagnosis — *"the 2026 styling layer is showing through the 2005 furniture"* — has been addressed at the surface (Lucida Grande, glass dock, wet-Aqua, tight corners, inactive dimming) **and** at the systems layer (Spotlight, Exposé, Dashboard, true genie, boot chime). A Tiger user now does a genuine double-take instead of clocking it as a tribute in ~3 seconds.
 
-**Overall Tiger Authenticity Score: 89 / 100** (up from **58**) — *"Convincing recreation; a few master-class details from pixel-perfect."*
+**Overall Tiger Authenticity Score: 91 / 100** (up from **58**) — *"Convincing recreation; a few master-class details from pixel-perfect."*
 
-The remaining 11-point gap to the 94 ceiling is fine-grain craft (brushed-metal texture vs gradient, app-aware menu bar, content-aware green zoom, mobile Aqua cues), not missing systems or glaring modern tells.
+The remaining 3-point gap to the 94 ceiling is fine-grain craft (brushed-metal texture vs gradient, app-aware menu bar, content-aware green zoom, per-app mobile layout polish), not missing systems or glaring modern tells.
 
 ---
 
@@ -28,13 +28,13 @@ The remaining 11-point gap to the 94 ceiling is fine-grain craft (brushed-metal 
 | 5 | Finder | 7 | **8** | +1 | 10 |
 | 6 | Motion & animation | 6 | **8** | +2 | 10 |
 | 7 | System feel | 6 | **9** | +3 | 10 |
-| 8 | Mobile (Tiger-appropriateness) | 5 | **5** | 0 | 8* |
+| 8 | Mobile (Tiger-appropriateness) | 5 | **7** | +2 | 8* |
 | 9 | Authenticity breakers (inverse) | 4 | **9** | +5 | 9 |
 | 10 | Tiger feature completeness | 4 | **9** | +5 | 9 |
 | 11 | Behavioral authenticity | 7 | **9** | +2 | 10 |
-| — | **Overall (normalized /100)** | **58** | **89** | **+31** | **94** |
+| — | **Overall (normalized /100)** | **58** | **91** | **+33** | **94** |
 
-\*Mobile remains the one untouched dimension — a deliberate scope choice this pass (the enhancement focused on the Tiger *desktop*). It's the highest-leverage place left to gain points.
+\*Mobile target is **8**, not 10 — a faithful Tiger desktop should not be forced pixel-for-pixel onto a phone. The +2 this pass came from the mobile lean fix below (removing the redundant landing + full-screen touch sheets that wear the Aqua chrome). The last point to 8 is per-app mobile layout polish (e.g. desktop-icon spacing at 390px).
 
 ---
 
@@ -75,32 +75,35 @@ Glass dock material, wet traffic lights, Aqua-blue selection in Finder, inactive
 
 ## Remaining gaps closed in this re-score pass
 
-Two small authenticity tells surfaced during the live re-score and were fixed immediately (verified: `tsc` clean, production build green, 0 console errors post-fix):
+Three authenticity / UX gaps surfaced during the live re-score and were fixed in the same pass (verified: `tsc` clean, production build green, 0 console errors post-fix):
 
 1. **Window title bars showed the lowercase app id** (`"finder"`, `"itunes"`) because `Window` fell back to `win.appKey` when no `title` prop was passed. Tiger titles are capitalized app names. **Fix:** added a `title` field to the app registry (`Finder`, `Safari`, `iTunes`, `iCal`, `Terminal`, …) and made `Window` use registry title as the fallback. Live render now reads **"Finder"**. (`registry.tsx`, `Window.tsx`)
 
 2. **Radix `DialogContent` a11y warnings** (`DialogContent requires a DialogTitle`) fired on the Desktop "Get Info", Finder "Quick Look", and Finder "Get Info" dialogs — two console errors per boot. **Fix:** added an `srTitle` prop to the shared `DialogContent` that renders a screen-reader-only `DialogTitle`, and wired it into all three call sites. Console is now **0 errors**. (`ui/dialog.tsx`, `Desktop.tsx`, `Finder.tsx`)
 
+3. **Mobile "Launch JeffOS" hit a redundant, off-brand dead-end** — on a phone, the opt-in rendered a *second* landing page ("Jeff Idodo / Full-Stack Developer", contradicting the AI-RCM Recruiter Mode just seen) and forced another tap to reach the desktop. **Fix:** `MobileShell` now delegates straight to `DesktopShell` (like `TabletShell`), and `Window` opens **near-full-screen below the menu bar on phones** (`vw < 480`) with dragging disabled and phone geometry kept out of desktop window-memory. The result: mobile "Launch JeffOS" → a touch-tuned Tiger desktop where apps are full-screen sheets that still wear the Aqua titlebar/chrome, wallpaper, dock and Lucida Grande — verified live on a 390px iPhone viewport (Finder opens full-width below the menu bar; 0 console errors). (`MobileShell.tsx`, `Window.tsx`) — lifts §8 mobile from 5 → 7.
+
 ---
 
-## What's left for the last 5 points (89 → 94)
+## What's left for the last 3 points (91 → 94)
 
 Ranked by authenticity ÷ effort — all craft, no missing systems:
 
-1. **Mobile Aqua cues** (§8, the only flat dimension): carry gloss / Lucida / system sounds into the mobile shell so it reads as "Tiger's design language on touch," not generic-modern. *Highest leverage left.*
-2. **App-aware menu bar** (§2, §11): the menu bar should change its app menu + File/Edit/View to match the focused window (currently Finder-centric). This is the last big *behavioral* tell.
-3. **Brushed-metal texture** on the Finder body (§5): currently a smooth gradient; a subtle repeating-noise texture would complete the metal.
-4. **Content-aware green zoom** (§4): green should resize-to-fit-content, not just maximize.
-5. **Tiger ease curves over springs** on menus/hovers (§6): a few menu/status-bar interactions still use `whileTap`/spring feel; swapping to fast time-based eases would finish the motion authenticity.
+1. **App-aware menu bar** (§2, §11): the menu bar should change its app menu + File/Edit/View to match the focused window (currently Finder-centric). This is the last big *behavioral* tell.
+2. **Brushed-metal texture** on the Finder body (§5): currently a smooth gradient; a subtle repeating-noise texture would complete the metal.
+3. **Content-aware green zoom** (§4): green should resize-to-fit-content, not just maximize.
+4. **Tiger ease curves over springs** on menus/hovers (§6): a few menu/status-bar interactions still use `whileTap`/spring feel; swapping to fast time-based eases would finish the motion authenticity.
+5. **Per-app mobile layout polish** (§8): the touch desktop is in place; remaining nits are desktop-icon spacing at ~390px and a couple of apps' internal layouts at phone width — finishes §8 from 7 → 8.
 
 ---
 
 ## Bottom line
 
-- **58 → 89 (+31).** The two highest-severity 🔴 breakers (dock material, Lucida Grande) and the missing 🔴 systems (Spotlight, Dashboard, dock glass) are all resolved.
+- **58 → 91 (+33).** The two highest-severity 🔴 breakers (dock material, Lucida Grande) and the missing 🔴 systems (Spotlight, Dashboard, dock glass) are all resolved.
 - The hard part — Tiger's *behavior* — was already ~75% at baseline; the surface re-skin + headline systems closed most of the visual gap.
-- What separates 89 from a 94 "pixel-perfect" is **fine craft and the mobile dimension**, not any conspicuous absence. JeffOS is now a convincing Tiger recreation that holds up to a purist's first (and second) look.
+- The mobile dead-end is fixed: phones now drop straight into a touch-tuned Tiger desktop (full-screen Aqua app sheets) instead of a redundant landing.
+- What separates 91 from a 94 "pixel-perfect" is **fine craft** (app-aware menu bar, brushed-metal texture, content-aware zoom, per-app mobile polish), not any conspicuous absence. JeffOS is now a convincing Tiger recreation that holds up to a purist's first (and second) look.
 
 ---
 
-*Re-score performed against the merged `main` build. Source audited across `Dock.tsx`, `Window.tsx`, `StatusBar.tsx`, `Finder.tsx`, `Spotlight.tsx`, `Expose.tsx`, `Dashboard.tsx`, `main.tsx`, `index.css`, `registry.tsx`. Live evidence captured via Playwright/Chromium at 1440×900. The two remaining gaps identified were fixed in the same pass; build verified green and console clean afterward. The original baseline review (`TIGER_AUTHENTICITY_REVIEW.md`, 58/100) is preserved unchanged as the historical record.*
+*Re-score performed against the merged `main` build. Source audited across `Dock.tsx`, `Window.tsx`, `StatusBar.tsx`, `Finder.tsx`, `Spotlight.tsx`, `Expose.tsx`, `Dashboard.tsx`, `main.tsx`, `index.css`, `registry.tsx`, `MobileShell.tsx`. Live evidence captured via Playwright/Chromium at 1440×900 (desktop) and a 390px iPhone viewport (mobile). The three gaps identified were fixed in the same pass; build verified green and console clean afterward. The original baseline review (`TIGER_AUTHENTICITY_REVIEW.md`, 58/100) is preserved unchanged as the historical record.*
