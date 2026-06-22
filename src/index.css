@@ -205,6 +205,15 @@ html.jeffos-active body {
   100% { transform: translateX(400%); }
 }
 
+/* Tiger boot spinner (steps for the classic 12-spoke pinwheel cadence) */
+@keyframes boot-gear-spin {
+  to { transform: rotate(360deg); }
+}
+.boot-gear {
+  transform-origin: center;
+  animation: boot-gear-spin 1s steps(12) infinite;
+}
+
 .animate-tiger-loader {
   width: 30%;
   animation: tiger-loader 2.2s ease-in-out infinite;

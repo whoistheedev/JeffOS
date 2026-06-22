@@ -93,6 +93,21 @@ function DockItem({ icon, minimized, winId, onClick, mouseX, scaleFactor }: Dock
         }}
         className="relative focus:outline-none touch-manipulation"
       >
+        {/* Tiger glass-floor reflection: a flipped, faded copy that scales with
+            the icon's magnification (shares the same motion wrapper). */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-full w-full"
+          style={{
+            height: "70%",
+            transform: "scaleY(-1)",
+            opacity: 0.28,
+            maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 75%)",
+            WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 75%)",
+          }}
+        >
+          <AppIconRenderer icon={icon} size="dock" />
+        </div>
         <AppIconRenderer icon={icon} size="dock" />
         {/* Tiger running indicator: a small black triangle under the icon,
             not the modern colored dot. (Replaces blue/orange dots.) */}

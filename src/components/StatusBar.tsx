@@ -7,6 +7,7 @@ import {
   BatteryCharging,
   Volume2,
   VolumeX,
+  Search,
 } from "lucide-react"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import * as Popover from "@radix-ui/react-popover"
@@ -200,13 +201,11 @@ export default function StatusBar() {
            className="z-[9999] bg-white/95 text-black rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-white/60 backdrop-blur-md p-1.5 min-w-[220px] sm:min-w-[240px] transition-all duration-150"
             sideOffset={4}
           >
+            {/* Authentic Tiger Apple-menu structure. "Leave the OS" actions
+                (Sleep/Restart/Shut Down/Log Out) all return to Recruiter Mode. */}
             <MenuItem onClick={openAboutThisMac}>About This Mac</MenuItem>
-            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
-            {/* Exit to Recruiter Mode lives in the Apple menu (where Log Out /
-                Shut Down sat in Tiger) — not a floating modern pill. */}
-            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>
-              Exit to Recruiter Mode
-            </MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("system.softwareUpdate")}>Software Update…</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("system.prefs")}>System Preferences…</MenuItem>
             <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
             {Object.values(apps).map((app) => {
               const icon = desktopIcons.find((i) => i.id === app.id)
@@ -226,6 +225,12 @@ export default function StatusBar() {
                 </MenuItem>
               )
             })}
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <MenuItem onClick={() => commandBus.dispatch("system.sleep")}>Sleep</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Restart…</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Shut Down…</MenuItem>
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Exit to Recruiter Mode</MenuItem>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
 
@@ -482,6 +487,16 @@ export default function StatusBar() {
       </div>
     </Popover.Content>
   </Popover.Root>
+
+  {/* Spotlight magnifier — far-right menu extra (Tiger). Opens the ⌘Space sheet. */}
+  <button
+    aria-label="Spotlight"
+    onClick={() => window.dispatchEvent(new Event("spotlight:open"))}
+    className="px-1.5 hover:bg-black/10 rounded-sm"
+    title="Spotlight (⌘Space)"
+  >
+    <Search size={13} />
+  </button>
 </div>
     </div>
   )
