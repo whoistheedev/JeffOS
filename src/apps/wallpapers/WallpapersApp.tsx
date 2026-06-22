@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabase"
 import { useStore } from "../../store"
 import { renderImage } from "../../lib/imageUrl"
 import { useFormFactor } from "../../hooks/useFormFactor"
+import { aquaBlueButton } from "../../lib/aquaSkin"
 import { toast } from "sonner"
 
 type Wallpaper = {
@@ -149,11 +150,8 @@ export default function WallpapersApp() {
         {/* Action + label: stacked under the preview on desktop, beside it on mobile. */}
         <div className={isMobile ? "flex flex-col items-start gap-1" : "flex flex-col items-center"}>
           <button
-            className={`px-4 py-2 rounded-md text-sm font-semibold text-white
-            bg-gradient-to-b from-[#5cb3ff] to-[#0b66c3]
-            hover:from-[#6cc3ff] hover:to-[#1a70ca]
-            active:scale-95 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.3)] transition-all ${isMobile ? "" : "mt-4"}`}
-            style={{ minHeight: "var(--touch-target-min)" }}
+            className={`px-4 py-2 rounded-md text-sm font-semibold active:scale-95 transition-all ${isMobile ? "" : "mt-4"}`}
+            style={{ ...aquaBlueButton, minHeight: "var(--touch-target-min)" }}
             onClick={() => {
               if (!preview) {
                 toast.info("Select a wallpaper first")

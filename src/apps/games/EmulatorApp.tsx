@@ -4,6 +4,7 @@ import { GameLibrary } from "./components/GameLibrary"
 import { EmulatorFrame } from "./components/EmulatorFrame"
 import { Toolbar } from "./components/Toolbar"
 import { supabase } from "../../lib/supabase"
+import { brushedMetal } from "../../lib/aquaSkin"
 
 export interface GameItem {
   title: string
@@ -159,15 +160,13 @@ export default function EmulatorApp() {
         >
           {loading ? (
             <div
-              className="flex flex-wrap justify-center items-center gap-6 p-6 
-              w-full h-full bg-gradient-to-b from-[#e7e7e7] to-[#bcbec1] 
-              dark:from-[#2c2c2e] dark:to-[#1a1a1c] overflow-auto"
+              className="flex flex-wrap justify-center items-center gap-6 p-6 w-full h-full overflow-auto"
+              style={brushedMetal}
             >
               {[...Array(10)].map((_, i) => (
                 <div
                   key={i}
-                  className="relative w-72 h-44 rounded-xl bg-white/10 dark:bg-white/5 
-                  overflow-hidden animate-pulse backdrop-blur-md border border-white/10"
+                  className="relative w-72 h-44 rounded-lg bg-white/40 overflow-hidden animate-pulse border border-white/50"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shine_1.8s_linear_infinite]" />
                 </div>

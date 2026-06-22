@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "../../lib/supabase"
 import { useStore } from "../../store"
+import { brushedMetal, aquaBlueButton } from "../../lib/aquaSkin"
 import { toast } from "sonner"
 
 type GuestRow = {
@@ -177,10 +178,7 @@ useEffect(() => {
           mutation.mutate({ anonId, handle, message })
         }}
         className="flex-shrink-0 flex items-center gap-2 px-3 py-2 border-t border-[#a6a6a6]/60"
-        style={{
-          background:
-            "linear-gradient(to bottom, #fafafa 0%, #e1e1e1 60%, #bdbdbd 100%)",
-        }}
+        style={brushedMetal}
       >
         <input
           type="text"
@@ -201,7 +199,8 @@ useEffect(() => {
         <motion.button
           whileTap={{ scale: 0.95 }}
           disabled={mutation.isPending || isLoading}
-          className="px-4 py-2 text-xs font-semibold text-white rounded-full bg-gradient-to-b from-[#6ec6ff] to-[#007aff] hover:brightness-110 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.25)]"
+          className="px-4 py-2 text-xs font-semibold rounded-full hover:brightness-110 disabled:opacity-60"
+          style={aquaBlueButton}
         >
           Send
         </motion.button>
