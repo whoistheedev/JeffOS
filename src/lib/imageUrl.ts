@@ -40,14 +40,36 @@ export function renderImage(url: string | undefined | null, opts: RenderOpts = {
   return qs ? `${base}?${qs}` : base
 }
 
-/** Wallpaper sized to the viewport (capped); covers the desktop. */
+/**
+ * Wallpaper cropped to the CURRENT viewport aspect ratio, sized + capped.
+ *
+ * Critically passes BOTH width and height with `resize: "cover"` so the render
+ * endpoint crops server-side to the screen's shape. Passing width only made a
+ * PORTRAIT image (e.g. the 1440×2160 holiday wallpapers) get scaled to fill the
+ * width on a landscape desktop — `background-size: cover` then blew it up so its
+ * height dwarfed the screen, showing a tiny zoomed-in band ("wallpaper bigger
+ * than the screen"). Cropping to the viewport aspect fixes that on every screen.
+ */
 export function wallpaperUrl(url: string | undefined | null): string {
   if (!url) return ""
-  // Cap at a sensible desktop width; DPR-aware but bounded to keep bytes small.
   const vw = typeof window !== "undefined" ? window.innerWidth : 1280
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800
   const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
-  const width = Math.min(Math.round(vw * dpr), 1920)
-  return renderImage(url, { width, quality: 72, resize: "cover" })
+  // Cap the longer edge at 1920 to keep bytes small, preserving the screen's aspect.
+  const aspect = vw / vh
+  let width = Math.round(vw * dpr)
+  let height = Math.round(vh * dpr)
+  const cap = 1920
+  if (width > cap || height > cap) {
+    if (aspect >= 1) {
+      width = cap
+      height = Math.round(cap / aspect)
+    } else {
+      height = cap
+      width = Math.round(cap * aspect)
+    }
+  }
+  return renderImage(url, { width, height, quality: 72, resize: "cover" })
 }
 
 /** Game-card thumbnail. */
