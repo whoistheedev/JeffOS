@@ -196,7 +196,7 @@ export default function Browser() {
                 Top Sites
               </h1>
               <div
-                className="grid grid-cols-3 gap-8"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full max-w-[640px] px-4"
                 style={{ transform: "rotateX(6deg)" }}
               >
                 {TOP_SITES.map((site, idx) => {
@@ -216,7 +216,7 @@ export default function Browser() {
                           setZooming(null)
                         }, 400)
                       }}
-                      className="relative w-48 h-32 bg-white rounded-lg overflow-hidden shadow-lg border border-[#aaa] cursor-pointer origin-center"
+                      className="relative w-full max-w-[192px] mx-auto aspect-[3/2] bg-white rounded-lg overflow-hidden shadow-lg border border-[#aaa] cursor-pointer origin-center"
                       style={{
                         transform: `rotateY(${tilt * 10}deg)`,
                         transformStyle: "preserve-3d",

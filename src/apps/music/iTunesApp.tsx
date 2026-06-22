@@ -3,6 +3,7 @@ import { Sidebar } from "./components/Sidebar"
 import { Toolbar } from "./components/Toolbar"
 import { TrackTable } from "./components/TrackTable"
 import { PlayerBar } from "./components/PlayerBar"
+import { useFormFactor } from "../../hooks/useFormFactor"
 import { motion, AnimatePresence } from "framer-motion"
 
 declare global {
@@ -13,6 +14,7 @@ declare global {
 }
 
 export default function iTunesApp() {
+  const isMobile = useFormFactor() === "mobile"
   const [currentTrack, setCurrentTrack] = useState<any | null>(null)
   const [player, setPlayer] = useState<any | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -238,7 +240,10 @@ export default function iTunesApp() {
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden border-t border-neutral-400/30 dark:border-neutral-700/50">
-        <Sidebar />
+        {/* The LIBRARY/PLAYLISTS sidebar is secondary nav; on a phone it ate
+            ~half the width and squeezed the track list. Hide it on mobile and
+            give the full width to the track table (UX_AUDIT_JEFFOS_APPS). */}
+        {!isMobile && <Sidebar />}
         <div className="flex-1 flex flex-col overflow-hidden relative">
           {mode === "loading" ? (
             <div className="flex-1 flex items-center justify-center text-neutral-400">

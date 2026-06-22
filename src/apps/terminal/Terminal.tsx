@@ -189,8 +189,12 @@ export default function Terminal() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="bg-transparent border-none outline-none text-white ml-2 flex-1"
+            className="bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-white ml-2 flex-1"
+            style={{ WebkitTapHighlightColor: "transparent", caretColor: "#00ff7f" }}
             autoFocus
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <span className="animate-pulse text-gray-400">▋</span>
         </div>

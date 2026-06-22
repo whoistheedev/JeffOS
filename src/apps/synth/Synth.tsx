@@ -176,7 +176,7 @@ export default function Synth() {
       border border-neutral-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.6),0_8px_14px_rgba(0,0,0,0.7)] w-full h-full"
     >
       {/* HEADER */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-b from-neutral-100 to-neutral-300 border-b border-neutral-500">
+      <div className="flex flex-wrap items-center justify-between gap-y-2 px-4 py-2 bg-gradient-to-b from-neutral-100 to-neutral-300 border-b border-neutral-500">
         {/* POWER */}
         <div className="flex items-center gap-3 text-neutral-700 font-semibold">
           <motion.div
@@ -200,7 +200,7 @@ export default function Synth() {
         </div>
 
         {/* PRESETS */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={preset}
             onChange={(e) => applyPreset(e.target.value)}
