@@ -5,7 +5,10 @@
 > **Method:** drove the live build end-to-end at **1440×900 (desktop)** and **390×844 / iPhone 13 (mobile)** through the full journey: Recruiter landing → tabs → "Launch JeffOS" → boot → desktop/springboard → open an app. Evidence captured as screenshots. **0 console errors** on both form factors.
 > **Scope:** audit + high-level design.
 >
-> **Update — §5 implemented.** The core finding (mobile JeffOS = a Tiger desktop shrunk onto a phone) has since been built out as the **JeffOS Mobile Springboard** (`MobileShell` no longer delegates to `DesktopShell`). On a phone you now get an iPhone-OS-era home screen: an Aqua status bar (not the Mac menu bar), a Springboard grid of glossy app tiles, a fixed dock (Finder · Safari · Spotlight · Recruiter), and apps that open full-screen with a real `‹ Home` nav bar — all reusing the existing app registry, icons, Fuse Spotlight, and system sounds. Verified live on iPhone 13 (launch → grid → open app → Home → Spotlight → exit to Recruiter), 0 console errors. The §3 transition polish remains open.
+> **Update — §5 + §3 implemented.**
+> • **§5 (the core finding):** mobile JeffOS is now the **Springboard** — an iPhone-OS-era home screen (Aqua status bar, glossy app grid, fixed dock Finder · Safari · Spotlight · Recruiter, full-screen apps with a `‹ Home` nav bar), reusing the existing app registry/icons/Fuse/sounds. `MobileShell` no longer delegates to `DesktopShell`.
+> • **§3 (transition polish):** a **LaunchVeil** ("Starting JeffOS…" fade-through-black) now plays on every fresh launch to smooth the Recruiter→Aqua cut; the JeffOS entry is a **deliberate accent-framed affordance** ("Explore JeffOS — my macOS Tiger recreation") that names the flex; and exit is first-class on mobile (the dock **Recruiter** button) and authentic on desktop (Apple menu).
+> All verified live (desktop 1440×900 + iPhone 13), 0 console errors. **The audit's findings are now resolved.**
 
 ---
 
