@@ -364,23 +364,32 @@ export function JeffOSCallout({ onLaunchJeffOS }: { onLaunchJeffOS: () => void }
   return (
     <SectionShell>
       <Card className="flex flex-col items-start gap-3">
-        <h2 className="text-lg font-medium">This entire site is an operating system I built from scratch.</h2>
+        <h2 className="text-lg font-medium">This entire site is a macOS Tiger recreation I built from scratch.</h2>
         <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">
-          Windowing, realtime, a security-audited Supabase backend, tracked migrations, PWA — the
-          same rigor I bring to healthcare systems, turned on my own portfolio. It demonstrates
-          systems thinking, frontend architecture, performance engineering, and platform design.
+          A faithful Mac OS X Tiger desktop — windowing, Spotlight, Exposé, Dashboard, a glass dock,
+          realtime, a security-audited Supabase backend, tracked migrations, PWA — with an
+          iPhone-OS-style home screen on mobile. The same rigor I bring to healthcare systems,
+          turned on my own portfolio: systems thinking, frontend architecture, performance
+          engineering, and platform design.
         </p>
         <div className="flex flex-wrap gap-1.5">
           {["Systems Thinking", "Frontend Architecture", "Performance Engineering", "Product Design", "Platform Design"].map((t) => (
             <CodeChip key={t}>{t}</CodeChip>
           ))}
         </div>
+        {/* The deliberate entry to the OS easter egg — a framed secondary
+            affordance that names the flex, distinct from the quiet Hero/Sidebar
+            links (UX_AUDIT §3). Styled with the hire accent so it invites. */}
         <button
           onClick={onLaunchJeffOS}
-          className="mt-1 inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
-          style={{ minHeight: "var(--touch-target-min)" }}
+          className="mt-1 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold"
+          style={{
+            minHeight: "var(--touch-target-min)",
+            border: "1px solid var(--color-hire)",
+            color: "var(--color-hire)",
+          }}
         >
-          Want to see how I think as an engineer? Launch JeffOS <ArrowUpRight size={16} aria-hidden />
+          Explore JeffOS — my macOS Tiger recreation <ArrowUpRight size={16} aria-hidden />
         </button>
       </Card>
     </SectionShell>

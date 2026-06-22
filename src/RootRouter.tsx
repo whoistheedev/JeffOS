@@ -3,6 +3,7 @@ import { Briefcase } from "lucide-react"
 import RecruiterMode from "./recruiter/RecruiterMode"
 import ErrorBoundary from "./components/ErrorBoundary"
 import BootLoader from "./components/BootLoader"
+import LaunchVeil from "./components/LaunchVeil"
 import { commandBus } from "./lib/commandBus"
 
 /**
@@ -22,6 +23,10 @@ export default function RootRouter() {
   const [launched, setLaunched] = useState<boolean>(
     () => typeof localStorage !== "undefined" && localStorage.getItem(LAUNCH_KEY) === "true"
   )
+  // True only for a fresh in-session launch (a tap on "Launch JeffOS"), so the
+  // transitional veil plays on entry but NOT on a hard refresh that restored
+  // `launched` from localStorage.
+  const [justLaunched, setJustLaunched] = useState(false)
 
   const launch = () => {
     try {
@@ -29,6 +34,7 @@ export default function RootRouter() {
     } catch {
       /* ignore storage failures */
     }
+    setJustLaunched(true)
     // Best-effort preload of the JeffOS desktop wallpaper while the boot screen
     // plays — never awaited, so a slow/hung fetch can't block the launch.
     // Dynamic import (not a top-level one): store/prefs participates in a
@@ -88,6 +94,9 @@ export default function RootRouter() {
           <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading JeffOS…</div>}>
             <JeffOS />
           </Suspense>
+          {/* Smooth the Recruiter→JeffOS aesthetic cut on a fresh launch (the
+              first-visit Tiger boot screen sits above this when it plays). */}
+          {justLaunched && <LaunchVeil />}
           {/* Exit lives in the Apple menu ( → Exit to Recruiter Mode); no
               floating desktop pill (authenticity — see TIGER_AUTHENTICITY_REVIEW). */}
         </div>
