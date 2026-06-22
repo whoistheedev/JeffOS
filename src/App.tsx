@@ -35,6 +35,17 @@ export default function App() {
       document.head.appendChild(m)
     }
 
+    // 🔄 Release any inherited orientation lock so the installed PWA can rotate
+    // freely (landscape is the natural orientation for gaming). The manifest
+    // says orientation:"any", but an app installed BEFORE that change can keep
+    // an OS-level portrait lock; unlock() clears it on browsers that support it.
+    try {
+      const so = (screen as any)?.orientation
+      so?.unlock?.()
+    } catch {
+      /* not supported (e.g. iOS Safari) — harmless; the page reflows on rotate */
+    }
+
     ;(async () => {
       try {
         await loadThemesFromSupabase()
