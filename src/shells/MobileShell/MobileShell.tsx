@@ -30,28 +30,14 @@ export default function MobileShell() {
 
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden">
-      {/* Wallpaper backdrop (navy fallback while it loads — never black). */}
-      {/* Blurred cover-fill behind the contained wallpaper (fills the bands). */}
-      {bg && (
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("${bg}")`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            filter: "blur(28px) brightness(0.85)",
-            transform: "scale(1.1)",
-          }}
-        />
-      )}
+      {/* Wallpaper: the WHOLE picture, contained (never cropped), on the solid
+          Tiger "Aqua Blue" desktop fill — authentic Tiger "Fit to Screen", not a
+          modern blurred backdrop. */}
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: bg ? "transparent" : "#1e2a44",
+          backgroundColor: "#4a6fab", // solid Tiger Aqua Blue fill
           backgroundImage: bg ? `url("${bg}")` : undefined,
-          // contain → the whole wallpaper is always visible; blurred layer fills bands.
           backgroundSize: "contain",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
