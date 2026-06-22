@@ -7,6 +7,7 @@ import {
   BatteryCharging,
   Volume2,
   VolumeX,
+  Search,
 } from "lucide-react"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import * as Popover from "@radix-ui/react-popover"
@@ -20,6 +21,7 @@ import { AppIconRenderer } from "./AppIconRenderer"
 import { openAboutApp } from "../helpers/openAboutApp"
 import { finderMenus } from "../config/menus/finderMenus"
 import { appsMenus } from "../config/menus/appsMenus"
+import { commandBus } from "../lib/commandBus"
 import type { AppMenus, MenuItemEntry } from "../types"
 
 
@@ -122,13 +124,26 @@ export default function StatusBar() {
           e.preventDefault()
           if (activeWinId) closeWindow(activeWinId)
           break
-        case "c":
-          e.preventDefault()
-          console.log("Copy action (placeholder)")
+        case "c": {
+          // Don't hijack copy when typing in a field — let the browser handle it.
+          const el = e.target as HTMLElement | null
+          const inField =
+            el?.tagName === "INPUT" ||
+            el?.tagName === "TEXTAREA" ||
+            el?.isContentEditable
+          if (inField) break
+
+          const selection = window.getSelection()?.toString() ?? ""
+          if (selection && navigator.clipboard?.writeText) {
+            e.preventDefault()
+            navigator.clipboard.writeText(selection).catch(() => {})
+          }
+          // No selection → let the default (browser) copy behavior proceed.
           break
+        }
         case "v":
-          e.preventDefault()
-          console.log("Paste action (placeholder)")
+          // Paste only makes sense in editable targets, which the browser
+          // already handles natively. Do not intercept in OS chrome.
           break
         case "q":
           e.preventDefault()
@@ -186,7 +201,11 @@ export default function StatusBar() {
            className="z-[9999] bg-white/95 text-black rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-white/60 backdrop-blur-md p-1.5 min-w-[220px] sm:min-w-[240px] transition-all duration-150"
             sideOffset={4}
           >
+            {/* Authentic Tiger Apple-menu structure. "Leave the OS" actions
+                (Sleep/Restart/Shut Down/Log Out) all return to Recruiter Mode. */}
             <MenuItem onClick={openAboutThisMac}>About This Mac</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("system.softwareUpdate")}>Software Update…</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("system.prefs")}>System Preferences…</MenuItem>
             <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
             {Object.values(apps).map((app) => {
               const icon = desktopIcons.find((i) => i.id === app.id)
@@ -206,6 +225,12 @@ export default function StatusBar() {
                 </MenuItem>
               )
             })}
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <MenuItem onClick={() => commandBus.dispatch("system.sleep")}>Sleep</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Restart…</MenuItem>
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Shut Down…</MenuItem>
+            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Exit to Recruiter Mode</MenuItem>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
 
@@ -462,6 +487,16 @@ export default function StatusBar() {
       </div>
     </Popover.Content>
   </Popover.Root>
+
+  {/* Spotlight magnifier — far-right menu extra (Tiger). Opens the ⌘Space sheet. */}
+  <button
+    aria-label="Spotlight"
+    onClick={() => window.dispatchEvent(new Event("spotlight:open"))}
+    className="px-1.5 hover:bg-black/10 rounded-sm"
+    title="Spotlight (⌘Space)"
+  >
+    <Search size={13} />
+  </button>
 </div>
     </div>
   )

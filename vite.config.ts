@@ -6,6 +6,38 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        /**
+         * ⚡ Vendor chunk optimization.
+         *
+         * IMPORTANT: React MUST share a chunk with every library that consumes
+         * it at module-evaluation time (react-rnd, @dnd-kit, @radix-ui,
+         * framer-motion). Splitting them into separate chunks broke the
+         * initialization order in the production build — a React-consuming vendor
+         * chunk could evaluate before vendor-react finished, throwing
+         * "Cannot set properties of undefined (setting 'Children')" (white
+         * screen). So all React + React-UI libs go in ONE `vendor-react` chunk.
+         *
+         * Supabase has no React dependency at eval time, so it stays separate for
+         * independent caching. App code is still code-split via React.lazy() in
+         * the app registry (heavy apps stay out of the initial bundle).
+         */
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('@supabase')) return 'vendor-supabase'
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|scheduler|react-rnd|@dnd-kit|@radix-ui|framer-motion|use-sync-external-store)[\\/]/.test(
+              id,
+            )
+          )
+            return 'vendor-react'
+          // everything else: let Rollup decide (default vendor splitting)
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -42,6 +74,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,woff2}'],
         cleanupOutdatedCaches: true,
+        // Take over immediately so a client that cached a broken build (e.g.
+        // the earlier vendor-chunk crash) gets the fixed bundle on next load
+        // instead of being served the stale, broken precache.
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           // ✅ Cache wallpapers, icons, sounds, etc. from Supabase Storage
           {

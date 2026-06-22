@@ -11,15 +11,40 @@ export function VisitorsWidget() {
   if (!anonId) return
   ;(async () => {
     try {
+      // Register this visit. The AFTER INSERT trigger on `visits` bumps the
+      // visit_stats counter (Phase 5 / P2.1); an upsert that matches the
+      // existing anon_id row no-ops (no new insert -> no double count).
       await supabase.from("visits").upsert({ anon_id: anonId })
-      const { count } = await supabase
-        .from("visits")
-        .select("*", { count: "exact", head: true })
-      setTotal(count ?? 0)
+
+      // Read the count from the single counter row (PK lookup) instead of
+      // COUNT(*) over the whole visits table.
+      const { data } = await supabase
+        .from("visit_stats")
+        .select("total")
+        .eq("id", 1)
+        .single()
+      if (data?.total != null) setTotal(Number(data.total))
     } catch (err) {
       console.warn("Visitor update failed:", err)
     }
   })()
+
+  // Live updates: the counter row updates once per new visit.
+  const channel = supabase
+    .channel("visit-stats")
+    .on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "visit_stats", filter: "id=eq.1" },
+      (payload) => {
+        const next = (payload.new as { total?: number | string })?.total
+        if (next != null) setTotal(Number(next))
+      }
+    )
+    .subscribe()
+
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }, [anonId])
 
 

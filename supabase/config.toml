@@ -1,0 +1,15 @@
+# Supabase project configuration — JeffOS
+# Project ref: akqqmrqeloasisiybdjx (whoisthedev portfolio)
+#
+# Minimal config to enable tracked migrations (`supabase/migrations/`).
+# This file does NOT apply anything; it only links the local migration
+# folder to the remote project for `supabase db push` / `supabase link`.
+#
+# NOTE: No migrations are applied automatically. See supabase/migrations/README.md
+# for the manual, review-gated apply procedure.
+
+project_id = "akqqmrqeloasisiybdjx"
+
+[db]
+# Postgres major version on the remote project (live: 17.x).
+major_version = 17

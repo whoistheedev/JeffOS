@@ -1,4 +1,4 @@
-import { Github, Linkedin, Coffee, FileText } from "lucide-react"
+import { Github, Linkedin, Coffee } from "lucide-react"
 
 export default function SocialsWidget() {
   return (
@@ -36,17 +36,6 @@ jeffrey-james-idodo-4402b6390
         className="hover:text-blue-400 transition-colors"
       >
         <Linkedin size={16} />
-      </a>
-
-      {/* Resume */}
-      <a
-        href="/Jeffrey James Idodo PERN_Full_Stack_Developer.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Resume"
-        className="hover:text-emerald-400 transition-colors"
-      >
-        <FileText size={16} />
       </a>
 
       {/* Buy Me a Coffee */}

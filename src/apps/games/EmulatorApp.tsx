@@ -58,53 +58,77 @@ export default function EmulatorApp() {
   const normalize = (str: string) =>
     str.toLowerCase().replace(/\s+/g, "").replace(/[()]/g, "")
 
-  // 🚀 Load games dynamically for all supported cores
+  // 🚀 Load games — manifest-first, with a fast parallel-list fallback.
+  //
+  // Phase 1 perf: the old path looped SUPPORTED_SYSTEMS (36) doing one
+  // SEQUENTIAL storage list() per system — 32 of which scanned empty folders
+  // (~6–11s). Now:
+  //   1. Read the precomputed `games_index` table (1 query). When populated,
+  //      discovery is O(1) regardless of catalog size — no bucket listing.
+  //   2. Fallback (index empty): list the bucket ROOT once to find the folders
+  //      that actually exist, then list only those IN PARALLEL — at most ~2
+  //      round-trips instead of 37 sequential calls.
   const loadGames = useCallback(async () => {
     try {
       setLoading(true)
+      const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/games`
+      const NO_THUMB = "https://dummyimage.com/512x384/1e1e1e/ffffff&text=No+Thumbnail"
 
-      // Fetch all thumbnails
-      const { data: thumbs } = await supabase.storage
-        .from("games")
-        .list("thumbs", { limit: 500 })
-      const thumbMap = new Map<string, string>()
-      thumbs?.forEach((f) => {
-        const key = normalize(f.name.replace(/\.(jpg|jpeg|png|webp)$/i, ""))
-        thumbMap.set(
-          key,
-          `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/games/thumbs/${f.name}`
-        )
-      })
-
-      const romExt =
-        /\.(nes|smc|sfc|gba|gbc|gb|n64|nds|iso|bin|cue|img|zip|chd|7z|rom)$/i
-      const all: GameItem[] = []
-
-      // Loop through supported systems
-      for (const system of SUPPORTED_SYSTEMS) {
-        const { data: files, error } = await supabase.storage
-          .from("games")
-          .list(system, { limit: 500 })
-
-        if (error || !files) continue
-
-        files.forEach((f) => {
-          if (!romExt.test(f.name)) return
-          const base = f.name.replace(romExt, "")
-          const key = normalize(base)
-          const thumb =
-            thumbMap.get(key) ||
-            "https://dummyimage.com/512x384/1e1e1e/ffffff&text=No+Thumbnail"
-
-          all.push({
-            title: base,
-            core: system,
-            url: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/games/${system}/${f.name}`,
-            thumb,
-          })
-        })
+      // 1) Manifest-first: precomputed games_index (1 query, O(1) discovery).
+      const { data: indexRows } = await supabase
+        .from("games_index")
+        .select("game_id, system, title, rom_path, thumb_path")
+      if (indexRows && indexRows.length > 0) {
+        const items: GameItem[] = indexRows.map((r) => ({
+          title: r.title,
+          core: r.system,
+          url: `${base}/${r.rom_path}`,
+          thumb: r.thumb_path ? `${base}/${r.thumb_path}` : NO_THUMB,
+        }))
+        setGames(items.sort((a, b) => a.title.localeCompare(b.title)))
+        return
       }
 
+      // 2) Fallback: discover real folders, then list them in parallel.
+      const romExt =
+        /\.(nes|smc|sfc|gba|gbc|gb|n64|nds|iso|bin|cue|img|zip|chd|7z|rom)$/i
+
+      // Thumbnails + root folders in parallel (2 calls, not sequential).
+      const [thumbsRes, rootRes] = await Promise.all([
+        supabase.storage.from("games").list("thumbs", { limit: 500 }),
+        supabase.storage.from("games").list("", { limit: 100 }),
+      ])
+
+      const thumbMap = new Map<string, string>()
+      thumbsRes.data?.forEach((f) => {
+        const key = normalize(f.name.replace(/\.(jpg|jpeg|png|webp)$/i, ""))
+        thumbMap.set(key, `${base}/thumbs/${f.name}`)
+      })
+
+      // Only the folders that actually exist (and that we support), excluding
+      // thumbs — no more scanning 32 empty system folders.
+      const supported = new Set(SUPPORTED_SYSTEMS)
+      const folders = (rootRes.data || [])
+        .map((f) => f.name)
+        .filter((name) => name && name.toLowerCase() !== "thumbs" && supported.has(name))
+
+      // List each real folder IN PARALLEL.
+      const perFolder = await Promise.all(
+        folders.map(async (system) => {
+          const { data: files } = await supabase.storage
+            .from("games")
+            .list(system, { limit: 500 })
+          return (files || [])
+            .filter((f) => romExt.test(f.name))
+            .map((f) => {
+              const title = f.name.replace(romExt, "")
+              const thumb = thumbMap.get(normalize(title)) || NO_THUMB
+              return { title, core: system, url: `${base}/${system}/${f.name}`, thumb }
+            })
+        })
+      )
+
+      const all = perFolder.flat()
       setGames(all.sort((a, b) => a.title.localeCompare(b.title)))
     } catch (err) {
       console.error("❌ Error loading games:", err)
@@ -113,30 +137,11 @@ export default function EmulatorApp() {
     }
   }, [])
 
-  // 🔁 Watch Supabase changes
-  useEffect(() => {
-    const channel = supabase
-      .channel("games-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "storage",
-          table: "objects",
-          filter: "bucket_id=eq.games",
-        },
-        () => {
-          clearTimeout((window as any)._gamesRefreshTimer)
-          ;(window as any)._gamesRefreshTimer = setTimeout(() => loadGames(), 1200)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [loadGames])
-
+  // NOTE: a `games-realtime` postgres_changes subscription on storage.objects
+  // was removed in Phase 5 (P2.3). storage.objects is not in the
+  // supabase_realtime publication, so it never fired; ROM uploads are rare and
+  // admin-driven. The games list loads on mount (below) and on remount; a
+  // precomputed games_index (P5.1) is the path to live/cheap refresh later.
   useEffect(() => {
     loadGames()
   }, [loadGames])
@@ -176,6 +181,8 @@ export default function EmulatorApp() {
             </div>
           ) : (
             <GameLibrary
+              games={games}
+              loaded={!loading}
               onSelect={(game) => {
                 setSelected(game)
                 setStarted(true)

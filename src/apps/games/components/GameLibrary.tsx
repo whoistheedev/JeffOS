@@ -1,75 +1,23 @@
-import React, { useEffect, useState } from "react"
-import { supabase } from "../../../lib/supabase"
 import type { GameItem } from "../EmulatorApp"
+import { thumbUrl } from "../../../lib/imageUrl"
 
-export function GameLibrary({ onSelect }: { onSelect: (g: GameItem) => void }) {
-  const [games, setGames] = useState<GameItem[]>([])
-  const [loaded, setLoaded] = useState(false)
-
-  const normalize = (str: string) =>
-    str.toLowerCase().replace(/\s+/g, "").replace(/[()]/g, "")
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadGames = async () => {
-      try {
-        const { data: folders } = await supabase.storage.from("games").list("", { limit: 50 })
-        const validFolders = (folders || []).filter(
-          (f) => f.name && f.name.toLowerCase() !== "thumbs"
-        )
-
-        const { data: thumbs } = await supabase.storage
-          .from("games")
-          .list("thumbs", { limit: 500 })
-
-        const thumbMap = new Map<string, string>()
-        thumbs?.forEach((f) => {
-          const key = normalize(f.name.replace(/\.(jpg|jpeg|png|webp)$/i, ""))
-          thumbMap.set(
-            key,
-            `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/games/thumbs/${f.name}`
-          )
-        })
-
-        const romExt = /\.(nes|smc|gba|gb|n64|bin|iso|zip|img)$/i
-        const all: GameItem[] = []
-
-        for (const folder of validFolders) {
-          const { data: files } = await supabase.storage
-            .from("games")
-            .list(folder.name, { limit: 300 })
-          files?.forEach((f) => {
-            if (!romExt.test(f.name)) return
-            const base = f.name.replace(romExt, "")
-            const key = normalize(base)
-            const thumb =
-              thumbMap.get(key) ||
-              "https://dummyimage.com/512x288/1e1e1e/ffffff&text=No+Thumbnail"
-            all.push({
-              title: base,
-              core: folder.name,
-              url: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/games/${folder.name}/${f.name}`,
-              thumb,
-            })
-          })
-        }
-
-        if (!cancelled) {
-          setGames(all.sort((a, b) => a.title.localeCompare(b.title)))
-          setLoaded(true)
-        }
-      } catch (err) {
-        console.error("❌ Error loading games:", err)
-      }
-    }
-
-    loadGames()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
+/**
+ * GameLibrary — PRESENTATIONAL only (Phase 1 perf).
+ *
+ * Previously this ran its OWN full bucket discovery (root list + per-folder +
+ * thumbs) on mount, duplicating the work EmulatorApp already did. Now it
+ * receives the games + loading state as props from EmulatorApp (the single
+ * source of truth), so discovery runs exactly once.
+ */
+export function GameLibrary({
+  games,
+  loaded,
+  onSelect,
+}: {
+  games: GameItem[]
+  loaded: boolean
+  onSelect: (g: GameItem) => void
+}) {
   // ✨ shimmer-only loader (never shows any text)
   if (!loaded) {
     return (
@@ -121,8 +69,9 @@ export function GameLibrary({ onSelect }: { onSelect: (g: GameItem) => void }) {
                        transition-all duration-200 ease-out"
           >
             <img
-              src={g.thumb}
+              src={thumbUrl(g.thumb)}
               alt={g.title}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 (e.target as HTMLImageElement).src =

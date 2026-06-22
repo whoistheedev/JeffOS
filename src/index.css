@@ -13,10 +13,25 @@
 /* -------------------------------------------------------
    Document defaults
 --------------------------------------------------------*/
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+/* #root grows with content (Recruiter Mode scrolls); JeffOS pins it to 100%
+   via html.jeffos-active below. */
+#root {
+  min-height: 100%;
+}
+
+/* Tiger authenticity: the whole OS shell uses Lucida Grande — Tiger's system
+   font — when JeffOS is active. Recruiter Mode (no .jeffos-active) keeps the
+   clean modern system stack on purpose. This is the single highest-impact
+   authenticity change (see TIGER_AUTHENTICITY_REVIEW §1/§2). */
+html.jeffos-active,
+html.jeffos-active body {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* -------------------------------------------------------
@@ -87,6 +102,18 @@ html, body, #root {
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  /* ---- Recruiter Mode tokens (Phase 6) ----
+     Conversion-intent tokens. Theme-INDEPENDENT on purpose: holiday themes
+     shift --accent seasonally, but the Hire CTA must stay recognizable and
+     AA-contrast across every theme. See PHASE_6_RECRUITER_MODE.md §6.1. */
+  --color-hire: oklch(0.55 0.2 264);              /* indigo-600-ish CTA */
+  --color-hire-foreground: oklch(0.985 0 0);      /* text on hire */
+  --color-live: oklch(0.72 0.19 145);             /* realtime "live" dot (green) */
+  --touch-target-min: 44px;                       /* WCAG 2.5.5 / Apple HIG */
+  --space-safe-top: env(safe-area-inset-top, 0px);
+  --space-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sheet-radius: 16px;                           /* vaul bottom sheets */
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -178,6 +205,22 @@ html, body, #root {
   100% { transform: translateX(400%); }
 }
 
+/* Tiger boot spinner (steps for the classic 12-spoke pinwheel cadence) */
+@keyframes boot-gear-spin {
+  to { transform: rotate(360deg); }
+}
+.boot-gear {
+  transform-origin: center;
+  animation: boot-gear-spin 1s steps(12) infinite;
+}
+
+/* Exposé F11 "Show Desktop": slide every open window off the edges to reveal
+   the desktop; clicking the catcher overlay restores. */
+html.expose-desktop [role="dialog"] {
+  transform: translateY(120vh) !important;
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
 .animate-tiger-loader {
   width: 30%;
   animation: tiger-loader 2.2s ease-in-out infinite;
@@ -238,12 +281,21 @@ html {
   touch-action: manipulation;
 }
 
-/* Global scaling for all elements */
+/* Recruiter Mode is a normal scrolling document, so body/#root must NOT clip
+   or be locked to viewport height by default. JeffOS (the fixed desktop OS)
+   re-applies the lock via the `.jeffos-active` class on <html> while it's
+   mounted (see RootRouter). */
 body, #root {
   width: 100%;
+  overscroll-behavior: none;
+}
+
+/* JeffOS fixed-viewport lock — only while the OS is active. */
+html.jeffos-active,
+html.jeffos-active body,
+html.jeffos-active #root {
   height: 100%;
   overflow: hidden;
-  overscroll-behavior: none;
 }
 
 /* Safe area for devices with notches (e.g. iPhone) */

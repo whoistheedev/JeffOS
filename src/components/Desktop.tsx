@@ -10,6 +10,7 @@ import {
   themesLoadedAt,
 } from "../config/themes"
 import { getActiveHoliday, type ThemeId, type Holiday } from "../config/holidays"
+import { wallpaperUrl as renderWallpaper } from "../lib/imageUrl"
 
 /* -------------------------------------------------------------------------- */
 /* 🖥 Desktop Component                                                       */
@@ -24,6 +25,9 @@ export default function Desktop() {
 
   // Local UI state
   const [wallpaperUrl, setWallpaperUrl] = useState<string>("")
+  // The actually-painted (rendered) URL — only updated after the image decodes,
+  // so the previous wallpaper stays visible until the next is ready.
+  const [displayedUrl, setDisplayedUrl] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
 
@@ -31,16 +35,44 @@ export default function Desktop() {
   const trash = useStore((s) => s.trash)
 
   /* -------------------------------------------------------------------------- */
-  /* ⚡ Instantly show cached wallpaper on mount                                */
+  /* ⚡ Instant cached wallpaper on mount                                       */
   /* -------------------------------------------------------------------------- */
   useEffect(() => {
-    if (wallpaper?.full) {
-      setWallpaperUrl(wallpaper.full)
-      console.log("⚡ Restored cached wallpaper:", wallpaper.name)
-    }
-    const t = setTimeout(() => setReady(true), 200)
-    return () => clearTimeout(t)
+    if (wallpaper?.full) setWallpaperUrl(wallpaper.full)
+    setReady(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  /* -------------------------------------------------------------------------- */
+  /* 🖼️ Keep-previous + cross-fade (Phase 1 perf fix).                         */
+  /* The currently-painted wallpaper (`displayedUrl`) stays visible while the   */
+  /* next one loads off-DOM; only when the new image is decoded do we swap +    */
+  /* cross-fade. Never shows black; repeat visits paint the persisted wallpaper */
+  /* instantly; theme swaps fade smoothly. (Render endpoint = small+cacheable.) */
+  /* -------------------------------------------------------------------------- */
+  const targetUrl = wallpaperUrl
+  useEffect(() => {
+    if (!targetUrl) return
+    const rendered = renderWallpaper(targetUrl)
+    // First paint: if nothing is displayed yet, show it immediately (the
+    // persisted/cached image is likely already in browser/edge cache).
+    if (!displayedUrl) {
+      setDisplayedUrl(rendered)
+      return
+    }
+    if (rendered === displayedUrl) return
+    let cancelled = false
+    const img = new Image()
+    img.src = rendered
+    const swap = () => {
+      if (!cancelled) setDisplayedUrl(rendered)
+    }
+    img.decode?.().then(swap).catch(swap)
+    img.onload = swap
+    return () => {
+      cancelled = true
+    }
+  }, [targetUrl, displayedUrl])
 
   /* -------------------------------------------------------------------------- */
   /* ⏰ Hourly holiday theme detection + auto apply                             */
@@ -146,15 +178,17 @@ export default function Desktop() {
   /* -------------------------------------------------------------------------- */
   const bgStyle = useMemo<React.CSSProperties>(
     () => ({
-      backgroundImage: wallpaperUrl ? `url('${wallpaperUrl}')` : undefined,
+      // `displayedUrl` is already the rendered (resized + CDN-cacheable) URL and
+      // is only set after decode → no black gap, smooth cross-fade.
+      backgroundImage: displayedUrl ? `url('${displayedUrl}')` : undefined,
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
-      backgroundColor: "#000",
+      backgroundColor: "#0b1020", // subtle backdrop (not black) before first paint
       opacity: ready ? 1 : 0,
-      transition: "opacity 0.2s ease-in-out, background-image 1s ease-in-out",
+      transition: "opacity 0.4s ease-in-out, background-image 0.6s ease-in-out",
     }),
-    [wallpaperUrl, ready]
+    [displayedUrl, ready]
   )
 
   const newFolder = () => {
@@ -199,13 +233,13 @@ export default function Desktop() {
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
         <div className="fixed inset-0 z-0" style={bgStyle}>
-          {!prefersReducedMotion && wallpaperUrl && (
+          {!prefersReducedMotion && displayedUrl && (
             <motion.div
-              key={wallpaperUrl}
+              key={displayedUrl}
               className="absolute inset-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1.0, ease: "easeInOut" }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
             />
           )}
 

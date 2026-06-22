@@ -26,8 +26,47 @@ export const LOCAL_THEMES: Record<ThemeId, ThemePack> = {
 export let THEME_PACKS: Record<string, ThemePack> = { ...LOCAL_THEMES }
 export let themesLoadedAt = 0
 
-/* ☁️ Load wallpapers by trying known filenames ----------------------------- */
+/* ☁️ Manifest-first load (Phase 5 / P5.2) ---------------------------------- */
+/**
+ * Fast path: read a single `defaults.themes_manifest` row mapping
+ * themeId -> wallpaperUrl, instead of HEAD-probing up to 4 extensions per theme
+ * (the ~32-request boot cost, audit S3). Returns true if the manifest was found
+ * and applied; false to fall back to the legacy probe below.
+ */
+async function tryLoadThemesManifest(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("defaults")
+      .select("value")
+      .eq("key", "themes_manifest")
+      .single()
+    if (error || !data?.value) return false
+
+    const map = JSON.parse(data.value) as Record<string, string | null>
+    const loaded = { ...LOCAL_THEMES }
+    let count = 0
+    for (const [themeId, theme] of Object.entries(LOCAL_THEMES)) {
+      const url = map[themeId]
+      if (url) {
+        loaded[themeId as ThemeId] = { ...theme, wallpaperUrl: url }
+        count++
+      }
+    }
+    THEME_PACKS = loaded
+    themesLoadedAt = Date.now()
+    console.log(`🌈 Loaded ${count} wallpapers from themes_manifest (1 request)`)
+    return true
+  } catch (err) {
+    console.warn("⚠️ themes_manifest read failed, falling back to probe:", err)
+    return false
+  }
+}
+
+/* ☁️ Load wallpapers by trying known filenames (fallback) ------------------ */
 export async function loadThemesFromSupabase(): Promise<void> {
+  // Manifest-first: skip all HEAD-probing when the manifest row exists.
+  if (await tryLoadThemesManifest()) return
+
   try {
     const bucket = "themes"
     console.log(`🎨 Loading wallpapers from Supabase bucket: ${bucket}`)

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Rnd } from "react-rnd";
 import {
   motion,
@@ -22,6 +22,27 @@ type Props = {
 
 const DEFAULT_SIZE = { width: 640, height: 420 };
 
+/**
+ * Fallback shown inside a window's content area while a lazy app chunk loads.
+ * Kept tiny and dependency-free; spin animation is skipped under reduced motion
+ * (the `motion-reduce` variant) so it degrades to a static label.
+ */
+function WindowLoadingFallback() {
+  return (
+    <div
+      className="flex h-full w-full items-center justify-center gap-3 bg-white text-sm text-gray-500"
+      role="status"
+      aria-live="polite"
+    >
+      <span
+        className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 motion-reduce:animate-none"
+        aria-hidden="true"
+      />
+      Loading…
+    </div>
+  );
+}
+
 // Store per-app memory
 const windowMemory: Record<
   string,
@@ -33,20 +54,21 @@ export default function Window({ id, title }: Props) {
   const closeWindow = useStore((s) => s.closeWindow);
   const minimizeWindow = useStore((s) => s.minimizeWindow);
   const zoomWindow = useStore((s) => s.zoomWindow);
-  const moveWindow = useStore((s) => s.moveWindow);
   const focusWindow = useStore((s) => s.focusWindow);
   const focusStack = useStore((s) => s.focusStack);
   const dockPos = useStore((s) => s.dockIconPositions[win?.appKey || ""]);
 
   const [hasBeenAutoSized, setHasBeenAutoSized] = useState(false);
-  if (!win) return null;
 
-  // Handle special About modals
-  if ((win.appKey as string) === "about") return <AboutWindow id={id} />;
-  if ((win.appKey as string) === "about-app") return <AboutAppWindow id={id} />;
+  // ⚠️ All hooks below MUST run on every render in the same order. Do NOT add
+  // early returns above this point — the special-case / null returns happen
+  // after every hook has been called (see the guards further down). Hook bodies
+  // guard on `win?.` since `win` can be briefly undefined.
 
-  // Registry
-  const appMeta = AppRegistry[win.appKey as keyof typeof AppRegistry] ?? null;
+  // Registry (safe to compute even when win is undefined)
+  const appMeta = win
+    ? AppRegistry[win.appKey as keyof typeof AppRegistry] ?? null
+    : null;
   const AppComponent = appMeta ? appMeta.component : null;
   const isResizable = appMeta ? appMeta.resizable : true;
 
@@ -55,7 +77,7 @@ export default function Window({ id, title }: Props) {
 
   // Responsive sizing logic
   useEffect(() => {
-    if (hasBeenAutoSized) return;
+    if (!win || hasBeenAutoSized) return;
     const remembered = windowMemory[win.appKey];
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -81,7 +103,11 @@ export default function Window({ id, title }: Props) {
     }));
     setHasBeenAutoSized(true);
     playSystemSound("open");
-  }, [id, win.appKey, hasBeenAutoSized]);
+    // `win` is intentionally accessed via optional chaining inside; depending on
+    // its full identity would re-run this one-shot auto-size effect on every
+    // window mutation, so we key on the stable appKey instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, win?.appKey, hasBeenAutoSized]);
 
   const saveMemory = (data: {
     x: number;
@@ -89,10 +115,10 @@ export default function Window({ id, title }: Props) {
     width: number;
     height: number;
   }) => {
-    windowMemory[win.appKey] = data;
+    if (win) windowMemory[win.appKey] = data;
   };
 
-  // Keyboard shortcuts (Mac style)
+  // Keyboard shortcuts (Mac style) + Escape-to-close (a11y)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const stack = storeApi.getState().focusStack;
@@ -100,6 +126,12 @@ export default function Window({ id, title }: Props) {
       if (top !== id) return;
 
       const key = e.key.toLowerCase();
+      // Escape closes the focused window (standard dialog convention).
+      if (key === "escape") {
+        playSystemSound("close");
+        closeWindow(id);
+        return;
+      }
       if (e.metaKey && key === "w") {
         playSystemSound("close");
         closeWindow(id);
@@ -151,6 +183,12 @@ export default function Window({ id, title }: Props) {
     return 100 + (idx >= 0 ? idx : 0);
   }, [focusStack, id]);
 
+  // ── Guard returns (after all hooks have run) ───────────────────────────────
+  if (!win) return null;
+  // Special About modals render their own components.
+  if ((win.appKey as string) === "about") return <AboutWindow id={id} />;
+  if ((win.appKey as string) === "about-app") return <AboutAppWindow id={id} />;
+
   const visibleVariant: TargetAndTransition = {
     opacity: 1,
     scale: 1,
@@ -162,13 +200,22 @@ export default function Window({ id, title }: Props) {
     y: 60,
     transition: { duration: 0.2, ease: easeIn },
   };
+  // Closer-to-Tiger genie: a two-stage curl — first pinch the width and start
+  // dropping, then suck the rest of the way to the dock while collapsing height.
+  // (Keyframe arrays approximate the curved "neck" better than a single skew.)
+  const dx = (dockPos?.x ?? 0) - (win.x + win.width / 2);
+  const dy = (dockPos?.y ?? 0) - (win.y + win.height);
   const genieVariant: TargetAndTransition = {
-    opacity: 0,
-    scaleY: 0.1,
-    scaleX: 0.5,
-    x: (dockPos?.x ?? 0) - (win.x + win.width / 2),
-    y: (dockPos?.y ?? 0) - (win.y + win.height),
-    transition: { duration: 0.55, ease: [0.65, 0, 0.35, 1] },
+    opacity: [1, 0.9, 0],
+    scaleX: [1, 0.45, 0.12],
+    scaleY: [1, 0.85, 0.04],
+    x: [0, dx * 0.4, dx],
+    y: [0, dy * 0.35, dy],
+    transition: {
+      duration: 0.5,
+      ease: [0.5, 0, 0.3, 1],
+      times: [0, 0.45, 1],
+    },
   };
 
   const variants: Variants = {
@@ -220,12 +267,17 @@ export default function Window({ id, title }: Props) {
       {!win.minimized && (
         <motion.div
           key={id}
+          // a11y: each window is a non-modal dialog (multiple can be open).
+          role="dialog"
+          aria-modal={false}
+          aria-label={title ?? String(win.appKey)}
           initial="hidden"
           animate="visible"
           exit={win.minimizing ? "genie" : "hidden"}
           variants={variants}
           className="absolute touch-none select-none"
-          style={{ zIndex }}
+          // bottom origin so the genie collapses downward toward the dock
+          style={{ zIndex, transformOrigin: "bottom center" }}
           onMouseDown={() => {
             focusWindow(id);
             playSystemSound("focus");
@@ -254,10 +306,10 @@ export default function Window({ id, title }: Props) {
             enableResizing={isResizable}
             dragHandleClassName="titlebar"
             disableDragging={window.innerWidth < 480} // prevent accidental drags on phones
-            className={`rounded-md overflow-hidden ${
-              isActive ? "shadow-xl" : "shadow"
-            }`}
+            className="overflow-hidden"
             style={{
+              // Tiger windows have tight top corners (~6px), not modern rounding.
+              borderRadius: "6px 6px 0 0",
               backgroundImage: `
                 linear-gradient(to bottom, #f4f4f4, #b0b0b0),
                 repeating-linear-gradient(
@@ -269,7 +321,13 @@ export default function Window({ id, title }: Props) {
               `,
               backgroundBlendMode: "overlay, overlay, normal",
               backgroundSize: "auto, 1px, 150px",
-              border: isActive ? "1px solid #555" : "1px solid #777",
+              border: isActive ? "1px solid #555" : "1px solid #888",
+              // Active windows cast a much heavier shadow than background ones
+              // (Tiger hallmark); inactive chrome reads dimmer.
+              boxShadow: isActive
+                ? "0 18px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)"
+                : "0 6px 16px rgba(0,0,0,0.22)",
+              opacity: isActive ? 1 : 0.97,
               touchAction: "none",
             }}
             onDrag={(_, d) => {
@@ -368,24 +426,29 @@ export default function Window({ id, title }: Props) {
                 borderTop: "1px solid #d0d0d0",
               }}
             >
-              {win.props?.component && typeof win.props.component === "function" ? (
-                (() => {
-                  const DynamicComp = win.props.component as ComponentType<any>;
-                  return <DynamicComp />;
-                })()
-              ) : AppComponent ? (
-                appMeta && appMeta.expandToFit ? (
-                  <div className="w-full h-full">
-                    <AppComponent />
-                  </div>
+              {/* ⚡ Suspense boundary for lazy-loaded apps. The window chrome
+                  (titlebar/traffic lights) stays mounted; only the content area
+                  shows the fallback while the app's chunk is fetched. */}
+              <Suspense fallback={<WindowLoadingFallback />}>
+                {win.props?.component && typeof win.props.component === "function" ? (
+                  (() => {
+                    const DynamicComp = win.props.component as ComponentType<any>;
+                    return <DynamicComp />;
+                  })()
+                ) : AppComponent ? (
+                  appMeta && appMeta.expandToFit ? (
+                    <div className="w-full h-full">
+                      <AppComponent />
+                    </div>
+                  ) : (
+                    <div className="inline-block">
+                      <AppComponent />
+                    </div>
+                  )
                 ) : (
-                  <div className="inline-block">
-                    <AppComponent />
-                  </div>
-                )
-              ) : (
-                <div className="p-4">No app found</div>
-              )}
+                  <div className="p-4">No app found</div>
+                )}
+              </Suspense>
             </div>
           </Rnd>
         </motion.div>

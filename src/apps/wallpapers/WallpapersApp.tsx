@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { supabase } from "../../lib/supabase"
 import { useStore } from "../../store"
+import { renderImage } from "../../lib/imageUrl"
 import { toast } from "sonner"
 
 type Wallpaper = {
@@ -15,7 +16,6 @@ const VALID_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "heic", "heif"]
 
 export default function WallpapersApp() {
   const [groups, setGroups] = useState<Record<string, Wallpaper[]>>({})
-  const [loading, setLoading] = useState(true)
   const [preview, setPreview] = useState<Wallpaper | null>(null)
 
   const setWallpaper = useStore((s) => s.setWallpaper)
@@ -55,7 +55,6 @@ export default function WallpapersApp() {
   // 🧠 Load wallpapers dynamically
   useEffect(() => {
     const loadWallpapers = async () => {
-      setLoading(true)
       const grouped: Record<string, Wallpaper[]> = {}
 
       const { data: folders } = await supabase.storage
@@ -87,25 +86,12 @@ export default function WallpapersApp() {
       }
 
       setGroups(grouped)
-      setLoading(false)
     }
 
     loadWallpapers()
   }, [])
 
   const current = prefsWallpaper?.full
-
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-full text-gray-700 text-sm">
-        <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        >
-          Loading Desktop Pictures…
-        </motion.div>
-      </div>
-    )
 
   return (
     <div
@@ -128,13 +114,13 @@ export default function WallpapersApp() {
         >
           {preview?.full ? (
             <img
-              src={preview.full}
+              src={renderImage(preview.full, { width: 640, quality: 70, resize: "cover" })}
               alt="Preview"
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : current ? (
             <img
-              src={current}
+              src={renderImage(current, { width: 640, quality: 70, resize: "cover" })}
               alt="Current wallpaper"
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -216,8 +202,9 @@ export default function WallpapersApp() {
                       onClick={() => setPreview(wp)}
                     >
                       <img
-                        src={wp.full}
+                        src={renderImage(wp.full, { width: 256, quality: 65, resize: "cover" })}
                         alt={wp.name}
+                        loading="lazy"
                         className="w-full h-24 object-cover transition-all group-hover:brightness-110"
                         draggable={false}
                       />
