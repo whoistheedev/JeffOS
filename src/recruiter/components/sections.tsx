@@ -1,4 +1,5 @@
 import { Calendar, ArrowUpRight, FolderGit2 } from "lucide-react"
+import { LaunchJeffOSButton } from "./LaunchJeffOSButton"
 import {
   IDENTITY,
   TRUST_INDICATORS,
@@ -106,7 +107,7 @@ export function Hero({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        {/* Primary */}
+        {/* Primary — the business conversion. */}
         <a
           href={scheduleHref()}
           target={CONTACT.schedulerUrl ? "_blank" : undefined}
@@ -116,22 +117,29 @@ export function Hero({
         >
           <Calendar size={16} aria-hidden /> Schedule a Conversation
         </a>
-        {/* Secondary */}
+        {/* #2 — the signature flex, promoted to a distinctive OS CTA so it sells
+            JeffOS in the first viewport (UX_AUDIT_JEFFOS_ENTRY). */}
+        <LaunchJeffOSButton onClick={onLaunchJeffOS} variant="compact" />
+        {/* Tertiary — quiet. */}
         <button
           onClick={() => (onViewProjects ? onViewProjects() : scrollToId("work"))}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
-          style={{ minHeight: "var(--touch-target-min)" }}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          <FolderGit2 size={16} aria-hidden /> View Projects
-        </button>
-        {/* Tertiary — quiet, never competes with Schedule */}
-        <button
-          onClick={onLaunchJeffOS}
-          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-        >
-          Launch JeffOS →
+          <FolderGit2 size={14} aria-hidden /> View Projects
         </button>
       </div>
+
+      {/* Move 2 — above-the-fold hook line. Plants the OS idea before any
+          scrolling, turning the easter egg into an explicit invitation. */}
+      <button
+        onClick={onLaunchJeffOS}
+        className="-mt-1 max-w-prose text-left text-[13px] leading-relaxed text-muted-foreground"
+      >
+        PS — this whole site is a <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+        <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
+          Take it for a spin →
+        </span>
+      </button>
 
       <div className="flex flex-wrap gap-2 pt-1">
         {TRUST_INDICATORS.map((t) => (

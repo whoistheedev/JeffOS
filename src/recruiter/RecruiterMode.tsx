@@ -1,8 +1,9 @@
 import { useRef, useState } from "react"
-import { Home, FolderGit2, Clock, Mail, Calendar, Github, Linkedin, ArrowUpRight, Sun, Moon } from "lucide-react"
+import { Home, FolderGit2, Clock, Mail, Calendar, Github, Linkedin, Sun, Moon } from "lucide-react"
 import { useFormFactor } from "../hooks/useFormFactor"
 import { useRecruiterTheme } from "./useRecruiterTheme"
 import ErrorBoundary from "../components/ErrorBoundary"
+import { LaunchJeffOSButton } from "./components/LaunchJeffOSButton"
 import {
   Hero,
   StatBand,
@@ -100,7 +101,7 @@ function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        {/* Primary */}
+        {/* Primary — the business conversion. */}
         <a
           href={scheduleHref()}
           target={CONTACT.schedulerUrl ? "_blank" : undefined}
@@ -110,20 +111,16 @@ function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
         >
           <Calendar size={16} aria-hidden /> Schedule a Conversation
         </a>
-        {/* Secondary */}
+        {/* #2 — the signature flex. Promoted from a tiny text link to a
+            distinctive OS CTA that sells JeffOS (UX_AUDIT_JEFFOS_ENTRY). */}
+        <LaunchJeffOSButton onClick={onLaunchJeffOS} variant="full" />
+        {/* Tertiary — quiet. Projects also live in the section nav + Featured
+            Work, so demoting this loses nothing. */}
         <button
           onClick={() => scrollTo("work")}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium"
-          style={{ minHeight: "var(--touch-target-min)" }}
-        >
-          <FolderGit2 size={16} aria-hidden /> View Projects
-        </button>
-        {/* Tertiary — quiet */}
-        <button
-          onClick={onLaunchJeffOS}
           className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Launch JeffOS <ArrowUpRight size={14} aria-hidden />
+          <FolderGit2 size={14} aria-hidden /> View Projects
         </button>
       </div>
 
@@ -215,6 +212,18 @@ function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) 
               {IDENTITY.headline}
             </h2>
             <p className="mt-3 max-w-prose text-base text-muted-foreground">{IDENTITY.subtitle}</p>
+            {/* Above-the-fold hook (UX_AUDIT_JEFFOS_ENTRY Move 2) — plants the OS
+                idea in the main column, not just the sidebar. */}
+            <button
+              onClick={onLaunchJeffOS}
+              className="mt-4 max-w-prose text-left text-sm leading-relaxed text-muted-foreground"
+            >
+              PS — this entire site is a{" "}
+              <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+              <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
+                Take it for a spin →
+              </span>
+            </button>
           </div>
           <ContentColumn onLaunchJeffOS={onLaunchJeffOS} />
           <RecruiterFooter />
