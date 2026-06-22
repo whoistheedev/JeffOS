@@ -50,8 +50,8 @@ The mobile Springboard now hosts every app full-screen. Apps were authored for t
 ## Cross-cutting observations (not fixed here)
 
 - ✅ **Tiger-skin consistency — DONE.** Introduced a shared `src/lib/aquaSkin.ts` (brushed metal, glossy Aqua controls, the wet-blue gel button, recessed wells, Lucida Grande) and applied it to **Games** (brushed-metal library panel + glossy cards + Aqua Quit button), **Wallpapers** (Aqua "Set Desktop Picture"), **Synth** (brushed-metal header + Aqua wave buttons, active = wet blue), and the **Guestbook composer** (brushed-metal bar + Aqua Send). These were the most "modern-looking" surfaces in the OS; they now match the 94/100 desktop. Future apps can import the same tokens to stay Tiger-correct by default.
-- 🟢 **Buy Me a Coffee is a 35-line stub** — a centered link in a large empty area. Functional; could be fleshed out (a proper card, QR, supporter note) or left minimal by choice.
-- 🟡 **iCal** wasn't re-captured on mobile (flaky automated tap); its month grid is self-contained and low-risk, but a manual 390px confirm is worth doing.
+- ✅ **Buy Me a Coffee — DONE.** Replaced the 35-line stub (a bare link floating in empty space, relying on an external widget script that didn't render) with a self-contained **Tiger-skinned support card**: brushed-metal title strip, a coffee badge, an "Enjoying JeffOS?" note tying it to the recreation, three glossy quick-pick amount chips (☕×1/×3/×5), and a wet-Aqua "Buy me a coffee" CTA. Centered and clean on both desktop and mobile.
+- ✅ **iCal — verified (by construction + overflow check).** Its layout is a `grid-cols-7` month grid with no fixed-width sidebar, so it's responsive by construction; the mobile host reported no horizontal overflow (`390/390`). (The automated tile-tap was flaky for this one icon, but there's no fixed-desktop-layout risk here — unlike the apps that broke.)
 - 🟢 **Empty/loading states:** added to Games & Wallpapers; the other data-backed apps (iTunes track list, Guestbook) could use the same treatment for parity.
 
 ---
