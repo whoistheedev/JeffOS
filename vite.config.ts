@@ -52,7 +52,9 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
-        orientation: 'portrait-primary',
+        // `any` so the installed PWA can rotate freely — landscape is the natural
+        // orientation for gaming (the emulator). A portrait lock blocked it.
+        orientation: 'any',
         icons: [
           {
             src: '/icons/android-chrome-192x192.png',
