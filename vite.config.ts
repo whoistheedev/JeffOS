@@ -42,7 +42,15 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // `prompt` (not autoUpdate): when a new build is detected, the new SW
+      // waits and we surface a visible "Update available — Reload" toast that
+      // the user taps to apply (see components/PWAUpdatePrompt.tsx). This avoids
+      // silently swapping the app mid-session.
+      registerType: 'prompt',
+      // We register the SW ourselves via registerSW() in PWAUpdatePrompt (to get
+      // the onNeedRefresh callback), so disable the auto-injected registration
+      // script to avoid a double registration.
+      injectRegister: false,
       includeAssets: ['**/*'], // ✅ includes everything in /public (icons/, sound/, etc.)
       manifest: {
         name: 'JeffOS',
@@ -88,11 +96,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,woff2}'],
         cleanupOutdatedCaches: true,
-        // Take over immediately so a client that cached a broken build (e.g.
-        // the earlier vendor-chunk crash) gets the fixed bundle on next load
-        // instead of being served the stale, broken precache.
         clientsClaim: true,
-        skipWaiting: true,
+        // skipWaiting:false for the prompt flow — the new SW WAITS until the
+        // user taps "Reload" in the update toast, which calls updateSW() →
+        // skipWaiting at that moment. (Avoids swapping the app mid-session.)
+        skipWaiting: false,
         runtimeCaching: [
           // ✅ Cache wallpapers, icons, sounds, etc. from Supabase Storage
           {
