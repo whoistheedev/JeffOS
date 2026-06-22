@@ -71,6 +71,8 @@ export default function Window({ id, title }: Props) {
     : null;
   const AppComponent = appMeta ? appMeta.component : null;
   const isResizable = appMeta ? appMeta.resizable : true;
+  // Tiger-correct display name: explicit prop > registry title > app id fallback.
+  const displayTitle = title ?? appMeta?.title ?? win?.appKey;
 
   const prefersReducedMotion = useReducedMotion();
   const isActive = focusStack[focusStack.length - 1] === id;
@@ -270,7 +272,7 @@ export default function Window({ id, title }: Props) {
           // a11y: each window is a non-modal dialog (multiple can be open).
           role="dialog"
           aria-modal={false}
-          aria-label={title ?? String(win.appKey)}
+          aria-label={String(displayTitle)}
           initial="hidden"
           animate="visible"
           exit={win.minimizing ? "genie" : "hidden"}
@@ -414,7 +416,7 @@ export default function Window({ id, title }: Props) {
               </div>
 
               <div className="flex-1 text-center text-sm font-medium text-gray-800 truncate">
-                {title ?? win.appKey}
+                {displayTitle}
               </div>
               <div className="w-16" />
             </div>
