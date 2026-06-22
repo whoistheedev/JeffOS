@@ -2,7 +2,14 @@
 
 > **Lens:** product/UX + interaction design, in the context of JeffOS = **macOS Tiger** on desktop and an **iPhone-OS Springboard** on mobile.
 > **Method:** read the source, then drove both apps live in **both** hosts — the desktop `Window` (1440×900) and the new mobile full-screen `MobileAppHost` (iPhone 13). Evidence captured as screenshots. **0 console errors** on both form factors.
-> **Scope:** audit only — no code changed in this pass.
+> **Scope:** audit + fixes.
+>
+> **Update — priority fixes implemented:**
+> • **W1 (🔴 Wallpapers mobile layout)** — now form-factor responsive: a two-pane rail+grid on desktop, a stacked **preview banner on top + grid below** on mobile (`useFormFactor`). Verified usable on iPhone 13 (was a squished column).
+> • **W5 / W2** — added a **loading skeleton** (shimmer grid) and an explicit **"No wallpapers found"** empty state; the desktop grid now fills its area instead of reading sparse.
+> • **G2 (in-game Toolbar)** — buttons enlarged to ≥44px touch targets and **labelled** ("Quit", "CRT/LCD") instead of cryptic 12px icons.
+> • **G3** — added a **"No games found"** empty state.
+> All verified live (desktop 1440×900 + iPhone 13), 0 console errors, build green. Remaining (lower priority): Tiger-skin both apps (G1, W3), shorten the mobile nav title (W4), and the 390px follow-up audit of the other apps.
 
 ---
 
