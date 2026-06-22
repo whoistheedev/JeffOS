@@ -196,7 +196,7 @@ export default function EmulatorApp() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="flex flex-col w-full h-full bg-black rounded-b-lg overflow-hidden"
+          className="flex flex-col w-full h-full min-h-0 bg-black rounded-b-lg overflow-hidden"
         >
           <Toolbar
             title={selected?.title || ""}
