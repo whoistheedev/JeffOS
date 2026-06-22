@@ -17,9 +17,20 @@ import { Search, Briefcase } from "lucide-react"
  * the same Aqua/Lucida look.
  */
 
+/**
+ * Short, home-screen-friendly labels for the Springboard. iPhone home screens
+ * use terse names; the desktop registry names ("Desktop & Screen Saver",
+ * "Buy Me a Coffee") truncate to "Desktop & …" / "Buy Me a C…" on a phone tile,
+ * which fails the QA bar. Override the long ones with crisp mobile names.
+ */
+const MOBILE_NAME: Partial<Record<AppId, string>> = {
+  wallpapers: "Wallpaper",
+  bmcoffee: "Coffee",
+}
+
 /** Tiger-correct display name for an app id (Safari/iTunes/Games…), with fallback. */
 function displayName(id: AppId, fallback: string) {
-  return AppRegistry[id as keyof typeof AppRegistry]?.title ?? fallback
+  return MOBILE_NAME[id] ?? AppRegistry[id as keyof typeof AppRegistry]?.title ?? fallback
 }
 
 function SpringIcon({ icon, label }: { icon: AppIcon; label: string }) {

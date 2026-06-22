@@ -51,19 +51,22 @@ export interface AppsSlice {
   moveDesktopIcon: (id: AppId, x: number, y: number) => void
 }
 
+// Desktop-icon (and Apple-menu / dock) display titles. Tiger-cased proper names
+// — the old id-style labels (iguest/igames/iweb/iwallpapers/ical/itunes) broke
+// the "macOS Tiger" polish on the desktop. Icon FILES still resolve by `id`
+// (/icons/<id>.png), so only the visible labels change. Window title bars use
+// AppRegistry titles; these mirror them.
 const APPS: Record<AppId, AppMeta> = {
   finder: { id: "finder", title: "Finder" },
-  guestbook: { id: "guestbook", title: "iguest" },
-  games: { id: "games", title: "igames" },
-  wallpapers: { id: "wallpapers", title: "iwallpapers" },
-  explorer: { id: "explorer", title: "iweb" },
+  guestbook: { id: "guestbook", title: "Guestbook" },
+  games: { id: "games", title: "Games" },
+  wallpapers: { id: "wallpapers", title: "Wallpapers" },
+  explorer: { id: "explorer", title: "Safari" },
   synth: { id: "synth", title: "Synth" },
-  calendar: { id: "calendar", title: "ical" },
-  itunes: { id: "itunes", title: "itunes" },
+  calendar: { id: "calendar", title: "iCal" },
+  itunes: { id: "itunes", title: "iTunes" },
   terminal: { id: "terminal", title: "Terminal" },
-   bmcoffee: { id: "bmcoffee", title: "Buy Me Coffee" },
-  
-
+  bmcoffee: { id: "bmcoffee", title: "Buy Me a Coffee" },
 }
 
 const PINNED_DEFAULT: AppId[] = [
