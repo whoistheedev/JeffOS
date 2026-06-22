@@ -19,7 +19,6 @@ const Games = lazy(() => import("../games/EmulatorApp"));
 const Guestbook = lazy(() => import("../guestbook/Guestbook"));
 const Piano = lazy(() => import("../synth/Synth"));
 const Explorer = lazy(() => import("../browser/Explorer"));
-const Recruiter = lazy(() => import("../recruiter/Recruiter"));
 const Finder = lazy(() => import("../finder/Finder"));
 const Ipod = lazy(() => import("../music/iTunesApp"));
 const Terminal = lazy(() => import("../terminal/Terminal"));
@@ -43,7 +42,6 @@ export const AppRegistry: Partial<Record<AppId, AppMeta>> = {
   guestbook:    { component: Guestbook,   resizable: true,  expandToFit: true, title: "Guestbook" },
   synth:        { component: Piano,       resizable: false, expandToFit: true, title: "Synth" },   // 🎹 fixed
   explorer:     { component: Explorer,    resizable: true,  expandToFit: true, title: "Safari" },
-  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true, title: "Recruiter" },
   finder:       { component: Finder,      resizable: true,  expandToFit: true, title: "Finder" },
 
   itunes:       { component: Ipod,        resizable: false, expandToFit: true, title: "iTunes" },   // 🎵 fixed

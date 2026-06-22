@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Home, FolderGit2, Clock, Mail, Calendar, Github, Linkedin, ArrowUpRight, Sun, Moon } from "lucide-react"
 import { useFormFactor } from "../hooks/useFormFactor"
 import { useRecruiterTheme } from "./useRecruiterTheme"
@@ -247,6 +247,14 @@ type Tab = "home" | "projects" | "experience" | "contact"
 
 function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   const [tab, setTab] = useState<Tab>("home")
+  // The scrolling content region. We reset it to the top on every tab change so
+  // a tab never opens halfway down the previous tab's scroll offset (findings).
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const goToTab = (t: Tab) => {
+    setTab(t)
+    scrollRef.current?.scrollTo({ top: 0 })
+  }
+
   const tabs: { id: Tab; label: string; icon: typeof Home }[] = [
     { id: "home", label: "Home", icon: Home },
     { id: "projects", label: "Projects", icon: FolderGit2 },
@@ -256,14 +264,19 @@ function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
 
   return (
     <div className="flex h-[100dvh] flex-col bg-background text-foreground">
-      {/* Top bar: theme toggle always reachable */}
-      <div className="flex justify-end px-5 pt-[max(0.75rem,var(--space-safe-top))]">
+      {/* Top bar: identity (name) + theme toggle. Recruiters see who this is
+          above the fold without scrolling, mirroring the desktop sidebar. */}
+      <div className="flex items-center justify-between px-5 pt-[max(0.75rem,var(--space-safe-top))]">
+        <span className="text-sm font-semibold tracking-tight">{IDENTITY.name}</span>
         <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
       </div>
-      <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 pt-2 pb-24">
         {tab === "home" && (
           <div className="space-y-12">
-            <Hero onLaunchJeffOS={onLaunchJeffOS} />
+            <Hero
+              onLaunchJeffOS={onLaunchJeffOS}
+              onViewProjects={() => goToTab("projects")}
+            />
             <StatBand />
             <CurrentImpact />
             <ArchitectureHighlights />
@@ -295,7 +308,7 @@ function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
           return (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => goToTab(t.id)}
               aria-current={active ? "page" : undefined}
               className="flex flex-col items-center gap-0.5 py-2 text-[10px]"
               style={{ minHeight: "var(--touch-target-min)", color: active ? "var(--color-hire)" : "var(--muted-foreground)" }}
