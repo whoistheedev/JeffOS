@@ -288,7 +288,7 @@ function RecruiterMobile({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
             <StatBand />
             <CurrentImpact />
             <ArchitectureHighlights />
-            <FeaturedAchievement />
+            <FeaturedAchievement onViewProjects={() => goToTab("projects")} />
             <WhyHire />
             <AvailableFor />
             <JeffOSCallout onLaunchJeffOS={onLaunchJeffOS} />
