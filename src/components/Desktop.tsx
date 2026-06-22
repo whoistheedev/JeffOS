@@ -181,7 +181,9 @@ export default function Desktop() {
   // (below) so the blurred fill can sit BEHIND the contained image.
   const bgStyle = useMemo<React.CSSProperties>(
     () => ({
-      backgroundColor: "#0b1020", // fallback before first paint
+      // Tiger "Aqua Blue" solid desktop fill — the colour shown around a fitted
+      // picture (and before first paint). Authentic Tiger, not a modern blur.
+      background: "linear-gradient(to bottom, #5b7fb4 0%, #3f6aa6 100%)",
       opacity: ready ? 1 : 0,
       transition: "opacity 0.4s ease-in-out",
     }),
@@ -230,24 +232,10 @@ export default function Desktop() {
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
         <div className="fixed inset-0 z-0" style={bgStyle}>
-          {/* Layer 1 — blurred cover-fill: a soft, screen-filling blur of the
-              same image, so the letter/pillar-box bands read as intentional
-              rather than flat-colour letterboxing. */}
-          {displayedUrl && (
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url('${displayedUrl}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                filter: "blur(28px) brightness(0.85)",
-                transform: "scale(1.1)", // hide the blurred edges
-              }}
-            />
-          )}
-          {/* Layer 2 — the WHOLE wallpaper, contained (never cropped). */}
+          {/* The WHOLE wallpaper, contained (never cropped). When the picture
+              doesn't fill the screen, the surrounding area is the solid Tiger
+              "Aqua Blue" desktop colour (on `bgStyle` below) — the authentic
+              Tiger "Fit to Screen" behaviour, not a modern blurred backdrop. */}
           {displayedUrl && (
             <motion.div
               key={displayedUrl}
