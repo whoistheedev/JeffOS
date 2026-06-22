@@ -63,8 +63,10 @@ export default function MobileAppHost() {
         </div>
       </div>
 
-      {/* App content fills the rest. expandToFit apps stretch; others scroll. */}
-      <div className="relative flex-1 overflow-auto">
+      {/* App content fills the rest. `min-h-0` lets a full-height app (e.g. the
+          game emulator) actually fill the flex area instead of overflowing —
+          important on short landscape viewports. */}
+      <div className="relative flex-1 min-h-0 overflow-auto">
         <Suspense
           fallback={
             <div className="flex h-full items-center justify-center" role="status" aria-label="Loading">

@@ -39,24 +39,22 @@ export function EmulatorFrame({ game, shader }: { game: GameItem; shader: string
   `
 
   return (
-    <div className="relative flex-1 flex items-center justify-center bg-black overflow-hidden">
-      {/* metallic bezel */}
-      <div className="absolute inset-0 rounded-xl border border-[#3a3a3a]
-        shadow-[inset_0_2px_6px_rgba(255,255,255,0.15),0_6px_12px_rgba(0,0,0,0.6)]
-        pointer-events-none" />
-
-      {/* glass reflection overlay */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-b
-        from-white/5 to-transparent mix-blend-overlay pointer-events-none" />
-
+    <div className="relative flex-1 min-h-0 bg-black overflow-hidden">
+      {/* The iframe fills the play area absolutely so the emulator always uses
+          ALL available space (key for short landscape viewports — EmulatorJS
+          scales the game to fit its container). */}
       <iframe
         key={game.url + shader}
         srcDoc={srcDoc}
         sandbox="allow-scripts allow-same-origin"
-        className="w-full h-full border-0 rounded-xl"
-        allow="autoplay"
+        className="absolute inset-0 w-full h-full border-0"
+        allow="autoplay; fullscreen"
         title={game.title}
       />
+
+      {/* glass reflection overlay (decorative, non-interactive) */}
+      <div className="absolute inset-0 bg-gradient-to-b
+        from-white/5 to-transparent mix-blend-overlay pointer-events-none" />
     </div>
   )
 }

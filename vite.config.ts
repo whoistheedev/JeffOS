@@ -56,15 +56,27 @@ export default defineConfig({
         // orientation for gaming (the emulator). A portrait lock blocked it.
         orientation: 'any',
         icons: [
+          // NOTE: these live at the public/ ROOT (not /icons/). The old paths
+          // pointed at a non-existent /icons/ folder, so the icons 404'd and the
+          // browser refused to offer "Install" (a valid icon is required).
           {
-            src: '/icons/android-chrome-192x192.png',
+            src: '/android-chrome-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: '/icons/android-chrome-512x512.png',
+            src: '/android-chrome-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
+          },
+          // A maskable icon makes Android install/adaptive-icon work cleanly.
+          {
+            src: '/android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: '/apple-touch-icon.png',
