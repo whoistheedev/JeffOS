@@ -312,14 +312,17 @@ function AutoArrangedIcons({ icons }: { icons: any[] }) {
   const [positions, setPositions] = useState<{ id: string; x: number; y: number }[]>([])
 
   useEffect(() => {
-    const ICON_WIDTH = 96
-    const ICON_HEIGHT = 96
-    const ICON_GAP = 22
-    const TOP_OFFSET = 100
-    const LEFT_OFFSET = 80
-    const DOCK_HEIGHT = 80
-
     const arrange = () => {
+      // Tighter icon footprint on phones so the right-aligned grid doesn't
+      // overflow the left edge or crowd the ~390px viewport (§8 mobile polish).
+      const isPhone = window.innerWidth < 480
+      const ICON_WIDTH = isPhone ? 64 : 96
+      const ICON_HEIGHT = isPhone ? 64 : 96
+      const ICON_GAP = isPhone ? 14 : 22
+      const TOP_OFFSET = isPhone ? 64 : 100
+      const LEFT_OFFSET = isPhone ? 16 : 80
+      const DOCK_HEIGHT = 80
+
       const viewportHeight = window.innerHeight - (DOCK_HEIGHT + ICON_GAP)
       const usableHeight = viewportHeight - TOP_OFFSET
       const maxPerColumn = Math.floor(usableHeight / (ICON_HEIGHT + ICON_GAP))

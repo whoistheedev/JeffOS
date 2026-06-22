@@ -133,7 +133,14 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set, get) 
 
     if (!win.zoomed) {
       const bounds = { x: win.x, y: win.y, width: win.width, height: win.height };
-      const width = Math.max(320, vw);
+      // Tiger's green zoom resizes to a sensible *content* size, not edge-to-edge
+      // maximize. Spanning a wide display full-width is the tell that it's
+      // "maximize", not Tiger "zoom". Zoom to a comfortable content width capped
+      // at ~1100px, clamped to the viewport — so on a 1440px+ monitor the window
+      // grows but doesn't stretch corner to corner.
+      const available = Math.max(320, vw - 2 * MENU_BAR);
+      const target = Math.max(win.width, 900); // grow to a comfortable size, never shrink
+      const width = Math.min(target, 1100, available);
       const height = Math.max(200, vh - MENU_BAR - DOCK_SPACE);
       const x = Math.max(0, Math.floor((vw - width) / 2));
       const y = MENU_BAR;
