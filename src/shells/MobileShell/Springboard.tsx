@@ -40,6 +40,7 @@ function SpringIcon({ icon, label }: { icon: AppIcon; label: string }) {
         playSystemSound("open")
         icon.launch()
       }}
+      aria-label={`Open ${label}`}
       className="flex flex-col items-center gap-1.5"
       style={{ width: 72 }}
     >
@@ -98,9 +99,11 @@ export default function Springboard() {
 
   return (
     <div className="relative flex h-full flex-col">
-      {/* Home grid */}
-      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-2">
-        <div className="grid grid-cols-4 gap-x-2 gap-y-5 justify-items-center">
+      {/* Home grid — sized to content and centered in the available space so the
+          screen reads as intentionally composed (not a top-loaded grid over a
+          void). Generous but bounded icon rhythm. */}
+      <div className="flex flex-1 items-center overflow-y-auto px-5 pt-4 pb-2">
+        <div className="grid w-full grid-cols-4 gap-x-3 gap-y-6 justify-items-center">
           {gridApps.map((icon) => (
             <SpringIcon key={icon.id} icon={icon} label={displayName(icon.id, icon.title)} />
           ))}
@@ -108,8 +111,8 @@ export default function Springboard() {
       </div>
 
       {/* Page dots (single page for now) */}
-      <div className="flex justify-center gap-1.5 pb-2" aria-hidden>
-        <span style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(255,255,255,0.9)" }} />
+      <div className="flex justify-center gap-1.5 pb-3" aria-hidden>
+        <span style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(255,255,255,0.95)" }} />
       </div>
 
       {/* Fixed dock — glassy shelf, 4 slots, tap-only (no magnify). */}

@@ -144,26 +144,23 @@ useEffect(() => {
                   }`}
                 >
                   <motion.div
-                    className={`relative max-w-[85%] sm:max-w-[75%] px-3 py-1.5 rounded-2xl text-[13px] leading-snug shadow-md backdrop-blur-md ${
+                    className={`relative max-w-[72%] px-3 py-1.5 rounded-[18px] text-[13px] leading-snug shadow-sm ${
                       isYou
-                        ? "bg-gradient-to-b from-[#86c6ff]/80 to-[#4f9aff]/70 text-black rounded-br-none"
-                        : "bg-gradient-to-b from-[#ffffff]/80 to-[#dcdcdc]/70 text-black rounded-bl-none"
+                        ? "bg-[#1f8aff] text-white rounded-br-[5px]"
+                        : "bg-[#e9e9eb] text-black rounded-bl-[5px]"
                     }`}
-                    style={{
-                      border: "1px solid rgba(255,255,255,0.4)",
-                    }}
                   >
                     <div
                       className={`text-[11px] font-semibold mb-[2px] ${
-                        isYou ? "text-[#004fa8]" : "text-gray-700/90"
+                        isYou ? "text-white/85" : "text-gray-600"
                       }`}
                     >
                       {row.handle}
                     </div>
-                    <div className="drop-shadow-[0_1px_0_rgba(255,255,255,0.3)]">
+                    <div>
                       {row.message}
                     </div>
-                    <div className="text-[10px] text-gray-600 mt-1 text-right">
+                    <div className={`text-[10px] mt-1 text-right ${isYou ? "text-white/65" : "text-gray-500"}`}>
                       {new Date(row.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
