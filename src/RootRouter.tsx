@@ -35,12 +35,15 @@ export default function RootRouter() {
       /* ignore storage failures */
     }
     setJustLaunched(true)
-    // Best-effort preload of the JeffOS desktop wallpaper while the boot screen
-    // plays — never awaited, so a slow/hung fetch can't block the launch.
-    // Dynamic import (not a top-level one): store/prefs participates in a
-    // store<->prefs import cycle, and pulling it into this early-evaluated
-    // module statically triggers a TDZ "createPrefsSlice before initialization"
-    // crash. Importing at click time runs after the store is initialized.
+    // Best-effort: kick off the JeffOS wallpaper load while the boot screen
+    // plays. Never awaited, so a slow/hung fetch can't block the launch.
+    //
+    // This uses a dynamic import purely to DEFER `store/prefs` evaluation to
+    // click time — it is NOT a code-split (store/prefs is statically imported
+    // across the app, so Vite keeps it in the main chunk; the build warns about
+    // exactly this, which is expected/intentional). Deferring avoids a TDZ
+    // "createPrefsSlice before initialization" crash from the store<->prefs
+    // import cycle if it were imported at this early-evaluated module's top.
     void import("./store/prefs")
       .then((m) => m.loadGlobalDefaultWallpaper())
       .catch(() => {
