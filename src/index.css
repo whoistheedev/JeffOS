@@ -214,6 +214,13 @@ html.jeffos-active body {
   animation: boot-gear-spin 1s steps(12) infinite;
 }
 
+/* Exposé F11 "Show Desktop": slide every open window off the edges to reveal
+   the desktop; clicking the catcher overlay restores. */
+html.expose-desktop [role="dialog"] {
+  transform: translateY(120vh) !important;
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
 .animate-tiger-loader {
   width: 30%;
   animation: tiger-loader 2.2s ease-in-out infinite;

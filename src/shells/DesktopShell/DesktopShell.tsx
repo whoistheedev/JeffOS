@@ -3,6 +3,8 @@ import Desktop from "../../components/Desktop"
 import Dock from "../../components/Dock"
 import WindowManager from "../../components/WindowManager"
 import Spotlight from "../../components/Spotlight"
+import Expose from "../../components/Expose"
+import Dashboard from "../../components/Dashboard"
 import { KeyboardHelp } from "../../components/KeyboardHelp"
 
 /**
@@ -21,6 +23,8 @@ export default function DesktopShell() {
       <WindowManager />
       <Dock />
       <Spotlight />
+      <Expose />
+      <Dashboard />
 
       {/* Visitor counter + socials widgets were removed from the JeffOS desktop
           for Tiger authenticity (modern web chrome on the OS surface). They

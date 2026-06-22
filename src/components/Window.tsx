@@ -200,13 +200,22 @@ export default function Window({ id, title }: Props) {
     y: 60,
     transition: { duration: 0.2, ease: easeIn },
   };
+  // Closer-to-Tiger genie: a two-stage curl — first pinch the width and start
+  // dropping, then suck the rest of the way to the dock while collapsing height.
+  // (Keyframe arrays approximate the curved "neck" better than a single skew.)
+  const dx = (dockPos?.x ?? 0) - (win.x + win.width / 2);
+  const dy = (dockPos?.y ?? 0) - (win.y + win.height);
   const genieVariant: TargetAndTransition = {
-    opacity: 0,
-    scaleY: 0.1,
-    scaleX: 0.5,
-    x: (dockPos?.x ?? 0) - (win.x + win.width / 2),
-    y: (dockPos?.y ?? 0) - (win.y + win.height),
-    transition: { duration: 0.55, ease: [0.65, 0, 0.35, 1] },
+    opacity: [1, 0.9, 0],
+    scaleX: [1, 0.45, 0.12],
+    scaleY: [1, 0.85, 0.04],
+    x: [0, dx * 0.4, dx],
+    y: [0, dy * 0.35, dy],
+    transition: {
+      duration: 0.5,
+      ease: [0.5, 0, 0.3, 1],
+      times: [0, 0.45, 1],
+    },
   };
 
   const variants: Variants = {
@@ -267,7 +276,8 @@ export default function Window({ id, title }: Props) {
           exit={win.minimizing ? "genie" : "hidden"}
           variants={variants}
           className="absolute touch-none select-none"
-          style={{ zIndex }}
+          // bottom origin so the genie collapses downward toward the dock
+          style={{ zIndex, transformOrigin: "bottom center" }}
           onMouseDown={() => {
             focusWindow(id);
             playSystemSound("focus");
