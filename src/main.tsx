@@ -37,6 +37,21 @@ function BootLoader({ children }: { children: React.ReactNode }) {
 
     setPhase("boot") // only for first-time visitors
 
+    // Tiger startup chime — reuse the existing app-open swell (the most
+    // chime-like sound in the bundle). Best-effort: browsers block autoplay
+    // before a user gesture, so this is wrapped to fail silently. Plays on the
+    // boot screen of a first-time visit (and works once the user has interacted
+    // earlier in the session, e.g. clicking "Launch JeffOS").
+    try {
+      const chime = new Audio("/sounds/app-open.mp3")
+      chime.volume = 0.6
+      void chime.play().catch(() => {
+        /* autoplay blocked — no chime, no error */
+      })
+    } catch {
+      /* ignore */
+    }
+
     // CRITICAL: the boot-screen timing must NOT be gated on the wallpaper
     // fetch. Previously we `await`ed loadGlobalDefaultWallpaper() before
     // scheduling these timers, so a hung/slow Supabase request (seen on
@@ -67,7 +82,7 @@ function BootLoader({ children }: { children: React.ReactNode }) {
 
   // Authentic Tiger boot: plain light-grey background, centered grey Apple,
   // and a spinning gear/pinwheel below it. No panel, no blue, no text.
-  // TODO(asset): play the Tiger startup chime here — needs a chime audio file.
+  // The startup chime (reusing app-open.mp3) fires in the effect above.
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-center"
