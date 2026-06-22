@@ -11,7 +11,6 @@ import {
 } from "../config/themes"
 import { getActiveHoliday, type ThemeId, type Holiday } from "../config/holidays"
 import { wallpaperUrl as renderWallpaper } from "../lib/imageUrl"
-import { useWallpaperFit } from "../hooks/useWallpaperFit"
 
 /* -------------------------------------------------------------------------- */
 /* 🖥 Desktop Component                                                       */
@@ -31,10 +30,6 @@ export default function Desktop() {
   const [displayedUrl, setDisplayedUrl] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
-
-  // Per-image fit: `cover` (fill, immersive) normally; `contain` (whole picture
-  // on the Tiger blue fill) only when the image aspect is wildly off-screen.
-  const wallpaperFit = useWallpaperFit(displayedUrl)
 
   const icons = useStore((s) => s.desktopIcons)
   const trash = useStore((s) => s.trash)
@@ -58,7 +53,9 @@ export default function Desktop() {
   const targetUrl = wallpaperUrl
   useEffect(() => {
     if (!targetUrl) return
-    const rendered = renderWallpaper(targetUrl)
+    // Desktop always fills edge-to-edge: crop to the viewport aspect so CSS
+    // `cover` paints a well-composed image (no zoomed band for portrait sources).
+    const rendered = renderWallpaper(targetUrl, { crop: true })
     // First paint: if nothing is displayed yet, show it immediately (the
     // persisted/cached image is likely already in browser/edge cache).
     if (!displayedUrl) {
@@ -237,11 +234,11 @@ export default function Desktop() {
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
         <div className="fixed inset-0 z-0" style={bgStyle}>
-          {/* The wallpaper. Default `cover` fills the screen (immersive, the
-              Tiger-authentic default). For an image whose aspect is wildly
-              different from the screen, `useWallpaperFit` switches to `contain`
-              so the whole picture shows on the solid Tiger "Aqua Blue" fill
-              (bgStyle) — never a heavily-cropped subject, never a modern blur. */}
+          {/* The wallpaper ALWAYS fills the desktop edge-to-edge (`cover`) — no
+              blue side/letterbox bands. A wallpaper's job is to fill the desktop
+              (the classic, immersive, Tiger-authentic look); the small overflow
+              is cropped. (Mobile keeps a per-image smart fit; the desktop does
+              not.) */}
           {displayedUrl && (
             <motion.div
               key={displayedUrl}
@@ -249,7 +246,7 @@ export default function Desktop() {
               className="absolute inset-0"
               style={{
                 backgroundImage: `url('${displayedUrl}')`,
-                backgroundSize: wallpaperFit, // "cover" (fill) or "contain" (whole picture)
+                backgroundSize: "cover", // always fill the desktop — no side gaps
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}

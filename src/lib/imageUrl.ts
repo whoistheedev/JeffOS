@@ -41,23 +41,38 @@ export function renderImage(url: string | undefined | null, opts: RenderOpts = {
 }
 
 /**
- * Wallpaper sized for display, at its NATIVE aspect ratio.
+ * Wallpaper URL for display.
  *
- * Bounds only the WIDTH (DPR-aware, capped) so the render endpoint scales
- * proportionally and never pads the image to a square. The Desktop/MobileShell
- * then choose the CSS fit per-image via `useWallpaperFit`:
- *   - `cover`   — fill the screen (default; immersive, Tiger-authentic),
- *   - `contain` — show the whole picture on the solid Tiger blue fill, only when
- *     the image aspect is wildly different from the screen (e.g. a portrait
- *     holiday wallpaper on a wide desktop) so the subject isn't cropped.
- * Because the source keeps its native aspect, BOTH modes render correctly with
- * no "tiny zoomed band" bug.
+ * Two modes:
+ *  - `crop: true` (DESKTOP): the render endpoint crops to the CURRENT viewport
+ *    aspect (width + height, `resize: cover`). Painting with CSS `cover` then
+ *    fills edge-to-edge with a WELL-COMPOSED crop — no "tiny zoomed band" that a
+ *    portrait source would produce if scaled by width alone. The desktop always
+ *    fills (no side gaps).
+ *  - default (MOBILE): keep the NATIVE aspect (width-only render, no square
+ *    padding) so the mobile smart fit (`useWallpaperFit`) can choose cover vs.
+ *    contain per image and both render correctly.
  */
-export function wallpaperUrl(url: string | undefined | null): string {
+export function wallpaperUrl(url: string | undefined | null, opts: { crop?: boolean } = {}): string {
   if (!url) return ""
   const vw = typeof window !== "undefined" ? window.innerWidth : 1280
   const vh = typeof window !== "undefined" ? window.innerHeight : 800
   const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
+
+  if (opts.crop) {
+    // Crop to the viewport aspect, longer edge capped at 1920.
+    const aspect = vw / vh
+    let width = Math.round(vw * dpr)
+    let height = Math.round(vh * dpr)
+    const cap = 1920
+    if (width > cap || height > cap) {
+      if (aspect >= 1) { width = cap; height = Math.round(cap / aspect) }
+      else { height = cap; width = Math.round(cap * aspect) }
+    }
+    return renderImage(url, { width, height, quality: 78, resize: "cover" })
+  }
+
+  // Native aspect (mobile smart-fit).
   const width = Math.min(Math.round(Math.max(vw, vh) * dpr), 1920)
   return renderImage(url, { width, quality: 78 })
 }
