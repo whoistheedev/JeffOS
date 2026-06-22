@@ -21,6 +21,7 @@ import { AppIconRenderer } from "./AppIconRenderer"
 import { openAboutApp } from "../helpers/openAboutApp"
 import { finderMenus } from "../config/menus/finderMenus"
 import { appsMenus } from "../config/menus/appsMenus"
+import { AppRegistry } from "../apps/registry/registry"
 import { commandBus } from "../lib/commandBus"
 import type { AppMenus, MenuItemEntry } from "../types"
 
@@ -104,7 +105,11 @@ export default function StatusBar() {
   const activeAppTitle = useMemo(() => {
     if (!activeAppKey) return "Finder"
     if ((activeAppKey as string) === "about") return "Finder"
-    return apps[activeAppKey as AppId]?.title ?? "Finder"
+    // Prefer the registry's Tiger-correct display name (Safari, iTunes, Games…)
+    // over the store's id-style title (iweb, itunes, igames) so the bold app
+    // menu reads like the real Tiger menu bar, not a lowercase app id.
+    const fromRegistry = AppRegistry[activeAppKey as keyof typeof AppRegistry]?.title
+    return fromRegistry ?? apps[activeAppKey as AppId]?.title ?? "Finder"
   }, [activeAppKey, apps])
 
   const appMenus: AppMenus =
@@ -251,7 +256,7 @@ export default function StatusBar() {
             {activeAppMeta ? (
               <>
                 <MenuItem onClick={() => openAboutApp(activeWin!.appKey as AppId)}>
-                  About {activeAppMeta.title}
+                  About {activeAppTitle}
                 </MenuItem>
                 <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
                 <MenuItem>Preferences…</MenuItem>

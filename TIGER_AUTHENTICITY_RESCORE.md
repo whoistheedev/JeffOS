@@ -3,7 +3,7 @@
 > Follow-up to `TIGER_AUTHENTICITY_REVIEW.md` (baseline **58/100**), measured **after** the Quick + Medium + Major wins + boot chime shipped (PRs #1–#4, merged to `main`).
 > Lens: former Apple HI designer · Tiger UX historian · principal product/interaction designer · frontend architect.
 > Evidence: **source audit** (23/23 review gaps verified against current code) + **live render** captured from the running build (`rescore-desktop`, `rescore-dock`, `rescore-finder`, `rescore-spotlight`, `rescore-expose`, `rescore-dashboard`, `rescore-applemenu`).
-> Re-scored *2026-06-22*. Two small remaining gaps found during the re-score were **fixed in the same pass** (see §Remaining gaps closed).
+> Re-scored *2026-06-22*. Several gaps found during the re-score and subsequent passes were **fixed in the same work** (see §Remaining gaps closed).
 
 ---
 
@@ -11,9 +11,9 @@
 
 JeffOS has crossed from **"strong homage"** into **"convincing web recreation of Mac OS X Tiger."** The original review's central diagnosis — *"the 2026 styling layer is showing through the 2005 furniture"* — has been addressed at the surface (Lucida Grande, glass dock, wet-Aqua, tight corners, inactive dimming) **and** at the systems layer (Spotlight, Exposé, Dashboard, true genie, boot chime). A Tiger user now does a genuine double-take instead of clocking it as a tribute in ~3 seconds.
 
-**Overall Tiger Authenticity Score: 91 / 100** (up from **58**) — *"Convincing recreation; a few master-class details from pixel-perfect."*
+**Overall Tiger Authenticity Score: 93 / 100** (up from **58**) — *"Convincing recreation; a hair from pixel-perfect."*
 
-The remaining 3-point gap to the 94 ceiling is fine-grain craft (brushed-metal texture vs gradient, app-aware menu bar, content-aware green zoom, per-app mobile layout polish), not missing systems or glaring modern tells.
+The remaining 1-point gap to the 94 ceiling is fine-grain craft (brushed-metal texture vs gradient, content-aware green zoom, per-app mobile layout polish), not missing systems or glaring modern tells.
 
 ---
 
@@ -22,7 +22,7 @@ The remaining 3-point gap to the 94 ceiling is fine-grain craft (brushed-metal t
 | § | Category | Baseline | **Now** | Δ | Target |
 |---|----------|:--------:|:-------:|:--:|:------:|
 | 1 | Visual authenticity | 6 | **9** | +3 | 10 |
-| 2 | Menu bar | 7 | **9** | +2 | 10 |
+| 2 | Menu bar | 7 | **10** | +3 | 10 |
 | 3 | Dock | 6 | **9** | +3 | 10 |
 | 4 | Window system | 7 | **9** | +2 | 10 |
 | 5 | Finder | 7 | **8** | +1 | 10 |
@@ -31,8 +31,8 @@ The remaining 3-point gap to the 94 ceiling is fine-grain craft (brushed-metal t
 | 8 | Mobile (Tiger-appropriateness) | 5 | **7** | +2 | 8* |
 | 9 | Authenticity breakers (inverse) | 4 | **9** | +5 | 9 |
 | 10 | Tiger feature completeness | 4 | **9** | +5 | 9 |
-| 11 | Behavioral authenticity | 7 | **9** | +2 | 10 |
-| — | **Overall (normalized /100)** | **58** | **91** | **+33** | **94** |
+| 11 | Behavioral authenticity | 7 | **10** | +3 | 10 |
+| — | **Overall (normalized /100)** | **58** | **93** | **+35** | **94** |
 
 \*Mobile target is **8**, not 10 — a faithful Tiger desktop should not be forced pixel-for-pixel onto a phone. The +2 this pass came from the mobile lean fix below (removing the redundant landing + full-screen touch sheets that wear the Aqua chrome). The last point to 8 is per-app mobile layout polish (e.g. desktop-icon spacing at 390px).
 
@@ -83,26 +83,28 @@ Three authenticity / UX gaps surfaced during the live re-score and were fixed in
 
 3. **Mobile "Launch JeffOS" hit a redundant, off-brand dead-end** — on a phone, the opt-in rendered a *second* landing page ("Jeff Idodo / Full-Stack Developer", contradicting the AI-RCM Recruiter Mode just seen) and forced another tap to reach the desktop. **Fix:** `MobileShell` now delegates straight to `DesktopShell` (like `TabletShell`), and `Window` opens **near-full-screen below the menu bar on phones** (`vw < 480`) with dragging disabled and phone geometry kept out of desktop window-memory. The result: mobile "Launch JeffOS" → a touch-tuned Tiger desktop where apps are full-screen sheets that still wear the Aqua titlebar/chrome, wallpaper, dock and Lucida Grande — verified live on a 390px iPhone viewport (Finder opens full-width below the menu bar; 0 console errors). (`MobileShell.tsx`, `Window.tsx`) — lifts §8 mobile from 5 → 7.
 
+4. **App-aware menu bar — already switched per app, but with two bugs.** Investigation found the menu bar *did* swap menus on focus (so the re-score's "Finder-centric" read was inaccurate), but (a) the bold app menu showed the **id-style store title** ("iweb", "igames", "itunes") instead of a Tiger name, and (b) `appsMenus` was keyed **`piano`/`ipod`** while the AppIds are **`synth`/`itunes`**, so Synth and iTunes silently fell back to *Finder's* menus (File·Edit·View·**Go**·Help) when focused. **Fix:** the bold app menu + "About …" now resolve the display name from `AppRegistry` (Safari / iTunes / Games / Synth / Guestbook …); `appsMenus` keys renamed to match AppIds. Verified live across six apps: each shows its proper name and its own menus (Synth/iTunes now expose **Controls**, not Finder's Go). (`StatusBar.tsx`, `appsMenus.ts`) — lifts §2 menu bar 9 → 10 and §11 behavioral 9 → 10.
+
 ---
 
-## What's left for the last 3 points (91 → 94)
+## What's left for the last 1 point (93 → 94)
 
 Ranked by authenticity ÷ effort — all craft, no missing systems:
 
-1. **App-aware menu bar** (§2, §11): the menu bar should change its app menu + File/Edit/View to match the focused window (currently Finder-centric). This is the last big *behavioral* tell.
-2. **Brushed-metal texture** on the Finder body (§5): currently a smooth gradient; a subtle repeating-noise texture would complete the metal.
-3. **Content-aware green zoom** (§4): green should resize-to-fit-content, not just maximize.
-4. **Tiger ease curves over springs** on menus/hovers (§6): a few menu/status-bar interactions still use `whileTap`/spring feel; swapping to fast time-based eases would finish the motion authenticity.
-5. **Per-app mobile layout polish** (§8): the touch desktop is in place; remaining nits are desktop-icon spacing at ~390px and a couple of apps' internal layouts at phone width — finishes §8 from 7 → 8.
+1. **Brushed-metal texture** on the Finder body (§5): currently a smooth gradient; a subtle repeating-noise texture would complete the metal.
+2. **Content-aware green zoom** (§4): green should resize-to-fit-content, not just maximize.
+3. **Tiger ease curves over springs** on menus/hovers (§6): a few menu/status-bar interactions still use `whileTap`/spring feel; swapping to fast time-based eases would finish the motion authenticity.
+4. **Per-app mobile layout polish** (§8): the touch desktop is in place; remaining nits are desktop-icon spacing at ~390px and a couple of apps' internal layouts at phone width — finishes §8 from 7 → 8.
 
 ---
 
 ## Bottom line
 
-- **58 → 91 (+33).** The two highest-severity 🔴 breakers (dock material, Lucida Grande) and the missing 🔴 systems (Spotlight, Dashboard, dock glass) are all resolved.
+- **58 → 93 (+35).** The two highest-severity 🔴 breakers (dock material, Lucida Grande) and the missing 🔴 systems (Spotlight, Dashboard, dock glass) are all resolved.
 - The hard part — Tiger's *behavior* — was already ~75% at baseline; the surface re-skin + headline systems closed most of the visual gap.
 - The mobile dead-end is fixed: phones now drop straight into a touch-tuned Tiger desktop (full-screen Aqua app sheets) instead of a redundant landing.
-- What separates 91 from a 94 "pixel-perfect" is **fine craft** (app-aware menu bar, brushed-metal texture, content-aware zoom, per-app mobile polish), not any conspicuous absence. JeffOS is now a convincing Tiger recreation that holds up to a purist's first (and second) look.
+- The menu bar is now genuinely app-aware: proper Tiger names (Safari/iTunes/Games/Synth…) and each app's own menus on focus.
+- What separates 93 from a 94 "pixel-perfect" is **fine craft** (brushed-metal texture, content-aware zoom, per-app mobile polish), not any conspicuous absence. JeffOS is now a convincing Tiger recreation that holds up to a purist's first (and second) look.
 
 ---
 
