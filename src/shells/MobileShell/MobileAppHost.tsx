@@ -67,7 +67,9 @@ export default function MobileAppHost() {
       <div className="relative flex-1 overflow-auto">
         <Suspense
           fallback={
-            <div className="flex h-full items-center justify-center text-sm text-gray-500">Loading {title}…</div>
+            <div className="flex h-full items-center justify-center" role="status" aria-label="Loading">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500 motion-reduce:animate-none" aria-hidden />
+            </div>
           }
         >
           {AppComponent ? (
