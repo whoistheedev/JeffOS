@@ -176,19 +176,16 @@ export default function Desktop() {
   /* -------------------------------------------------------------------------- */
   /* 🎨 Wallpaper background style + fade-in                                   */
   /* -------------------------------------------------------------------------- */
+  // Backdrop container: holds the layered wallpaper (blurred cover-fill +
+  // contained image) and the fade-in. The image layers are rendered as children
+  // (below) so the blurred fill can sit BEHIND the contained image.
   const bgStyle = useMemo<React.CSSProperties>(
     () => ({
-      // `displayedUrl` is already the rendered (resized + CDN-cacheable) URL and
-      // is only set after decode → no black gap, smooth cross-fade.
-      backgroundImage: displayedUrl ? `url('${displayedUrl}')` : undefined,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundColor: "#0b1020", // subtle backdrop (not black) before first paint
+      backgroundColor: "#0b1020", // fallback before first paint
       opacity: ready ? 1 : 0,
-      transition: "opacity 0.4s ease-in-out, background-image 0.6s ease-in-out",
+      transition: "opacity 0.4s ease-in-out",
     }),
-    [displayedUrl, ready]
+    [ready]
   )
 
   const newFolder = () => {
@@ -233,11 +230,36 @@ export default function Desktop() {
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
         <div className="fixed inset-0 z-0" style={bgStyle}>
-          {!prefersReducedMotion && displayedUrl && (
+          {/* Layer 1 — blurred cover-fill: a soft, screen-filling blur of the
+              same image, so the letter/pillar-box bands read as intentional
+              rather than flat-colour letterboxing. */}
+          {displayedUrl && (
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url('${displayedUrl}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                filter: "blur(28px) brightness(0.85)",
+                transform: "scale(1.1)", // hide the blurred edges
+              }}
+            />
+          )}
+          {/* Layer 2 — the WHOLE wallpaper, contained (never cropped). */}
+          {displayedUrl && (
             <motion.div
               key={displayedUrl}
+              aria-hidden
               className="absolute inset-0"
-              initial={{ opacity: 0 }}
+              style={{
+                backgroundImage: `url('${displayedUrl}')`,
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+              initial={prefersReducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
             />

@@ -41,35 +41,30 @@ export function renderImage(url: string | undefined | null, opts: RenderOpts = {
 }
 
 /**
- * Wallpaper cropped to the CURRENT viewport aspect ratio, sized + capped.
+ * Wallpaper sized for display — the WHOLE picture is always preserved.
  *
- * Critically passes BOTH width and height with `resize: "cover"` so the render
- * endpoint crops server-side to the screen's shape. Passing width only made a
- * PORTRAIT image (e.g. the 1440×2160 holiday wallpapers) get scaled to fill the
- * width on a landscape desktop — `background-size: cover` then blew it up so its
- * height dwarfed the screen, showing a tiny zoomed-in band ("wallpaper bigger
- * than the screen"). Cropping to the viewport aspect fixes that on every screen.
+ * We request the render endpoint with `resize: "contain"` and a single bounded
+ * dimension (the longer screen edge, capped), so the image keeps its own aspect
+ * ratio and is never cropped server-side. The Desktop/MobileShell then paint it
+ * with `background-size: contain` so the full picture is visible on every
+ * screen, with the desktop backdrop colour filling any letter/pillar-box bands.
+ *
+ * (Earlier approaches used `cover`, which cropped tall/wide wallpapers — a
+ * portrait holiday wallpaper on a wide desktop got heavily cut off. Per product
+ * decision the full image must always be visible, so we use contain.)
  */
 export function wallpaperUrl(url: string | undefined | null): string {
   if (!url) return ""
   const vw = typeof window !== "undefined" ? window.innerWidth : 1280
   const vh = typeof window !== "undefined" ? window.innerHeight : 800
   const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
-  // Cap the longer edge at 1920 to keep bytes small, preserving the screen's aspect.
-  const aspect = vw / vh
-  let width = Math.round(vw * dpr)
-  let height = Math.round(vh * dpr)
-  const cap = 1920
-  if (width > cap || height > cap) {
-    if (aspect >= 1) {
-      width = cap
-      height = Math.round(cap / aspect)
-    } else {
-      height = cap
-      width = Math.round(cap * aspect)
-    }
-  }
-  return renderImage(url, { width, height, quality: 72, resize: "cover" })
+  // Bound only the WIDTH (DPR-aware, capped). With width-only the render endpoint
+  // scales proportionally and preserves the SOURCE aspect ratio — it does NOT pad
+  // to a square (passing width===height would letterbox the image into a square).
+  // The Desktop/MobileShell then paint it with `background-size: contain`, so the
+  // whole picture is visible at the screen's own aspect, never cropped.
+  const width = Math.min(Math.round(Math.max(vw, vh) * dpr), 1920)
+  return renderImage(url, { width, quality: 78 })
 }
 
 /** Game-card thumbnail. */
