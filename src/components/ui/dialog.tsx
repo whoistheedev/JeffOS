@@ -48,9 +48,17 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  srTitle,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  /**
+   * Screen-reader-only accessible name for dialogs that have no visible title.
+   * Radix requires every DialogContent to be labelled by a DialogTitle; when a
+   * consumer doesn't render a visible one, pass `srTitle` and we add a hidden
+   * DialogTitle so the dialog is accessible (and the console warning is gone).
+   */
+  srTitle?: string
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -63,6 +71,9 @@ function DialogContent({
         )}
         {...props}
       >
+        {srTitle && (
+          <DialogPrimitive.Title className="sr-only">{srTitle}</DialogPrimitive.Title>
+        )}
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close

@@ -30,21 +30,25 @@ export type AppMeta = {
   component: ComponentType | LazyExoticComponent<ComponentType>; // 👈 lazy-loaded component
   resizable: boolean;      // 👈 can resize window
   expandToFit: boolean;    // 👈 should app content stretch to fill window?
+  title: string;           // 👈 Tiger-correct window/title-bar display name (e.g. "Finder", not "finder")
 };
 
 // Registry maps AppId -> Component + meta
+// `title` is the human-readable window title shown in the title bar. Without it,
+// windows fell back to the lowercase app id ("finder") — a small authenticity
+// tell. Real Tiger titles are capitalized app names (TIGER_AUTHENTICITY_REVIEW §4).
 export const AppRegistry: Partial<Record<AppId, AppMeta>> = {
-  wallpapers:   { component: Wallpapers,  resizable: true,  expandToFit: true },  // 📄 fixed
-  games:        { component: Games,       resizable: true,  expandToFit: true },
-  guestbook:    { component: Guestbook,   resizable: true,  expandToFit: true },
-  synth:        { component: Piano,       resizable: false, expandToFit: true },   // 🎹 fixed
-  explorer:     { component: Explorer,    resizable: true,  expandToFit: true },
-  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true },
-  finder:       { component: Finder,      resizable: true,  expandToFit: true },
+  wallpapers:   { component: Wallpapers,  resizable: true,  expandToFit: true, title: "Desktop & Screen Saver" },  // 📄 fixed
+  games:        { component: Games,       resizable: true,  expandToFit: true, title: "Games" },
+  guestbook:    { component: Guestbook,   resizable: true,  expandToFit: true, title: "Guestbook" },
+  synth:        { component: Piano,       resizable: false, expandToFit: true, title: "Synth" },   // 🎹 fixed
+  explorer:     { component: Explorer,    resizable: true,  expandToFit: true, title: "Safari" },
+  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true, title: "Recruiter" },
+  finder:       { component: Finder,      resizable: true,  expandToFit: true, title: "Finder" },
 
-  itunes:       { component: Ipod,        resizable: false, expandToFit: true },   // 🎵 fixed
-  terminal:     { component: Terminal,    resizable: true,  expandToFit: true },
-  calendar:     { component: Calendar,    resizable: true,  expandToFit: true },
-  bmcoffee:     { component: BuyMeCoffee, resizable: true,  expandToFit: true },
+  itunes:       { component: Ipod,        resizable: false, expandToFit: true, title: "iTunes" },   // 🎵 fixed
+  terminal:     { component: Terminal,    resizable: true,  expandToFit: true, title: "Terminal" },
+  calendar:     { component: Calendar,    resizable: true,  expandToFit: true, title: "iCal" },
+  bmcoffee:     { component: BuyMeCoffee, resizable: true,  expandToFit: true, title: "Buy Me a Coffee" },
 
 };

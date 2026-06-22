@@ -285,7 +285,7 @@ export default function Desktop() {
 
       {/* Info dialog */}
       <Dialog open={showInfo} onOpenChange={setShowInfo}>
-        <DialogContent className="max-w-sm space-y-2 text-sm">
+        <DialogContent srTitle="Desktop Info" className="max-w-sm space-y-2 text-sm">
           <h2 className="font-bold text-lg">Desktop</h2>
           <div>
             <span className="text-gray-500">Kind:</span> Folder

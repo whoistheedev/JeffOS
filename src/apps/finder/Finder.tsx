@@ -524,7 +524,7 @@ export default function Finder() {
 
       {/* Quick Look */}
       <Dialog open={!!quickLook} onOpenChange={(o) => !o && setQuickLook(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent srTitle="Quick Look" className="max-w-sm">
           {quickLook && (
             <div className="text-center">
               {quickLook.appRef ? (
@@ -540,7 +540,7 @@ export default function Finder() {
 
       {/* Get Info */}
       <Dialog open={!!getInfo} onOpenChange={(o) => !o && setGetInfo(null)}>
-        <DialogContent className="max-w-sm space-y-2 text-sm">
+        <DialogContent srTitle="Get Info" className="max-w-sm space-y-2 text-sm">
           {getInfo && (
             <>
               <h2 className="font-bold text-lg">{getInfo.title}</h2>
