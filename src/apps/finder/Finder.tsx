@@ -5,6 +5,7 @@ import * as ContextMenu from "@radix-ui/react-context-menu"
 import { LayoutGrid, List, Columns, ChevronLeft, ChevronRight } from "lucide-react"
 import type { AppIcon } from "../../store/apps"
 import { AppIconRenderer } from "../../components/AppIconRenderer" // ✅ shared renderer
+import { useFormFactor } from "../../hooks/useFormFactor"
 
 type ViewMode = "icon" | "list" | "column"
 type FinderItemType = "app" | "folder"
@@ -19,6 +20,7 @@ interface FinderEntry {
 }
 
 export default function Finder() {
+  const isMobile = useFormFactor() === "mobile"
   const apps = useStore((s) => s.desktopIcons)
 
   // 🔗 Global trash state
@@ -278,9 +280,11 @@ export default function Finder() {
 
       {/* Main body: Sidebar + Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-44 border-r bg-gradient-to-b from-gray-100 to-gray-200 
-                        text-sm flex-shrink-0 overflow-y-auto">
+        {/* Sidebar — DEVICES/PLACES nav. On a phone it took ~45% of the width
+            and squeezed the file area, so hide it on mobile and give the icons
+            the full screen (UX_AUDIT_JEFFOS_APPS). */}
+        <div className={`${isMobile ? "hidden" : "w-44"} border-r bg-gradient-to-b from-gray-100 to-gray-200
+                        text-sm flex-shrink-0 overflow-y-auto`}>
           {/* Devices */}
           <div className="px-2 py-1 text-[11px] font-semibold text-gray-500">DEVICES</div>
           <div className="py-1">
