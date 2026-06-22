@@ -218,14 +218,18 @@ export function ArchitectureHighlights() {
 }
 
 /* -------------------------- Featured Achievement -------------------------- */
-export function FeaturedAchievement() {
+export function FeaturedAchievement({ onViewProjects }: { onViewProjects?: () => void }) {
   return (
     <section className="border-y border-border py-10">
       <p className="max-w-[32ch] text-2xl font-medium leading-snug tracking-tight sm:text-3xl">
         {FEATURED_STATEMENT}
       </p>
+      {/* Same pattern as the Hero "View Projects" CTA: Featured Work isn't in
+          the mobile Home document (it's behind the Projects tab), so #work has
+          no target there. Mobile passes a handler that switches tabs; desktop/
+          tablet fall back to in-page scroll. */}
       <button
-        onClick={() => scrollToId("work")}
+        onClick={() => (onViewProjects ? onViewProjects() : scrollToId("work"))}
         className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium"
         style={{ color: "var(--color-hire)" }}
       >
