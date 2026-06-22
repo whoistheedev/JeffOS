@@ -11,6 +11,7 @@ import {
 } from "../config/themes"
 import { getActiveHoliday, type ThemeId, type Holiday } from "../config/holidays"
 import { wallpaperUrl as renderWallpaper } from "../lib/imageUrl"
+import { useWallpaperFit } from "../hooks/useWallpaperFit"
 
 /* -------------------------------------------------------------------------- */
 /* 🖥 Desktop Component                                                       */
@@ -30,6 +31,10 @@ export default function Desktop() {
   const [displayedUrl, setDisplayedUrl] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+
+  // Per-image fit: `cover` (fill, immersive) normally; `contain` (whole picture
+  // on the Tiger blue fill) only when the image aspect is wildly off-screen.
+  const wallpaperFit = useWallpaperFit(displayedUrl)
 
   const icons = useStore((s) => s.desktopIcons)
   const trash = useStore((s) => s.trash)
@@ -232,10 +237,11 @@ export default function Desktop() {
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
         <div className="fixed inset-0 z-0" style={bgStyle}>
-          {/* The WHOLE wallpaper, contained (never cropped). When the picture
-              doesn't fill the screen, the surrounding area is the solid Tiger
-              "Aqua Blue" desktop colour (on `bgStyle` below) — the authentic
-              Tiger "Fit to Screen" behaviour, not a modern blurred backdrop. */}
+          {/* The wallpaper. Default `cover` fills the screen (immersive, the
+              Tiger-authentic default). For an image whose aspect is wildly
+              different from the screen, `useWallpaperFit` switches to `contain`
+              so the whole picture shows on the solid Tiger "Aqua Blue" fill
+              (bgStyle) — never a heavily-cropped subject, never a modern blur. */}
           {displayedUrl && (
             <motion.div
               key={displayedUrl}
@@ -243,7 +249,7 @@ export default function Desktop() {
               className="absolute inset-0"
               style={{
                 backgroundImage: `url('${displayedUrl}')`,
-                backgroundSize: "contain",
+                backgroundSize: wallpaperFit, // "cover" (fill) or "contain" (whole picture)
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
