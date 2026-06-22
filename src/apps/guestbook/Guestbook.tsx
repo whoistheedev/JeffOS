@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "../../lib/supabase"
 import { useStore } from "../../store"
 import { brushedMetal, aquaBlueButton } from "../../lib/aquaSkin"
+import { beginBusy } from "../../lib/updateBus"
 import { toast } from "sonner"
 
 type GuestRow = {
@@ -42,21 +43,29 @@ export default function Guestbook() {
     { anonId: string; handle: string; message: string }
   >({
     mutationFn: async (payload) => {
-      const res = await fetch(
-        "https://akqqmrqeloasisiybdjx.supabase.co/functions/v1/guestbook-add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-            }`,
-          },
-          body: JSON.stringify({ ...payload, startedAt }),
-        }
-      )
-      if (!res.ok) throw new Error(await res.text())
-      return res.json()
+      // Defer any pending PWA auto-update soft-reload until this POST resolves,
+      // so a deployment mid-submission can't drop the message (edge case, see
+      // PWA_AUTO_UPDATE_ARCHITECTURE.md §5).
+      const release = beginBusy("guestbook-submit")
+      try {
+        const res = await fetch(
+          "https://akqqmrqeloasisiybdjx.supabase.co/functions/v1/guestbook-add",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${
+                import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+              }`,
+            },
+            body: JSON.stringify({ ...payload, startedAt }),
+          }
+        )
+        if (!res.ok) throw new Error(await res.text())
+        return res.json()
+      } finally {
+        release()
+      }
     },
     onSuccess: (row) => {
       qc.setQueryData<GuestRow[]>(["guestbook"], (old) =>
