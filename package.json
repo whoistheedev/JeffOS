@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@sparticuz/chromium": "^149.0.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@types/seedrandom": "^3.0.8",
@@ -56,7 +57,7 @@
     "globals": "^16.3.0",
     "playwright": "^1.61.0",
     "prettier": "^3.6.2",
-    "puppeteer": "^25.2.0",
+    "puppeteer-core": "^25.2.0",
     "tsx": "^4.22.4",
     "tw-animate-css": "^1.3.7",
     "typescript": "~5.8.3",
