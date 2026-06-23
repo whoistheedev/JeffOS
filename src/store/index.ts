@@ -10,8 +10,6 @@ import type { PrefsSlice } from "./prefs";
 import { createPrefsSlice } from "./prefs";
 import type { AppsSlice } from "./apps";
 import { createAppsSlice } from "./apps";
-import type { GamesSlice } from "./games";
-import { createGamesSlice } from "./games";
 import type { MetricsSlice } from "./metrics";
 import { createMetricsSlice } from "./metrics";
 
@@ -25,7 +23,7 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay = 200) {
 }
 
 // Combined store type
-export type StoreState = UiSlice & PrefsSlice & AppsSlice & GamesSlice & MetricsSlice;
+export type StoreState = UiSlice & PrefsSlice & AppsSlice & MetricsSlice;
 
 const LOCAL_STORAGE_KEY = "whoisthedev-root";
 
@@ -35,7 +33,6 @@ const useBoundStore = create<StoreState>()(
       ...createUiSlice(...a),
       ...createPrefsSlice(...a),
       ...createAppsSlice(...a),
-      ...createGamesSlice(...a),
       ...createMetricsSlice(...a),
     }),
     {
@@ -57,10 +54,6 @@ const useBoundStore = create<StoreState>()(
 
           // Apps slice
           apps: s.apps,
-
-          // Games slice
-          sessions: s.sessions,
-          leaderboards: s.leaderboards,
 
           // Metrics slice
           metrics: s.metrics,

@@ -135,7 +135,8 @@ export function Hero({
         onClick={onLaunchJeffOS}
         className="-mt-1 max-w-prose text-left text-[13px] leading-relaxed text-muted-foreground"
       >
-        PS — this whole site is a <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+        PS — this whole site is an OS I built from scratch:{" "}
+        <span className="font-medium text-foreground">macOS Tiger on desktop, iPhone-era JeffOS on mobile</span>.{" "}
         <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
           Take it for a spin →
         </span>
@@ -293,8 +294,18 @@ export function FeaturedWork() {
             </dl>
             <div className="mt-4 border-t border-border pt-3">
               <p className="text-sm"><span className="font-medium">Outcome — </span><span className="text-muted-foreground">{w.outcome}</span></p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {w.tech.map((t) => <CodeChip key={t}>{t}</CodeChip>)}
+                {/* Real <a> to the prerendered static case-study page: gives
+                    crawlers an in-page discovery path (not just the sitemap) and
+                    users a shareable, deep-linkable URL. */}
+                <a
+                  href={`/projects/${w.slug}/`}
+                  className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  aria-label={`Read the ${w.name} case study`}
+                >
+                  Case study →
+                </a>
               </div>
             </div>
           </Card>

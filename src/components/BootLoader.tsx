@@ -12,6 +12,13 @@ import { useEffect, useState } from "react"
  * boot sequence (a conversion risk, especially on mobile). So RootRouter mounts
  * this around the JeffOS branch, not around the entire application.
  */
+// Module-level flag: did the Tiger boot screen play this page-session? Set true
+// while boot is showing so LaunchVeil can SKIP (avoids the double-gate: boot
+// ~3s, then a redundant veil ~1s over the already-visible OS). Can't be derived
+// from `hasSeenBootScreen` because BootLoader withholds children (LaunchVeil)
+// until boot finishes, by which point that flag is already set.
+export let bootedThisSession = false
+
 export default function BootLoader({ children }: { children: React.ReactNode }) {
   const [phase, setPhase] = useState<"boot" | "fadein" | "done">("done")
 
@@ -26,6 +33,7 @@ export default function BootLoader({ children }: { children: React.ReactNode }) 
     }
     if (seen) return // RETURN IMMEDIATELY for returning visitors
 
+    bootedThisSession = true // boot is about to play → LaunchVeil should skip
     setPhase("boot") // only for first-time JeffOS entry
 
     // Tiger startup chime — reuse the existing app-open swell (the most

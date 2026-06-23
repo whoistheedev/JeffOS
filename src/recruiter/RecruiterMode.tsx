@@ -91,9 +91,12 @@ function Sidebar({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) {
   return (
     <aside className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight">
+        {/* Visually the primary title, but semantically a supporting label: the
+            keyword-rich page <h1> lives in the main column (better for SEO).
+            Name + identity are still exposed via <title> and JSON-LD. */}
+        <p className="text-3xl font-semibold leading-[1.1] tracking-tight">
           {IDENTITY.name}
-        </h1>
+        </p>
         <p className="mt-2 text-sm font-medium">
           {IDENTITY.title} · {IDENTITY.org}
         </p>
@@ -208,9 +211,9 @@ function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) 
         <div>
           {/* Headline lead — the AI-RCM statement the sidebar identity supports */}
           <div className="mb-10">
-            <h2 className="max-w-[20ch] text-4xl font-semibold leading-[1.05] tracking-tight">
+            <h1 className="max-w-[20ch] text-4xl font-semibold leading-[1.05] tracking-tight">
               {IDENTITY.headline}
-            </h2>
+            </h1>
             <p className="mt-3 max-w-prose text-base text-muted-foreground">{IDENTITY.subtitle}</p>
             {/* Above-the-fold hook (UX_AUDIT_JEFFOS_ENTRY Move 2) — plants the OS
                 idea in the main column, not just the sidebar. */}
@@ -218,8 +221,8 @@ function RecruiterDesktop({ onLaunchJeffOS, isDark, toggleTheme }: LayoutProps) 
               onClick={onLaunchJeffOS}
               className="mt-4 max-w-prose text-left text-sm leading-relaxed text-muted-foreground"
             >
-              PS — this entire site is a{" "}
-              <span className="font-medium text-foreground">macOS Tiger desktop I built from scratch</span>.{" "}
+              PS — this entire site is an OS I built from scratch:{" "}
+              <span className="font-medium text-foreground">macOS Tiger on desktop, iPhone-era JeffOS on mobile</span>.{" "}
               <span className="underline decoration-dotted underline-offset-2" style={{ color: "var(--color-hire)" }}>
                 Take it for a spin →
               </span>
