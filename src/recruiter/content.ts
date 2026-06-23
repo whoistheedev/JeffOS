@@ -147,6 +147,12 @@ export const FEATURED_WORK: {
   slug: string
   name: string
   summary: string
+  /**
+   * Fuller 130–160 char meta description for the prerendered case-study page
+   * (better SERP copy than the short `summary`, which stays the card subtitle).
+   * Drawn from this entry's own problem/solution/outcome — no new claims.
+   */
+  seoDescription?: string
   problem: string
   constraints: string
   architecture: string
@@ -159,6 +165,8 @@ export const FEATURED_WORK: {
     slug: "bflow-rcm",
     name: "BFLOW RCM Platform",
     summary: "AI-powered revenue-cycle automation for healthcare operations.",
+    seoDescription:
+      "AI-assisted automation of the healthcare revenue cycle — claims, eligibility, payments, denials — on a multi-tenant, HIPAA-aware Supabase backend.",
     problem: "Healthcare revenue-cycle workflows were manual, fragmented, and error-prone across claims, payments, and denials.",
     constraints: "HIPAA-aware data handling; multi-tenant isolation; auditability; integration with existing EDI transaction formats.",
     architecture: "AI-assisted automation on a multi-tenant Supabase backend (RLS isolation), server-authoritative Edge Functions, and event-driven EDI pipelines.",
@@ -171,6 +179,8 @@ export const FEATURED_WORK: {
     slug: "multi-tenant-migration",
     name: "Multi-Tenant Database Migration",
     summary: "Consolidating isolated healthcare systems into one platform.",
+    seoDescription:
+      "Migrating 50+ isolated healthcare databases into one RLS-isolated multi-tenant platform on Supabase — zero data loss and HIPAA-aware access control.",
     problem: "Dozens of isolated healthcare databases meant duplicated effort, inconsistent data, and no unified operational view.",
     constraints: "Zero data loss; tenant isolation; HIPAA-aware access control; migrate without disrupting live operations.",
     architecture: "Unified multi-tenant schema with Supabase Row-Level Security per tenant; tracked migrations; least-privilege access; data-integrity validation.",
@@ -182,6 +192,8 @@ export const FEATURED_WORK: {
     slug: "edi-automation",
     name: "EDI Automation Platform",
     summary: "Turning healthcare transactions into operational workflows.",
+    seoDescription:
+      "Automated pipelines that parse healthcare EDI transactions (837/835/277/999) into normalized, auditable workflows on Supabase Edge Functions.",
     problem: "Healthcare EDI transactions (837/835/277/999) arrived as opaque files with no automated path into operations.",
     constraints: "Format fidelity; auditability; reliability; compliant handling of sensitive data.",
     architecture: "Ingestion → normalization → reconciliation pipelines on serverless Edge Functions, with audit trails and secure storage.",
@@ -193,6 +205,8 @@ export const FEATURED_WORK: {
     slug: "jeffos",
     name: "JeffOS",
     summary: "An operating-system-style portfolio, built from scratch.",
+    seoDescription:
+      "An operating-system-style portfolio built from scratch: a React 19 windowing OS with a PWA, Supabase realtime, themes, and a security-hardened backend.",
     problem: "How do you prove engineering range, not just claim it?",
     constraints: "Real backend, real realtime, real performance/accessibility budgets — not a demo.",
     architecture: "React 19 windowing OS, capability-based responsive shells, Supabase realtime via a counter pattern, PWA, tracked migrations, security-hardened RLS.",

@@ -37,7 +37,9 @@ type Work = (typeof FEATURED_WORK)[number]
 function page(w: Work): string {
   const url = `${ORIGIN}/projects/${w.slug}/`
   const title = `${w.name} — ${IDENTITY.name} | Case Study`
-  const desc = w.summary
+  // Prefer the fuller 130–160 char SERP description; fall back to the short
+  // card summary. (abstract in JSON-LD stays the short summary.)
+  const desc = w.seoDescription ?? w.summary
   // The SPA's "/" defaults to RecruiterMode (the full portfolio) — see
   // RootRouter. There's no per-case-study deep link yet, so the CTA lands on
   // the portfolio front door, which is exactly what the button promises.

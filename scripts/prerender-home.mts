@@ -32,6 +32,20 @@ const DIST = resolve(__dirname, "..", "dist")
 const PORT = 4317
 const ORIGIN = `http://localhost:${PORT}`
 
+// In CI (Vercel sets CI/VERCEL), shipping the empty SPA shell is a real SEO
+// regression — fail the build so a broken snapshot is caught, not silently
+// deployed. Locally, a dev without a working browser shouldn't be blocked, so
+// we only warn. Override with PRERENDER_STRICT=1 / =0 to force either way.
+const STRICT = process.env.PRERENDER_STRICT
+  ? process.env.PRERENDER_STRICT === "1"
+  : Boolean(process.env.CI || process.env.VERCEL)
+
+/** Warn (local) or throw (CI/strict) — keeps the failure policy in one place. */
+function failOrWarn(message: string): void {
+  if (STRICT) throw new Error(message)
+  console.warn("⚠ prerender-home: " + message + " (non-fatal — not in CI)")
+}
+
 const MIME: Record<string, string> = {
   ".html": "text/html",
   ".js": "text/javascript",
@@ -103,8 +117,8 @@ async function main() {
       rendered.length > 1000 &&
       (rendered.includes("Revenue Cycle") || rendered.includes("Senior Software Engineer"))
     if (!hasContent) {
-      console.warn(
-        `⚠ prerender-home: rendered #root looked empty (${rendered.length} chars) — leaving shell index.html as-is.`,
+      failOrWarn(
+        `rendered #root looked empty (${rendered.length} chars) — leaving shell index.html as-is`,
       )
       return
     }
@@ -112,15 +126,20 @@ async function main() {
     const doc = html.startsWith("<!doctype") ? html : "<!doctype html>\n" + html
     await writeFile(resolve(DIST, "index.html"), doc, "utf8")
     console.log(`✓ prerendered homepage (RecruiterMode) — #root body: ${rendered.length} chars`)
-  } catch (err) {
-    console.warn(
-      "⚠ prerender-home: snapshot failed — leaving shell index.html as-is.",
-      (err as Error)?.message ?? err,
-    )
   } finally {
     await browser?.close()
     server.close()
   }
 }
 
-await main()
+try {
+  await main()
+} catch (err) {
+  const msg = (err as Error)?.message ?? String(err)
+  if (STRICT) {
+    // In CI, a failed homepage snapshot is fatal — don't ship the empty shell.
+    console.error("✖ prerender-home: snapshot failed in strict/CI mode — failing the build.\n  " + msg)
+    process.exit(1)
+  }
+  console.warn("⚠ prerender-home: snapshot failed — leaving shell index.html as-is. " + msg)
+}
