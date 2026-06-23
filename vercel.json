@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!assets/|icons/|sounds/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
+    { "source": "/((?!assets/|icons/|sounds/|projects/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
