@@ -25,12 +25,65 @@ import { readFile, writeFile } from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { resolve, dirname, join, extname } from "node:path"
 import { fileURLToPath } from "node:url"
-import puppeteer from "puppeteer"
+import type { Browser } from "puppeteer-core"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DIST = resolve(__dirname, "..", "dist")
 const PORT = 4317
 const ORIGIN = `http://localhost:${PORT}`
+
+const ON_VERCEL = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION)
+
+/** First existing path wins — used to find a local system Chrome/Chromium. */
+function findLocalChrome(): string | undefined {
+  const candidates = [
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    process.env.CHROME_PATH,
+    // macOS
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    // Linux
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ].filter(Boolean) as string[]
+  return candidates.find((p) => existsSync(p))
+}
+
+/**
+ * Launch a headless browser via puppeteer-core, picking the right Chromium:
+ *
+ * - On Vercel/CI the build image lacks Chromium's system shared libraries
+ *   (libnspr4.so, libnss3, …) — a plain download fails with "error while
+ *   loading shared libraries". @sparticuz/chromium ships a self-contained
+ *   Chromium built for exactly this.
+ * - Locally we drive the system Google Chrome / Chromium directly (no large
+ *   browser download — keeps the dep footprint small).
+ */
+async function launchBrowser(): Promise<Browser> {
+  const { default: puppeteerCore } = await import("puppeteer-core")
+
+  if (ON_VERCEL) {
+    const { default: chromium } = await import("@sparticuz/chromium")
+    return puppeteerCore.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    })
+  }
+
+  const executablePath = findLocalChrome()
+  if (!executablePath) {
+    throw new Error(
+      "no local Chrome/Chromium found — set PUPPETEER_EXECUTABLE_PATH or install Google Chrome",
+    )
+  }
+  return puppeteerCore.launch({
+    executablePath,
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+  })
+}
 
 // In CI (Vercel sets CI/VERCEL), shipping the empty SPA shell is a real SEO
 // regression — fail the build so a broken snapshot is caught, not silently
@@ -89,12 +142,9 @@ async function main() {
   const server = serveDist()
   await new Promise<void>((r) => server.listen(PORT, r))
 
-  let browser
+  let browser: Browser | undefined
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-    })
+    browser = await launchBrowser()
     const page = await browser.newPage()
     await page.setViewport({ width: 1280, height: 900 })
 
