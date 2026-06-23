@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react"
 import { Sidebar } from "./components/Sidebar"
 import { Toolbar } from "./components/Toolbar"
 import { TrackTable } from "./components/TrackTable"
-import { PlayerBar } from "./components/PlayerBar"
 import { useFormFactor } from "../../hooks/useFormFactor"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -248,6 +247,27 @@ export default function iTunesApp() {
   const nextTrack = () => skip("next")
   const prevTrack = () => skip("previous")
 
+  // Seek (scrubber). Personal mode: SDK seek; fallback preview: set audio time.
+  function seekTo(ms: number) {
+    if (mode === "personal") {
+      player?.seek?.(Math.max(0, Math.floor(ms)))
+    } else if (audio) {
+      audio.currentTime = Math.max(0, ms / 1000)
+      setProgress(ms)
+    }
+  }
+
+  // Unified transport handlers shared by the Toolbar in either mode.
+  const handlePlayPause = () => {
+    if (mode === "fallback") {
+      if (audio) (audio.paused ? audio.play() : audio.pause())
+    } else {
+      togglePersonalPlay()
+    }
+  }
+  const handleNext = () => mode === "personal" && nextTrack()
+  const handlePrev = () => mode === "personal" && prevTrack()
+
   async function togglePersonalPlay() {
     // Prefer the SDK toggle (instant), but if the stream was stolen, reclaim it.
     if (streamStolen) {
@@ -356,8 +376,6 @@ export default function iTunesApp() {
     }, 80)
   }
 
-  const readOnly = mode === "fallback"
-
   return (
     <div
       className="
@@ -369,7 +387,16 @@ export default function iTunesApp() {
         backdrop-blur-md shadow-inner
       "
     >
-      <Toolbar />
+      <Toolbar
+        track={currentTrack}
+        isPlaying={isPlaying}
+        progress={progress}
+        duration={duration}
+        onPlayPause={handlePlayPause}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        onSeek={seekTo}
+      />
 
       {/* Alerts */}
       <AnimatePresence>
@@ -429,25 +456,6 @@ export default function iTunesApp() {
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* Player */}
-      <div className={readOnly ? "pointer-events-none opacity-60" : ""}>
-        <PlayerBar
-          track={currentTrack}
-          isPlaying={isPlaying}
-          progress={progress}
-          duration={duration}
-          onPlayPause={() =>
-            mode === "fallback" && audio
-              ? audio.paused
-                ? audio.play()
-                : audio.pause()
-              : togglePersonalPlay()
-          }
-          onNext={() => mode === "personal" && nextTrack()}
-          onPrev={() => mode === "personal" && prevTrack()}
-        />
-      </div>
 
       {/* Subtle reconnect spinner */}
       <AnimatePresence>
