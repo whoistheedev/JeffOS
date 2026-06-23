@@ -81,7 +81,8 @@ export default defineConfig({
       manifest: {
         name: 'JeffOS',
         short_name: 'JeffOS',
-        description: 'A sleek web-based OS experience built by Jeffrey James Idodo.',
+        description:
+          'Portfolio of Jeffrey James Idodo, Senior Software Engineer building AI-assisted healthcare automation, EDI infrastructure, and multi-tenant Supabase platforms — presented as JeffOS, a macOS-inspired web OS.',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
