@@ -29,9 +29,8 @@ export default function iTunesApp() {
   // True once the first token has arrived — gates the one-time SDK setup so the
   // player isn't rebuilt on every token refresh.
   const [tokenReady, setTokenReady] = useState(false)
-  const [playlistUri, setPlaylistUri] = useState<string | null>(null)
-  // Latest playlist URI for the stable SDK effect (which doesn't re-run on
-  // refresh) and the "ready" listener.
+  // Latest playlist URI (ref, not state): the SDK effect is stable and doesn't
+  // re-run on refresh, and the "ready"/control helpers read the current value.
   const playlistUriRef = useRef<string | null>(null)
   const [progress, setProgress] = useState<number>(0)
   const [duration, setDuration] = useState<number>(0)
@@ -39,6 +38,12 @@ export default function iTunesApp() {
   const [reconnecting, setReconnecting] = useState(false)
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
   const [alert, setAlert] = useState<string | null>(null)
+  // This visitor's SDK device id — needed to drive transfer + REST next/prev.
+  const deviceIdRef = useRef<string | null>(null)
+  // Spotify allows ONE active stream per account. If another visitor connects,
+  // playback transfers to them and this device goes silent. We detect that and
+  // surface a "Resume here" affordance instead of a silent stop.
+  const [streamStolen, setStreamStolen] = useState(false)
 
   /* ---------- Fetch Spotify Token ---------- */
   async function getSpotifyToken() {
@@ -54,7 +59,6 @@ export default function iTunesApp() {
       // Flip true only on the FIRST token, so the SDK effect runs once (and
       // doesn't rebuild the player on every 50-min refresh).
       if (wasEmpty && data.access_token) setTokenReady(true)
-      setPlaylistUri(data.playlist_uri)
       setMode((data.mode as "personal" | "fallback") ?? "fallback")
     } catch {
       setMode("fallback")
@@ -74,6 +78,9 @@ export default function iTunesApp() {
   useEffect(() => {
     const unlockAudio = () => {
       try {
+        // Personal mode: the Web Playback SDK requires a user gesture to
+        // activate its <audio> element before it can produce sound (autoplay).
+        player?.activateElement?.()
         if (!audio) {
           const a = new Audio()
           a.muted = true
@@ -88,7 +95,7 @@ export default function iTunesApp() {
     }
     window.addEventListener("click", unlockAudio, { once: true })
     return () => window.removeEventListener("click", unlockAudio)
-  }, [audio])
+  }, [audio, player])
 
   /* ---------- Clean up SDK when switching ---------- */
   useEffect(() => {
@@ -123,6 +130,7 @@ export default function iTunesApp() {
       })
 
       _player.addListener("ready", ({ device_id }: any) => {
+        deviceIdRef.current = device_id
         setTimeout(() => {
           const uri = playlistUriRef.current
           if (uri && tokenRef.current) startPlayback(device_id, tokenRef.current, uri)
@@ -131,7 +139,14 @@ export default function iTunesApp() {
       })
 
       _player.addListener("player_state_changed", (state: any) => {
-        if (!state) return
+        // state === null means this device is no longer the active one — i.e.
+        // another visitor connected and took the single allowed stream.
+        if (!state) {
+          setIsPlaying(false)
+          setStreamStolen(true)
+          return
+        }
+        setStreamStolen(false)
         const current = state.track_window.current_track
         setCurrentTrack(current)
         setIsPlaying(!state.paused)
@@ -144,6 +159,11 @@ export default function iTunesApp() {
       _player.addListener("authentication_error", () => {
         getSpotifyToken()
       })
+
+      // account_error / playback_error usually mean the stream moved off this
+      // device (or a non-Premium account). Surface the "Resume here" state.
+      _player.addListener("account_error", () => setStreamStolen(true))
+      _player.addListener("playback_error", () => setStreamStolen(true))
 
       _player.addListener("not_ready", () => setReconnecting(true))
       _player.connect()
@@ -166,7 +186,102 @@ export default function iTunesApp() {
         },
         body: JSON.stringify({ context_uri: playlistUri }),
       })
+      setStreamStolen(false)
     } catch {}
+  }
+
+  /* ---------- Spotify Web API control (device-targeted) ----------
+   * The SDK's local player.nextTrack()/previousTrack() only work when THIS
+   * device currently holds the active playback context — which races with
+   * transfer and silently no-ops. Driving the REST endpoints against our own
+   * device_id is reliable: Spotify routes the command to the device we name.
+   */
+  async function spotifyControl(
+    path: string,
+    method: "POST" | "PUT",
+    body?: object
+  ): Promise<Response | null> {
+    const token = tokenRef.current
+    const deviceId = deviceIdRef.current
+    if (!token || !deviceId) return null
+    try {
+      const url = `https://api.spotify.com/v1/me/player/${path}${
+        path.includes("?") ? "&" : "?"
+      }device_id=${deviceId}`
+      return await fetch(url, {
+        method,
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+    } catch {
+      return null
+    }
+  }
+
+  // Re-claim the active stream onto THIS device (used by Next/Prev and the
+  // "Resume here" button when another visitor stole playback).
+  async function transferToThisDevice(play = true) {
+    const token = tokenRef.current
+    const deviceId = deviceIdRef.current
+    if (!token || !deviceId) return
+    try {
+      await fetch("https://api.spotify.com/v1/me/player", {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ device_ids: [deviceId], play }),
+      })
+      setStreamStolen(false)
+    } catch {}
+  }
+
+  // Skip helper: try the command first (fast path when this device is already
+  // active). Only if it fails (stream is elsewhere) do we transfer here and
+  // retry — avoiding a needless restart in the common case.
+  async function skip(direction: "next" | "previous") {
+    const r = await spotifyControl(direction, "POST")
+    if (!r || !r.ok) {
+      await transferToThisDevice(true)
+      await spotifyControl(direction, "POST")
+    }
+  }
+
+  const nextTrack = () => skip("next")
+  const prevTrack = () => skip("previous")
+
+  async function togglePersonalPlay() {
+    // Prefer the SDK toggle (instant), but if the stream was stolen, reclaim it.
+    if (streamStolen) {
+      await transferToThisDevice(true)
+      return
+    }
+    player?.togglePlay?.()
+  }
+
+  // Play a SPECIFIC track from the playlist on this device, keeping the playlist
+  // as the context so Next/Prev continue to walk the list. Falls back to playing
+  // by track URI if the track isn't in the current playlist context.
+  async function playTrack(track: any) {
+    const token = tokenRef.current
+    const deviceId = deviceIdRef.current
+    const uri: string | undefined = track?.uri || (track?.id && `spotify:track:${track.id}`)
+    if (!token || !deviceId || !uri) {
+      // No device yet (SDK not ready) — let the SDK auto-start the playlist.
+      return
+    }
+    try {
+      const ctx = playlistUriRef.current
+      const body = ctx
+        ? { context_uri: ctx, offset: { uri } } // keep playlist context for next/prev
+        : { uris: [uri] }
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      setStreamStolen(false)
+    } catch {
+      /* ignore */
+    }
   }
 
   /* ---------- Web API 30s Preview ---------- */
@@ -290,12 +405,30 @@ export default function iTunesApp() {
               onSelectTrack={(track) => {
                 setCurrentTrack(track)
                 if (mode === "fallback") playPreview(track)
-                else player?.togglePlay?.()
+                else playTrack(track)
               }}
             />
           )}
         </div>
       </div>
+
+      {/* Stream-stolen banner: another visitor took the single allowed stream.
+          Spotify permits one active stream per account, so we offer to reclaim
+          it here rather than dying silently. */}
+      <AnimatePresence>
+        {streamStolen && mode === "personal" && (
+          <motion.button
+            key="resume"
+            onClick={() => transferToThisDevice(true)}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
+            className="mx-3 mb-1 rounded-md bg-[#1f8aff] px-3 py-2 text-[12px] font-medium text-white shadow hover:bg-[#1577e0]"
+          >
+            🎧 Playing on another device — tap to resume here
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Player */}
       <div className={readOnly ? "pointer-events-none opacity-60" : ""}>
@@ -309,10 +442,10 @@ export default function iTunesApp() {
               ? audio.paused
                 ? audio.play()
                 : audio.pause()
-              : player?.togglePlay?.()
+              : togglePersonalPlay()
           }
-          onNext={() => mode === "personal" && player?.nextTrack()}
-          onPrev={() => mode === "personal" && player?.previousTrack()}
+          onNext={() => mode === "personal" && nextTrack()}
+          onPrev={() => mode === "personal" && prevTrack()}
         />
       </div>
 
