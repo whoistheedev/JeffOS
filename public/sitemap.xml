@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  NOTE: `npm run build` regenerates dist/sitemap.xml from FEATURED_WORK
+  (scripts/prerender-projects.mts), adding <lastmod>. This static copy is a
+  correct fallback for the rare case of deploying without that build step;
+  keep its <loc> list in sync with the FEATURED_WORK slugs.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://whoisjeff.dev/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://whoisjeff.dev/projects/bflow-rcm/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://whoisjeff.dev/projects/multi-tenant-migration/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://whoisjeff.dev/projects/edi-automation/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://whoisjeff.dev/projects/jeffos/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

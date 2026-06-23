@@ -294,8 +294,18 @@ export function FeaturedWork() {
             </dl>
             <div className="mt-4 border-t border-border pt-3">
               <p className="text-sm"><span className="font-medium">Outcome — </span><span className="text-muted-foreground">{w.outcome}</span></p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {w.tech.map((t) => <CodeChip key={t}>{t}</CodeChip>)}
+                {/* Real <a> to the prerendered static case-study page: gives
+                    crawlers an in-page discovery path (not just the sitemap) and
+                    users a shareable, deep-linkable URL. */}
+                <a
+                  href={`/projects/${w.slug}/`}
+                  className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  aria-label={`Read the ${w.name} case study`}
+                >
+                  Case study →
+                </a>
               </div>
             </div>
           </Card>
