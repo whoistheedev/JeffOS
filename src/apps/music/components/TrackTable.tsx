@@ -75,20 +75,18 @@ export function TrackTable({ onSelectTrack, token }: TrackTableProps) {
                     setActiveId(t.id)
                     onSelectTrack(t)
                   }}
-                  layout
-                  initial={{ opacity: 0, y: 2 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  whileHover={{ scale: 1.01 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: 0.12 }}
                   className={`
-                    cursor-default transition-colors duration-150
+                    cursor-default transition-colors duration-100
                     ${
                       isActive
-                        ? "bg-[linear-gradient(180deg,#4ea2ff_0%,#1a6aff_100%)] text-white shadow-[inset_0_1px_rgba(255,255,255,0.3),inset_0_-1px_rgba(0,0,0,0.25)]"
+                        ? "bg-[linear-gradient(180deg,#5a9ff0_0%,#1c6fde_100%)] text-white shadow-[inset_0_1px_rgba(255,255,255,0.35)]"
                         : even
-                        ? "bg-[linear-gradient(180deg,#f7f7f7_0%,#ececec_100%)] hover:bg-[rgba(120,180,255,0.2)]"
-                        : "bg-[linear-gradient(180deg,#f2f2f2_0%,#e5e5e5_100%)] hover:bg-[rgba(120,180,255,0.2)]"
+                        ? "bg-[#f3f6fa] hover:bg-[#dfeaf8]"
+                        : "bg-[#eaeff5] hover:bg-[#dfeaf8]"
                     }
                   `}
                 >
