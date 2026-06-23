@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Sidebar } from "./components/Sidebar"
 import { Toolbar } from "./components/Toolbar"
 import { TrackTable } from "./components/TrackTable"
@@ -19,7 +19,20 @@ export default function iTunesApp() {
   const [player, setPlayer] = useState<any | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [token, setToken] = useState<string | null>(null)
+  // Always holds the LATEST access token. The Web Playback SDK's getOAuthToken
+  // callback closes over whatever it reads at call time, so reading from a ref
+  // (not the `token` state captured in the effect closure) lets the SDK pick up
+  // refreshed tokens when its current one expires — without rebuilding the
+  // player. This is what keeps "personal" playback alive past the 1-hour token
+  // lifetime for a tab left open.
+  const tokenRef = useRef<string | null>(null)
+  // True once the first token has arrived — gates the one-time SDK setup so the
+  // player isn't rebuilt on every token refresh.
+  const [tokenReady, setTokenReady] = useState(false)
   const [playlistUri, setPlaylistUri] = useState<string | null>(null)
+  // Latest playlist URI for the stable SDK effect (which doesn't re-run on
+  // refresh) and the "ready" listener.
+  const playlistUriRef = useRef<string | null>(null)
   const [progress, setProgress] = useState<number>(0)
   const [duration, setDuration] = useState<number>(0)
   const [mode, setMode] = useState<"personal" | "fallback" | "loading">("loading")
@@ -34,7 +47,13 @@ export default function iTunesApp() {
         "https://akqqmrqeloasisiybdjx.supabase.co/functions/v1/spotify-token"
       )
       const data = await res.json()
+      const wasEmpty = !tokenRef.current
+      tokenRef.current = data.access_token ?? null
+      playlistUriRef.current = data.playlist_uri ?? null
       setToken(data.access_token)
+      // Flip true only on the FIRST token, so the SDK effect runs once (and
+      // doesn't rebuild the player on every 50-min refresh).
+      if (wasEmpty && data.access_token) setTokenReady(true)
       setPlaylistUri(data.playlist_uri)
       setMode((data.mode as "personal" | "fallback") ?? "fallback")
     } catch {
@@ -44,7 +63,10 @@ export default function iTunesApp() {
 
   useEffect(() => {
     getSpotifyToken()
-    const id = setInterval(getSpotifyToken, 55 * 60 * 1000)
+    // Refresh before the 60-min token lifetime is up. The new token lands in
+    // tokenRef so the running SDK picks it up the next time it asks for one
+    // (on its own expiry) — playback never drops for an open tab.
+    const id = setInterval(getSpotifyToken, 50 * 60 * 1000)
     return () => clearInterval(id)
   }, [])
 
@@ -77,8 +99,12 @@ export default function iTunesApp() {
   }, [mode])
 
   /* ---------- Spotify Web Playback SDK ---------- */
+  // Runs ONCE per personal session (gated on the first token via `tokenReady`),
+  // NOT on every token refresh — so the player is built a single time and the
+  // music isn't interrupted. The SDK pulls a fresh token from `tokenRef` each
+  // time it (re)authenticates, which is how playback survives token expiry.
   useEffect(() => {
-    if (!token || mode !== "personal") return
+    if (!tokenReady || mode !== "personal") return
 
     const script = document.createElement("script")
     script.src = "https://sdk.scdn.co/spotify-player.js"
@@ -90,13 +116,16 @@ export default function iTunesApp() {
       setReconnecting(true)
       _player = new window.Spotify.Player({
         name: "jeffOS iTunes",
-        getOAuthToken: (cb: (t: string) => void) => cb(token),
+        // Always serve the LATEST token (from the ref), not a stale closure —
+        // the SDK calls this again whenever its token expires.
+        getOAuthToken: (cb: (t: string) => void) => cb(tokenRef.current ?? ""),
         volume: 0.6,
       })
 
       _player.addListener("ready", ({ device_id }: any) => {
         setTimeout(() => {
-          if (playlistUri) startPlayback(device_id, token, playlistUri)
+          const uri = playlistUriRef.current
+          if (uri && tokenRef.current) startPlayback(device_id, tokenRef.current, uri)
           setReconnecting(false)
         }, 800)
       })
@@ -110,6 +139,12 @@ export default function iTunesApp() {
         setDuration(state.duration)
       })
 
+      // Spotify fires authentication_error when a token is rejected. Refetch a
+      // fresh one into the ref so the SDK's next getOAuthToken call recovers.
+      _player.addListener("authentication_error", () => {
+        getSpotifyToken()
+      })
+
       _player.addListener("not_ready", () => setReconnecting(true))
       _player.connect()
       setPlayer(_player)
@@ -117,9 +152,9 @@ export default function iTunesApp() {
 
     return () => {
       _player?.disconnect()
-      document.body.removeChild(script)
+      script.remove()
     }
-  }, [token, playlistUri, mode])
+  }, [tokenReady, mode])
 
   async function startPlayback(deviceId: string, token: string, playlistUri: string) {
     try {
