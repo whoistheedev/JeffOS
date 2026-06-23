@@ -1,0 +1,126 @@
+/**
+ * Prerender the homepage (RecruiterMode) into static HTML.
+ *
+ * The portfolio is a client-rendered SPA: a no-JS crawler that fetches `/` sees
+ * only the empty `#root` shell. RecruiterMode is too large/runtime-heavy to
+ * `renderToString` in plain Node, so we snapshot the REAL rendered output with a
+ * headless browser (Puppeteer's bundled Chromium — works in Vercel CI):
+ *
+ *   1. Serve the freshly-built `dist/` over a local HTTP origin (module scripts
+ *      and the service worker need a real origin, not file://).
+ *   2. Load `/`, wait for RecruiterMode's content to paint (it renders
+ *      synchronously from the static content.ts — no data fetch gates first
+ *      paint), and read `document.documentElement.outerHTML`.
+ *   3. Write that hydrated markup back over `dist/index.html`. The original
+ *      <script type="module"> tags are preserved, so the app still boots and
+ *      re-renders for full interactivity (React 19 createRoot replaces #root,
+ *      so there's no hydration-mismatch risk) — we've only added a real,
+ *      crawlable static body and kept all the <head> metadata.
+ *
+ * Run AFTER `vite build`. Wired into `npm run build`. If anything fails, it logs
+ * a warning and leaves the shell index.html untouched — the build never breaks.
+ */
+import { createServer } from "node:http"
+import { readFile, writeFile } from "node:fs/promises"
+import { existsSync } from "node:fs"
+import { resolve, dirname, join, extname } from "node:path"
+import { fileURLToPath } from "node:url"
+import puppeteer from "puppeteer"
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const DIST = resolve(__dirname, "..", "dist")
+const PORT = 4317
+const ORIGIN = `http://localhost:${PORT}`
+
+const MIME: Record<string, string> = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".webmanifest": "application/manifest+json",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".mp3": "audio/mpeg",
+  ".txt": "text/plain",
+  ".xml": "application/xml",
+}
+
+/** Minimal static file server over dist/, SPA-fallback to index.html. */
+function serveDist() {
+  return createServer(async (req, res) => {
+    try {
+      const urlPath = decodeURIComponent((req.url || "/").split("?")[0])
+      let filePath = join(DIST, urlPath)
+      if (urlPath.endsWith("/")) filePath = join(filePath, "index.html")
+      if (!existsSync(filePath) || extname(filePath) === "") {
+        filePath = join(DIST, "index.html")
+      }
+      const body = await readFile(filePath)
+      res.setHeader("Content-Type", MIME[extname(filePath)] || "application/octet-stream")
+      res.end(body)
+    } catch {
+      res.statusCode = 404
+      res.end("not found")
+    }
+  })
+}
+
+async function main() {
+  const server = serveDist()
+  await new Promise<void>((r) => server.listen(PORT, r))
+
+  let browser
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    })
+    const page = await browser.newPage()
+    await page.setViewport({ width: 1280, height: 900 })
+
+    // Surface any page error so a broken render is visible in CI logs (non-fatal).
+    page.on("pageerror", (e) => console.warn("  page error:", e.message))
+
+    await page.goto(ORIGIN + "/", { waitUntil: "networkidle0", timeout: 30000 })
+
+    // RecruiterMode paints the keyword headline as the page <h1>. Wait for it so
+    // we snapshot a fully-rendered tree, not a mid-mount frame.
+    await page.waitForSelector("#root h1", { timeout: 15000 })
+
+    const html = await page.evaluate(() => document.documentElement.outerHTML)
+
+    // Sanity: only overwrite if the snapshot actually captured a real render.
+    const rootIdx = html.indexOf('<div id="root">')
+    const bodyEnd = html.lastIndexOf("</body>")
+    const rendered = rootIdx >= 0 && bodyEnd > rootIdx ? html.slice(rootIdx, bodyEnd) : ""
+    const hasContent =
+      rendered.length > 1000 &&
+      (rendered.includes("Revenue Cycle") || rendered.includes("Senior Software Engineer"))
+    if (!hasContent) {
+      console.warn(
+        `⚠ prerender-home: rendered #root looked empty (${rendered.length} chars) — leaving shell index.html as-is.`,
+      )
+      return
+    }
+
+    const doc = html.startsWith("<!doctype") ? html : "<!doctype html>\n" + html
+    await writeFile(resolve(DIST, "index.html"), doc, "utf8")
+    console.log(`✓ prerendered homepage (RecruiterMode) — #root body: ${rendered.length} chars`)
+  } catch (err) {
+    console.warn(
+      "⚠ prerender-home: snapshot failed — leaving shell index.html as-is.",
+      (err as Error)?.message ?? err,
+    )
+  } finally {
+    await browser?.close()
+    server.close()
+  }
+}
+
+await main()
