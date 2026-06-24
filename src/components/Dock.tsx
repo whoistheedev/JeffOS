@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react"
-import { motion, useSpring, animate } from "framer-motion"
+import { motion, AnimatePresence, useSpring, animate } from "framer-motion"
+import { tigerFont } from "../lib/aquaSkin"
 import { useStore } from "../store"
 import type { AppIcon } from "../store/apps"
 import { AppIconRenderer } from "./AppIconRenderer"
@@ -28,6 +29,9 @@ function DockItem({ icon, minimized, winId, onClick, mouseX, scaleFactor }: Dock
   const ref = useRef<HTMLButtonElement | null>(null)
   const setDockIconPosition = useStore((s) => s.setDockIconPosition)
   const [centerX, setCenterX] = useState(0)
+  // True when the cursor is essentially over THIS icon — drives the Aqua
+  // name-tag bubble (Tiger shows the app name above the hovered icon).
+  const [showLabel, setShowLabel] = useState(false)
 
   const scale = useSpring(1, SPRING_CONFIG)
   const y = useSpring(0, SPRING_CONFIG)
@@ -69,11 +73,19 @@ function DockItem({ icon, minimized, winId, onClick, mouseX, scaleFactor }: Dock
     y.set(targetY)
     dotScale.set(1 + 0.8 * strength)
     dotY.set(-6 * strength)
+    // Show the name-tag once the cursor is right over this icon.
+    setShowLabel(distance < BASE_SIZE * 0.6)
   }, [mouseX, centerX, scale, y, dotScale, dotY])
 
   const handleClick = () => {
     if (!winId) {
-      animate(scale, [1, 1.4, 0.9, 1.1, 1], { duration: 0.6, ease: "easeOut" })
+      // Classic Tiger launch bounce: the icon hops up and down a few times
+      // while the app opens (decaying jumps), not a single scale pop.
+      animate(y.get(), [0, -22, 0, -14, 0, -7, 0], {
+        duration: 0.9,
+        ease: "easeOut",
+        onUpdate: (v) => y.set(v),
+      })
       playSystemSound("appOpen")
     } else playSystemSound("focus")
     onClick()
@@ -81,9 +93,46 @@ function DockItem({ icon, minimized, winId, onClick, mouseX, scaleFactor }: Dock
 
   return (
     <motion.div className="relative flex flex-col items-center" style={{ y }}>
+      {/* Aqua hover name-tag (Tiger): rounded translucent-black label with a
+          little downward arrow, floating above the magnified icon. */}
+      <AnimatePresence>
+        {showLabel && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.9 }}
+            transition={{ duration: 0.12 }}
+            className="pointer-events-none absolute left-1/2 -translate-x-1/2 z-50 whitespace-nowrap"
+            style={{ bottom: "calc(100% + 14px)" }}
+          >
+            <div
+              className="px-2.5 py-[3px] rounded-[7px] text-[12px] font-medium text-white"
+              style={{
+                fontFamily: tigerFont,
+                background: "rgba(30,30,30,0.82)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                boxShadow: "inset 0 1px rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.4)",
+                textShadow: "0 1px 1px rgba(0,0,0,0.6)",
+              }}
+            >
+              {icon.title}
+            </div>
+            {/* downward arrow */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 -bottom-[4px]"
+              style={{
+                width: 0,
+                height: 0,
+                borderLeft: "5px solid transparent",
+                borderRight: "5px solid transparent",
+                borderTop: "5px solid rgba(30,30,30,0.82)",
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <motion.button
         ref={ref}
-        title={icon.title}
         aria-label={`Open ${icon.title}`}
         onClick={handleClick}
         style={{
@@ -229,6 +278,18 @@ export default function Dock() {
           scaleFactor={scaleFactor}
         />
       ))}
+      {/* Tiger dock separator: a faint vertical pinstripe dividing apps from
+          the Trash (the right-hand "documents/trash" region). */}
+      <div
+        aria-hidden
+        className="self-stretch my-1 mx-1"
+        style={{
+          width: 1,
+          background:
+            "linear-gradient(to bottom, transparent, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.18) 70%, transparent)",
+          boxShadow: "1px 0 0 rgba(255,255,255,0.5)",
+        }}
+      />
       <DockItem
         key="trash"
         icon={trashIcon}
