@@ -14,6 +14,7 @@ import { AppRegistry } from "../apps/registry/registry";
 import AboutWindow from "./AboutWindow";
 import AboutAppWindow from "./AboutAppWindow";
 import { playSystemSound } from "../store/sounds";
+import { tigerFont } from "../lib/aquaSkin";
 
 type Props = {
   id: string;
@@ -392,15 +393,25 @@ export default function Window({ id, title }: Props) {
                 zoomWindow(id);
               }}
               style={{
+                // Tiger brushed-metal titlebar: fine horizontal pinstripe over a
+                // light→dark gradient. Inactive windows read a touch dimmer.
                 backgroundImage: `
-                  linear-gradient(to bottom, #dcdcdc, #b8b8b8)
+                  repeating-linear-gradient(
+                    0deg,
+                    rgba(255,255,255,0) 0px,
+                    rgba(255,255,255,0.30) 1px,
+                    rgba(0,0,0,0.03) 2px,
+                    rgba(0,0,0,0) 3px
+                  ),
+                  linear-gradient(to bottom, ${isActive ? "#e7e7e7" : "#ededed"}, ${isActive ? "#c2c2c2" : "#d2d2d2"})
                 `,
-                backgroundBlendMode: "overlay, normal",
-                borderBottom: "1px solid rgba(0,0,0,0.6)",
+                borderBottom: "1px solid #8d8d8d",
+                boxShadow: "inset 0 1px rgba(255,255,255,0.75)",
               }}
             >
-              {/* Traffic Lights */}
-              <div className="flex items-center gap-2">
+              {/* Traffic Lights — Tiger shows the ×/−/+ glyphs only on hover of
+                  the button group (the `group` + `group-hover` pattern). */}
+              <div className="group flex items-center gap-2">
                 {(["close", "minimize", "zoom"] as const).map((type) => {
                   const { className, style } = getTrafficLightStyle(type, isActive);
                   const clickMap = {
@@ -420,19 +431,41 @@ export default function Window({ id, title }: Props) {
                       zoomWindow(id);
                     },
                   };
+                  const glyph = { close: "×", minimize: "−", zoom: "+" }[type];
                   return (
                     <button
                       key={type}
                       aria-label={type}
-                      className={className}
+                      className={`${className} flex items-center justify-center`}
                       style={style}
                       onClick={clickMap[type]}
-                    />
+                    >
+                      <span
+                        aria-hidden
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-100 leading-none font-bold"
+                        style={{
+                          fontSize: type === "zoom" ? 11 : type === "close" ? 10 : 12,
+                          color: "rgba(0,0,0,0.55)",
+                          textShadow: "0 1px 0 rgba(255,255,255,0.4)",
+                          marginTop: type === "minimize" ? -1 : 0,
+                        }}
+                      >
+                        {glyph}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
 
-              <div className="flex-1 text-center text-sm font-medium text-gray-800 truncate">
+              <div
+                className="flex-1 text-center text-[13px] truncate"
+                style={{
+                  fontFamily: tigerFont,
+                  fontWeight: 500,
+                  color: isActive ? "#3a3a3a" : "#8a8a8a",
+                  textShadow: "0 1px 0 rgba(255,255,255,0.8)",
+                }}
+              >
                 {displayTitle}
               </div>
               <div className="w-16" />
