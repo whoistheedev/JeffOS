@@ -23,20 +23,22 @@ import { finderMenus } from "../config/menus/finderMenus"
 import { appsMenus } from "../config/menus/appsMenus"
 import { AppRegistry } from "../apps/registry/registry"
 import { commandBus } from "../lib/commandBus"
+import { tigerMenuSurface } from "../lib/aquaSkin"
 import type { AppMenus, MenuItemEntry } from "../types"
 
+/** Shared Tiger pull-down panel style for every menu-bar dropdown. */
+const MENU_SURFACE_CLASS = "z-[9999] min-w-[200px]"
 
 const MenuItem: React.FC<{
   onClick?: () => void
   children: React.ReactNode
   iconRenderer?: React.ReactNode
 }> = ({ onClick, children, iconRenderer }) => (
-  <DropdownMenu.Item
-    onClick={onClick}
-    className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-blue-600 hover:text-white rounded-sm text-[13px]"
-  >
-    {iconRenderer}
-    {children}
+  <DropdownMenu.Item onClick={onClick} className="tiger-menu-item">
+    <span className="flex items-center gap-2">
+      {iconRenderer}
+      {children}
+    </span>
   </DropdownMenu.Item>
 )
 
@@ -197,13 +199,14 @@ export default function StatusBar() {
           <DropdownMenu.Trigger asChild>
             <motion.button
               whileTap={{ scale: 0.92 }}
-              className="flex items-center px-1 hover:bg-black/10 rounded-sm"
+              className="flex items-center px-1.5 rounded-sm data-[state=open]:bg-[#2f7bea] hover:bg-black/10"
             >
               <img src="/apple.png" alt="Apple" className="w-[24px] h-[24px]" />
             </motion.button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content
-           className="z-[9999] bg-white/95 text-black rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-white/60 backdrop-blur-md p-1.5 min-w-[220px] sm:min-w-[240px] transition-all duration-150"
+            className={`${MENU_SURFACE_CLASS} min-w-[220px] sm:min-w-[240px]`}
+            style={tigerMenuSurface}
             sideOffset={4}
           >
             {/* Authentic Tiger Apple-menu structure. "Leave the OS" actions
@@ -211,7 +214,7 @@ export default function StatusBar() {
             <MenuItem onClick={openAboutThisMac}>About This Mac</MenuItem>
             <MenuItem onClick={() => commandBus.dispatch("system.softwareUpdate")}>Software Update…</MenuItem>
             <MenuItem onClick={() => commandBus.dispatch("system.prefs")}>System Preferences…</MenuItem>
-            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <DropdownMenu.Separator className="tiger-menu-sep" />
             {Object.values(apps).map((app) => {
               const icon = desktopIcons.find((i) => i.id === app.id)
               return (
@@ -230,11 +233,11 @@ export default function StatusBar() {
                 </MenuItem>
               )
             })}
-            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <DropdownMenu.Separator className="tiger-menu-sep" />
             <MenuItem onClick={() => commandBus.dispatch("system.sleep")}>Sleep</MenuItem>
             <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Restart…</MenuItem>
             <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Shut Down…</MenuItem>
-            <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+            <DropdownMenu.Separator className="tiger-menu-sep" />
             <MenuItem onClick={() => commandBus.dispatch("recruiter.exit")}>Exit to Recruiter Mode</MenuItem>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
@@ -244,13 +247,14 @@ export default function StatusBar() {
           <DropdownMenu.Trigger asChild>
             <motion.button
               whileTap={{ scale: 0.95 }}
-              className="px-1 hover:bg-black/10 rounded-sm font-semibold"
+              className="px-2 rounded-sm font-semibold data-[state=open]:bg-[#2f7bea] data-[state=open]:text-white hover:bg-black/10"
             >
               {activeAppTitle}
             </motion.button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content
-            className="bg-white text-black rounded-md shadow-lg p-1 min-w-[180px]"
+            className={`${MENU_SURFACE_CLASS} min-w-[180px]`}
+            style={tigerMenuSurface}
             sideOffset={4}
           >
             {activeAppMeta ? (
@@ -258,16 +262,16 @@ export default function StatusBar() {
                 <MenuItem onClick={() => openAboutApp(activeWin!.appKey as AppId)}>
                   About {activeAppTitle}
                 </MenuItem>
-                <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+                <DropdownMenu.Separator className="tiger-menu-sep" />
                 <MenuItem>Preferences…</MenuItem>
-                <MenuItem>Close</MenuItem>
+                <MenuItem onClick={() => activeWinId && closeWindow(activeWinId)}>Close</MenuItem>
               </>
             ) : (
               <>
                 <MenuItem onClick={() => openAboutApp("finder" as AppId)}>
                   About Finder
                 </MenuItem>
-                <DropdownMenu.Separator className="my-1 h-px bg-gray-300" />
+                <DropdownMenu.Separator className="tiger-menu-sep" />
                 <MenuItem>Preferences…</MenuItem>
                 <MenuItem>Empty Trash</MenuItem>
               </>
@@ -281,35 +285,27 @@ export default function StatusBar() {
     <DropdownMenu.Trigger asChild>
       <motion.button
         whileTap={{ scale: 0.95 }}
-        className="px-1 hover:bg-black/10 rounded-sm"
+        className="px-2 rounded-sm data-[state=open]:bg-[#2f7bea] data-[state=open]:text-white hover:bg-black/10"
       >
         {menuName}
       </motion.button>
     </DropdownMenu.Trigger>
     <DropdownMenu.Content
-      className="bg-white text-black rounded-md shadow-lg p-1 min-w-[200px]"
+      className={MENU_SURFACE_CLASS}
+      style={tigerMenuSurface}
       sideOffset={4}
     >
       {items.map((item, i) =>
         item.type === "separator" ? (
-          <DropdownMenu.Separator
-            key={i}
-            className="my-1 h-px bg-gray-300"
-          />
+          <DropdownMenu.Separator key={i} className="tiger-menu-sep" />
         ) : (
           <DropdownMenu.Item
             key={i}
             disabled={item.disabled}
-            className={`flex justify-between px-3 py-1.5 text-[13px] ${
-              item.disabled
-                ? "text-gray-400 pointer-events-none"
-                : "cursor-pointer hover:bg-blue-600 hover:text-white"
-            }`}
+            className={`tiger-menu-item ${item.disabled ? "is-disabled" : ""}`}
           >
-            {item.label}
-            {item.shortcut && (
-              <span className="ml-6 text-gray-500">{item.shortcut}</span>
-            )}
+            <span>{item.label}</span>
+            {item.shortcut && <span className="menu-shortcut">{item.shortcut}</span>}
           </DropdownMenu.Item>
         )
       )}

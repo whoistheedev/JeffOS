@@ -363,3 +363,36 @@ html.jeffos-active #root {
   }
 }
 
+
+/* ---- Tiger menu-bar pull-down items (Aqua highlight) ----
+   A menu row that turns into the glossy blue Aqua highlight bar on hover/focus
+   (Radix sets data-highlighted on keyboard/pointer focus). Used by StatusBar's
+   Apple menu, app menu, and Finder-style menus so they all match Tiger. */
+.tiger-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 3px 18px 3px 10px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: #1a1a1a;
+  border-radius: 4px;
+  cursor: default;
+  outline: none;
+  white-space: nowrap;
+}
+.tiger-menu-item[data-disabled],
+.tiger-menu-item.is-disabled {
+  color: #b0b0b0;
+  pointer-events: none;
+}
+.tiger-menu-item:not([data-disabled]):hover,
+.tiger-menu-item:not([data-disabled])[data-highlighted] {
+  background: linear-gradient(to bottom, #5b9df9 0%, #2f7bea 50%, #2670e3 51%, #1e63d6 100%);
+  color: #fff;
+}
+.tiger-menu-item .menu-shortcut { color: #8a8a8a; }
+.tiger-menu-item:not([data-disabled]):hover .menu-shortcut,
+.tiger-menu-item:not([data-disabled])[data-highlighted] .menu-shortcut { color: rgba(255,255,255,0.85); }
+.tiger-menu-sep { margin: 4px 6px; height: 1px; background: #d2d2d2; }
