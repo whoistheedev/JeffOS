@@ -13,10 +13,17 @@
  *
  * `renderImage` is a safe no-op for non-Supabase URLs (e.g. the dummyimage
  * fallback thumb) and for URLs already pointing at the render endpoint.
+ *
+ * ⚠️ Image Transformations is a Supabase PRO feature. On the Free plan the
+ * render endpoint returns `403 FeatureNotEnabled` for EVERY image (blank
+ * desktop, empty wallpaper grid, missing game thumbs). So it is OFF unless
+ * `VITE_SUPABASE_IMAGE_TRANSFORMS=true` — set that only on a Pro org. When off,
+ * every helper returns the original public-object URL unchanged.
  */
 
 const OBJECT_PUBLIC = "/storage/v1/object/public/"
 const RENDER_PUBLIC = "/storage/v1/render/image/public/"
+const TRANSFORMS_ENABLED = import.meta.env.VITE_SUPABASE_IMAGE_TRANSFORMS === "true"
 
 export type RenderOpts = {
   width?: number
@@ -28,7 +35,7 @@ export type RenderOpts = {
 export function renderImage(url: string | undefined | null, opts: RenderOpts = {}): string {
   if (!url) return ""
   // Only transform Supabase public-object URLs; leave everything else untouched.
-  if (!url.includes(OBJECT_PUBLIC)) return url
+  if (!TRANSFORMS_ENABLED || !url.includes(OBJECT_PUBLIC)) return url
 
   const base = url.replace(OBJECT_PUBLIC, RENDER_PUBLIC)
   const params = new URLSearchParams()

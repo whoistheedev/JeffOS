@@ -149,11 +149,14 @@ export default defineConfig({
             },
           },
           // 🖼 Supabase Storage — wallpapers, ROMs/game assets, thumbs. Aggressive.
+          // <img> fetches are no-cors → opaque (status 0), so errors served
+          // while the project was paused may have been cached. Bump the cache
+          // name (v2) to orphan any poisoned entries.
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'supabase-assets',
+              cacheName: 'supabase-assets-v2',
               expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 }, // 30 days
               cacheableResponse: { statuses: [0, 200] },
             },
