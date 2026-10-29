@@ -10,7 +10,8 @@ import {
   SYSTEM_INFO,
   workBySlug,
 } from "../content"
-import { buttonClass, CopyEmailButton, LiveDot, MacPanel, Monogram } from "./primitives"
+import { CopyEmailButton, LiveDot, MacPanel, Monogram } from "./primitives"
+import { buttonClass } from "./ui"
 
 /* ------------------------------ What I Can Own ---------------------------- */
 /**

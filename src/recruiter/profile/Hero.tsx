@@ -1,7 +1,8 @@
 import { ArrowDown, Mail, ScanEye } from "lucide-react"
 import { ABOUT_ROWS, IDENTITY, PRIMARY_CTA } from "../content"
 import { cn } from "../../lib/utils"
-import { buttonClass, LiveDot, MacPanel, Monogram } from "./primitives"
+import { LiveDot, MacPanel, Monogram } from "./primitives"
+import { buttonClass } from "./ui"
 
 /**
  * Hero — "Meet the engineer". Asymmetric: an editorial name + statement on the
