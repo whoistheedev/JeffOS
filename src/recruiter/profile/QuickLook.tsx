@@ -2,7 +2,8 @@ import type { RefObject } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
 import { ChevronRight, FileText, Github, Linkedin, Mail, X } from "lucide-react"
 import { AVAILABLE_FOR, CONTACT, FEATURED_WORK, IDENTITY, PRIMARY_CTA, RESUME_REQUEST_HREF } from "../content"
-import { buttonClass, Chip, CopyEmailButton, Monogram, TrafficLights } from "./primitives"
+import { Chip, CopyEmailButton, Monogram, TrafficLights } from "./primitives"
+import { buttonClass } from "./ui"
 
 const EXPERTISE = ["AI-powered RCM", "EDI 837/835/277/999", "Node.js · TypeScript", "Supabase · PostgreSQL", "RLS · RBAC", "React"]
 

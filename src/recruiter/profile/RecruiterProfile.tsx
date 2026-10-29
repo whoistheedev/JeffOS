@@ -7,7 +7,8 @@ import { ProjectExplorer } from "./ProjectExplorer"
 import { QuickLook } from "./QuickLook"
 import { Capabilities, CareerLog, ConnectionPanel, JeffOSCallout, SystemInformation } from "./Sections"
 import { cn } from "../../lib/utils"
-import { buttonClass, Monogram, SectionHeader, scrollToId } from "./primitives"
+import { Monogram, SectionHeader } from "./primitives"
+import { buttonClass, scrollToId } from "./ui"
 
 type PageProps = {
   variant: "page"
