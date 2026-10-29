@@ -4,8 +4,21 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!assets/|icons/|sounds/|projects/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
+    { "source": "/((?!assets/|icons/|sounds/|projects/|_vercel/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
   ],
+  "images": {
+    "sizes": [256, 384, 640, 1080, 1280, 1920],
+    "qualities": [65, 70, 78],
+    "formats": ["image/webp"],
+    "minimumCacheTTL": 2678400,
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "akqqmrqeloasisiybdjx.supabase.co",
+        "pathname": "^/storage/v1/object/public/.*$"
+      }
+    ]
+  },
   "headers": [
     {
       "source": "/",
