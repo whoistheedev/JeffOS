@@ -31,7 +31,7 @@ export function Capabilities({ onEvidence }: { onEvidence: (slug: string) => voi
           >
             <span
               aria-hidden
-              className="rx-mono row-span-3 text-[28px] font-medium leading-none text-foreground/20 transition-colors duration-200 group-hover:text-[var(--color-hire)] @3xl:row-span-1 @3xl:text-[40px]"
+              className="rx-mono row-span-3 text-[28px] font-medium leading-none text-foreground/45 transition-colors duration-200 group-hover:text-[var(--rx-accent-text)] @3xl:row-span-1 @3xl:text-[40px]"
             >
               {String(i + 1).padStart(2, "0")}
             </span>
@@ -41,7 +41,7 @@ export function Capabilities({ onEvidence }: { onEvidence: (slug: string) => voi
               <button
                 type="button"
                 onClick={() => onEvidence(work.slug)}
-                className="inline-flex min-h-11 items-center gap-1 justify-self-start rounded-md text-[13px] font-medium text-[var(--color-hire)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)] @3xl:justify-self-end"
+                className="inline-flex min-h-11 items-center gap-1 justify-self-start rounded-md text-[13px] font-medium text-[var(--rx-accent-text)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)] @3xl:justify-self-end"
               >
                 <span className="text-muted-foreground">Evidence:</span> {work.name}
                 <ChevronRight size={14} aria-hidden />

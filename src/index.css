@@ -416,11 +416,14 @@ html.jeffos-active #root {
   --rx-titlebar: linear-gradient(to bottom, #f6f6f6 0%, #e4e4e4 100%);
   --rx-titlebar-text: #4a4a4a;
   --rx-panel-shadow: 0 1px 0 rgb(0 0 0 / 0.03), 0 18px 40px -22px rgb(0 0 0 / 0.35);
+  /* Accent as TEXT (links, labels). Filled CTAs keep --color-hire. */
+  --rx-accent-text: var(--color-hire);
 }
 .dark .rx {
   --rx-titlebar: linear-gradient(to bottom, #3a3a3c 0%, #2c2c2e 100%);
   --rx-titlebar-text: #c7c7cc;
   --rx-panel-shadow: 0 1px 0 rgb(255 255 255 / 0.04), 0 18px 40px -22px rgb(0 0 0 / 0.8);
+  --rx-accent-text: oklch(0.74 0.13 264); /* ≈7:1 on the dark background */
 }
 .rx-mono { font-family: var(--rx-mono); }
 

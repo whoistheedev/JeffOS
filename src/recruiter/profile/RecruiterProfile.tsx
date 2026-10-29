@@ -148,7 +148,7 @@ function PageActionStrip({
   onQuickLook,
 }: PageProps & { onQuickLook: () => void }) {
   return (
-    <div className="sticky top-0 z-40 border-b border-border/80 bg-background/85 pt-[var(--space-safe-top)] backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 pt-[var(--space-safe-top)] backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-[72rem] items-center gap-3 px-5 @2xl:px-8 @5xl:px-12">
         <Monogram initials={IDENTITY.initials} size={30} />
         <p className="hidden min-w-0 truncate text-[14px] font-semibold @lg:block">{IDENTITY.name}</p>
@@ -172,14 +172,17 @@ function PageActionStrip({
           </button>
         </div>
       </div>
-    </div>
+    </header>
   )
 }
 
 /** Phone-width front door: the two key actions in the thumb zone (Fitts's Law). */
 function MobileThumbBar({ onQuickLook }: { onQuickLook: () => void }) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/92 px-4 pb-[max(0.75rem,var(--space-safe-bottom))] pt-3 backdrop-blur-md sm:hidden">
+    <aside
+      aria-label="Quick actions"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/92 px-4 pb-[max(0.75rem,var(--space-safe-bottom))] pt-3 backdrop-blur-md sm:hidden"
+    >
       <div className="grid grid-cols-[auto_1fr] gap-2">
         <button type="button" onClick={onQuickLook} className={buttonClass("secondary", "sm")}>
           <ScanEye size={15} aria-hidden /> Quick Look
@@ -188,7 +191,7 @@ function MobileThumbBar({ onQuickLook }: { onQuickLook: () => void }) {
           <Mail size={15} aria-hidden /> {PRIMARY_CTA.label}
         </a>
       </div>
-    </div>
+    </aside>
   )
 }
 

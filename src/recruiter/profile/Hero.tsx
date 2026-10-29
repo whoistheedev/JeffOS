@@ -9,7 +9,8 @@ import { buttonClass } from "./ui"
  * left, and an "About This Engineer" window on the right (Tiger's About This
  * Mac, re-cast as a spec card). Who / what / how-to-contact are all answered
  * in the first viewport; the primary CTA is the only filled button
- * (Von Restorff). Entrance motion is transform/opacity only and motion-safe.
+ * (Von Restorff). Only the About panel animates in (transform/opacity,
+ * motion-safe) — the name, statement and CTAs paint immediately.
  */
 export function Hero({
   onExploreWork,
@@ -25,14 +26,14 @@ export function Hero({
   return (
     <section aria-label="Introduction" className="grid gap-10 @4xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] @4xl:items-center @4xl:gap-14">
       <div>
-        <p className="rx-rise flex items-center gap-2 text-[13px] text-muted-foreground">
+        <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
           <LiveDot />
           <span>
             Shipping at <span className="font-medium text-foreground">{IDENTITY.org}</span> since {IDENTITY.since}
           </span>
         </p>
 
-        <h1 className="rx-rise mt-5 [animation-delay:60ms]">
+        <h1 className="mt-5">
           <span className="block text-[44px] font-semibold leading-[0.95] tracking-[-0.035em] text-balance @2xl:text-[60px] @5xl:text-[72px]">
             {IDENTITY.name}
           </span>
@@ -42,11 +43,11 @@ export function Hero({
           </span>
         </h1>
 
-        <p className="rx-rise mt-5 max-w-[58ch] text-[15px] leading-6 text-muted-foreground [animation-delay:120ms]">
+        <p className="mt-5 max-w-[58ch] text-[15px] leading-6 text-muted-foreground">
           {IDENTITY.subtitle}
         </p>
 
-        <div className="rx-rise mt-8 flex flex-wrap items-center gap-3 [animation-delay:180ms]">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <a href={PRIMARY_CTA.href} aria-describedby={hintId} className={buttonClass("primary")}>
             <Mail size={17} aria-hidden /> {PRIMARY_CTA.label}
           </a>
@@ -57,7 +58,7 @@ export function Hero({
         <p id={hintId} className="sr-only">{PRIMARY_CTA.hint}</p>
 
         {/* The recruiter shortcut — essentials in one panel, never gated. */}
-        <p className="rx-rise mt-5 flex flex-wrap items-center gap-x-2 text-[13px] text-muted-foreground [animation-delay:240ms]">
+        <p className="mt-5 flex flex-wrap items-center gap-x-2 text-[13px] text-muted-foreground">
           Need the essentials?
           <button type="button" onClick={onQuickLook} className={cn(buttonClass("tertiary", "sm"), "-ml-1 font-medium text-foreground")}>
             <ScanEye size={15} aria-hidden /> Open Quick Look
