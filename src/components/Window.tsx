@@ -92,10 +92,11 @@ export default function Window({ id, title }: Props) {
     const isPhone = vw < 480;
 
     // adaptive default for smaller devices
-    const baseWidth = isPhone ? vw : Math.min(DEFAULT_SIZE.width, vw * 0.9);
+    const size = appMeta?.defaultSize ?? DEFAULT_SIZE;
+    const baseWidth = isPhone ? vw : Math.min(size.width, vw * 0.9);
     const baseHeight = isPhone
       ? vh - 24 /* leave the 24px menu bar visible */
-      : Math.min(DEFAULT_SIZE.height, vh * 0.75);
+      : Math.min(size.height, vh * (appMeta?.defaultSize ? 0.85 : 0.75));
 
     let width = baseWidth;
     let height = baseHeight;

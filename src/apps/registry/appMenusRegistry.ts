@@ -85,6 +85,13 @@ export const appMenusRegistry: Record<string, AppMenus> = {
     Help: [{ label: "Buy Me a Coffee Help" }],
   },
 
+  recruiter: {
+    File: [{ label: "Close Window", shortcut: "⌘W" }],
+    Edit: [{ label: "Copy", shortcut: "⌘C" }],
+    View: [{ label: "Quick Look" }],
+    Help: [{ label: "Hire Me Help" }],
+  },
+
   "about-this-mac": {
     File: [{ label: "Close Window", shortcut: "⌘W" }],
     Help: [{ label: "About This Mac Help" }],

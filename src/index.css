@@ -404,3 +404,46 @@ html.jeffos-active #root {
   background: linear-gradient(to bottom, #6aa0e8 0%, #3b7fd6 50%, #2f73cd 51%, #2768c4 100%);
   box-shadow: inset 0 1px rgba(255,255,255,0.4), inset 0 -1px rgba(0,0,0,0.15);
 }
+
+/* -------------------------------------------------------
+   Recruiter experience ("rx") — shared by the Recruiter Mode front door and
+   the JeffOS "Hire Me" window. Classic Mac chrome (title bars, traffic
+   lights, Aqua selection) over a Swiss editorial grid. Token-driven so it
+   follows the front door's light/dark toggle; JeffOS windows stay light.
+------------------------------------------------------- */
+.rx {
+  --rx-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --rx-titlebar: linear-gradient(to bottom, #f6f6f6 0%, #e4e4e4 100%);
+  --rx-titlebar-text: #4a4a4a;
+  --rx-panel-shadow: 0 1px 0 rgb(0 0 0 / 0.03), 0 18px 40px -22px rgb(0 0 0 / 0.35);
+}
+.dark .rx {
+  --rx-titlebar: linear-gradient(to bottom, #3a3a3c 0%, #2c2c2e 100%);
+  --rx-titlebar-text: #c7c7cc;
+  --rx-panel-shadow: 0 1px 0 rgb(255 255 255 / 0.04), 0 18px 40px -22px rgb(0 0 0 / 0.8);
+}
+.rx-mono { font-family: var(--rx-mono); }
+
+/* Aqua selection gel, darkened from .tiger-sidebar-selected so white text
+   clears WCAG AA (≥4.5:1 across the text band). */
+.rx-selected,
+.rx-selectable[data-state="active"] {
+  background: linear-gradient(to bottom, #4a86dc 0%, #2a66c4 50%, #2560bd 51%, #1f58b3 100%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.35), inset 0 -1px rgb(0 0 0 / 0.15);
+  color: #fff;
+}
+
+/* Entrance: transform + opacity only, once, motion-safe. Content is fully
+   visible without it (reduced motion / no animation support). */
+@keyframes rx-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rx-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-live) 55%, transparent); }
+  50%      { box-shadow: 0 0 0 5px transparent; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rx-rise { animation: rx-rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .rx-pulse { animation: rx-pulse 2.4s ease-in-out infinite; }
+}

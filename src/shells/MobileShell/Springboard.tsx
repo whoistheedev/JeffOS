@@ -26,6 +26,7 @@ import { Search, Briefcase } from "lucide-react"
 const MOBILE_NAME: Partial<Record<AppId, string>> = {
   wallpapers: "Wallpaper",
   bmcoffee: "Coffee",
+  recruiter: "Hire Me",
 }
 
 /** Tiger-correct display name for an app id (Safari/iTunes/Games…), with fallback. */

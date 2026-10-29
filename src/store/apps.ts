@@ -14,6 +14,7 @@ export type AppId =
   
   | "bmcoffee"
   | "terminal"
+  | "recruiter"
 
 
 export interface AppMeta {
@@ -67,10 +68,12 @@ const APPS: Record<AppId, AppMeta> = {
   itunes: { id: "itunes", title: "iTunes" },
   terminal: { id: "terminal", title: "Terminal" },
   bmcoffee: { id: "bmcoffee", title: "Buy Me a Coffee" },
+  recruiter: { id: "recruiter", title: "Hire Me" },
 }
 
 const PINNED_DEFAULT: AppId[] = [
   "finder",
+  "recruiter",
   "games",
   "guestbook",
   "wallpapers",
