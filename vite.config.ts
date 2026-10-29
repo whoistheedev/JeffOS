@@ -31,6 +31,8 @@ const APP_VERSION = {
 export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(APP_VERSION),
+    // Vercel Image Optimization (`/_vercel/image`) only exists on Vercel deploys.
+    __VERCEL_IMAGES__: JSON.stringify(!!process.env.VERCEL),
   },
   build: {
     rollupOptions: {
