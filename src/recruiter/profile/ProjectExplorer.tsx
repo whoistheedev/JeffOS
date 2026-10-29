@@ -49,7 +49,7 @@ export function ProjectExplorer({
               <span className="flex items-center gap-2">
                 <span className="text-[15px] font-semibold leading-5">{w.name}</span>
                 {w.flagship && (
-                  <span className="rx-mono rounded-[4px] border border-current px-1 text-[10px] uppercase leading-4 tracking-wider text-[var(--color-hire)] group-data-[state=active]:text-white">
+                  <span className="rx-mono rounded-[4px] border border-current px-1 text-[10px] uppercase leading-4 tracking-wider text-[var(--rx-accent-text)] group-data-[state=active]:text-white">
                     Flagship
                   </span>
                 )}
@@ -100,7 +100,7 @@ export function ProjectExplorer({
                 href={`/projects/${w.slug}/`}
                 target={newTab ? "_blank" : undefined}
                 rel={newTab ? "noopener noreferrer" : undefined}
-                className="inline-flex min-h-11 items-center gap-1 rounded-md px-1 text-[14px] font-medium text-[var(--color-hire)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)]"
+                className="inline-flex min-h-11 items-center gap-1 rounded-md px-1 text-[14px] font-medium text-[var(--rx-accent-text)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)]"
               >
                 Read the case study <ArrowUpRight size={15} aria-hidden />
                 {newTab && <span className="sr-only"> (opens in a new tab)</span>}
