@@ -24,12 +24,14 @@ const Ipod = lazy(() => import("../music/iTunesApp"));
 const Terminal = lazy(() => import("../terminal/Terminal"));
 const Calendar = lazy(() => import("../calendar/HolidayCalendar"));
 const BuyMeCoffee = lazy(() => import("../bmcoffee/BuyMeCoffee"));
+const Recruiter = lazy(() => import("../recruiter/RecruiterApp"));
 
 export type AppMeta = {
   component: ComponentType | LazyExoticComponent<ComponentType>; // 👈 lazy-loaded component
   resizable: boolean;      // 👈 can resize window
   expandToFit: boolean;    // 👈 should app content stretch to fill window?
   title: string;           // 👈 Tiger-correct window/title-bar display name (e.g. "Finder", not "finder")
+  defaultSize?: { width: number; height: number }; // 👈 first-open size (Window.tsx clamps to the viewport)
 };
 
 // Registry maps AppId -> Component + meta
@@ -48,5 +50,6 @@ export const AppRegistry: Partial<Record<AppId, AppMeta>> = {
   terminal:     { component: Terminal,    resizable: true,  expandToFit: true, title: "Terminal" },
   calendar:     { component: Calendar,    resizable: true,  expandToFit: true, title: "iCal" },
   bmcoffee:     { component: BuyMeCoffee, resizable: true,  expandToFit: true, title: "Buy Me a Coffee" },
+  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true, title: "Hire Me", defaultSize: { width: 960, height: 620 } },
 
 };

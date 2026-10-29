@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStore } from "../store"
 import { AppIconRenderer } from "./AppIconRenderer"
+import { AppRegistry } from "../apps/registry/registry"
 
 /**
  * Exposé (Tiger 10.4):
@@ -81,7 +82,9 @@ export default function Expose() {
           >
             {open.map((w) => {
               const icon = desktopIcons.find((i) => i.id === w.appKey)
-              const title = apps[w.appKey]?.title ?? String(w.appKey)
+              // `apps` is persisted, so returning visitors' copy can predate newer apps
+              // (e.g. Hire Me); fall back to the registry title before the raw id.
+              const title = apps[w.appKey]?.title ?? AppRegistry[w.appKey]?.title ?? String(w.appKey)
               return (
                 <motion.button
                   key={w.id}

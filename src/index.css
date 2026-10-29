@@ -363,3 +363,90 @@ html.jeffos-active #root {
   }
 }
 
+
+/* ---- Tiger menu-bar pull-down items (Aqua highlight) ----
+   A menu row that turns into the glossy blue Aqua highlight bar on hover/focus
+   (Radix sets data-highlighted on keyboard/pointer focus). Used by StatusBar's
+   Apple menu, app menu, and Finder-style menus so they all match Tiger. */
+.tiger-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 3px 18px 3px 10px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: #1a1a1a;
+  border-radius: 4px;
+  cursor: default;
+  outline: none;
+  white-space: nowrap;
+}
+.tiger-menu-item[data-disabled],
+.tiger-menu-item.is-disabled {
+  color: #b0b0b0;
+  pointer-events: none;
+}
+.tiger-menu-item:not([data-disabled]):hover,
+.tiger-menu-item:not([data-disabled])[data-highlighted] {
+  background: linear-gradient(to bottom, #5b9df9 0%, #2f7bea 50%, #2670e3 51%, #1e63d6 100%);
+  color: #fff;
+}
+.tiger-menu-item .menu-shortcut { color: #8a8a8a; }
+.tiger-menu-item:not([data-disabled]):hover .menu-shortcut,
+.tiger-menu-item:not([data-disabled])[data-highlighted] .menu-shortcut { color: rgba(255,255,255,0.85); }
+.tiger-menu-sep { margin: 4px 6px; height: 1px; background: #d2d2d2; }
+
+/* ---- Finder sidebar selection (Tiger Aqua gel) ----
+   Glossy blue gradient pill for the selected sidebar row, replacing a flat
+   bg-blue-500. The icon + label go white (handled in the component). */
+.tiger-sidebar-selected {
+  background: linear-gradient(to bottom, #6aa0e8 0%, #3b7fd6 50%, #2f73cd 51%, #2768c4 100%);
+  box-shadow: inset 0 1px rgba(255,255,255,0.4), inset 0 -1px rgba(0,0,0,0.15);
+}
+
+/* -------------------------------------------------------
+   Recruiter experience ("rx") — shared by the Recruiter Mode front door and
+   the JeffOS "Hire Me" window. Classic Mac chrome (title bars, traffic
+   lights, Aqua selection) over a Swiss editorial grid. Token-driven so it
+   follows the front door's light/dark toggle; JeffOS windows stay light.
+------------------------------------------------------- */
+.rx {
+  --rx-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --rx-titlebar: linear-gradient(to bottom, #f6f6f6 0%, #e4e4e4 100%);
+  --rx-titlebar-text: #4a4a4a;
+  --rx-panel-shadow: 0 1px 0 rgb(0 0 0 / 0.03), 0 18px 40px -22px rgb(0 0 0 / 0.35);
+  /* Accent as TEXT (links, labels). Filled CTAs keep --color-hire. */
+  --rx-accent-text: var(--color-hire);
+}
+.dark .rx {
+  --rx-titlebar: linear-gradient(to bottom, #3a3a3c 0%, #2c2c2e 100%);
+  --rx-titlebar-text: #c7c7cc;
+  --rx-panel-shadow: 0 1px 0 rgb(255 255 255 / 0.04), 0 18px 40px -22px rgb(0 0 0 / 0.8);
+  --rx-accent-text: oklch(0.74 0.13 264); /* ≈7:1 on the dark background */
+}
+.rx-mono { font-family: var(--rx-mono); }
+
+/* Aqua selection gel, darkened from .tiger-sidebar-selected so white text
+   clears WCAG AA (≥4.5:1 across the text band). */
+.rx-selected,
+.rx-selectable[data-state="active"] {
+  background: linear-gradient(to bottom, #4a86dc 0%, #2a66c4 50%, #2560bd 51%, #1f58b3 100%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.35), inset 0 -1px rgb(0 0 0 / 0.15);
+  color: #fff;
+}
+
+/* Entrance: transform + opacity only, once, motion-safe. Content is fully
+   visible without it (reduced motion / no animation support). */
+@keyframes rx-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rx-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-live) 55%, transparent); }
+  50%      { box-shadow: 0 0 0 5px transparent; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rx-rise { animation: rx-rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .rx-pulse { animation: rx-pulse 2.4s ease-in-out infinite; }
+}

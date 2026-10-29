@@ -1,125 +1,213 @@
 import React, { useState } from "react"
 import { motion } from "framer-motion"
-import { Search, ListMusic, Grid3X3, HardDrive } from "lucide-react"
+import { Search, SkipBack, SkipForward, Play, Pause } from "lucide-react"
+import { brushedMetalBar, tigerFont } from "../../../lib/aquaSkin"
 
-export function Toolbar() {
-  const [view, setView] = useState<"list" | "grid" | "devices">("list")
+interface ToolbarProps {
+  track?: any
+  isPlaying?: boolean
+  progress?: number
+  duration?: number
+  onPlayPause?: () => void
+  onNext?: () => void
+  onPrev?: () => void
+  onSeek?: (ms: number) => void
+}
+
+/**
+ * iTunes (Tiger era) top chrome: round Aqua transport buttons on the left, the
+ * iconic rounded LCD "now playing" display in the center, and a capsule search
+ * on the right — all on a brushed-metal bar. See aquaSkin.ts / TIGER_AUTHENTICITY.
+ */
+export function Toolbar({
+  track,
+  isPlaying = false,
+  progress = 0,
+  duration = 0,
+  onPlayPause,
+  onNext,
+  onPrev,
+  onSeek,
+}: ToolbarProps) {
   const [search, setSearch] = useState("")
 
   return (
     <div
-      className="
-        flex items-center justify-between px-3
-        h-[44px]
-        text-[12px] font-[Lucida_Grande,system-ui,sans-serif]
-        bg-[linear-gradient(180deg,#ededed_0%,#c8c8c8_100%)]
-        dark:bg-[linear-gradient(180deg,#222_0%,#111_100%)]
-        border-b border-[#8c8c8c]/60
-        [box-shadow:inset_0_1px_rgba(255,255,255,0.6),inset_0_-1px_rgba(0,0,0,0.25)]
-        select-none relative z-10
-      "
+      className="flex items-center gap-3 px-3 h-[58px] select-none relative z-10"
+      style={{ ...brushedMetalBar, fontFamily: tigerFont }}
     >
-      {/* Left: App title + segmented controls */}
+      {/* Left: round Aqua transport */}
       <div className="flex items-center gap-2">
-        <div
-          className="
-            relative text-[13px] font-semibold text-[#2b2b2b] dark:text-neutral-100
-            drop-shadow-[0_1px_0_white] tracking-wide
-          "
-        >
-          iTunes
-          <span className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-transparent opacity-70 [mask-image:radial-gradient(circle_at_30%_40%,white,transparent_70%)]" />
-        </div>
-
-        {/* Segmented controls */}
-        <div
-          className="
-            flex items-center ml-3 border border-[#7f7f7f]/60 rounded-[6px]
-            shadow-[inset_0_1px_rgba(255,255,255,0.7)]
-            overflow-hidden backdrop-blur-[2px]
-          "
-        >
-          <SegmentButton
-            icon={<ListMusic size={13} />}
-            active={view === "list"}
-            onClick={() => setView("list")}
-          />
-          <SegmentButton
-            icon={<Grid3X3 size={13} />}
-            active={view === "grid"}
-            onClick={() => setView("grid")}
-          />
-          <SegmentButton
-            icon={<HardDrive size={13} />}
-            active={view === "devices"}
-            onClick={() => setView("devices")}
-          />
-        </div>
+        <TransportButton aria="Previous" onClick={onPrev}>
+          <SkipBack size={13} fill="currentColor" />
+        </TransportButton>
+        <TransportButton aria={isPlaying ? "Pause" : "Play"} large onClick={onPlayPause}>
+          {isPlaying ? (
+            <Pause size={16} fill="currentColor" />
+          ) : (
+            <Play size={16} fill="currentColor" className="ml-[1px]" />
+          )}
+        </TransportButton>
+        <TransportButton aria="Next" onClick={onNext}>
+          <SkipForward size={13} fill="currentColor" />
+        </TransportButton>
       </div>
 
-      {/* Right: Search */}
+      {/* Center: the iconic LCD now-playing display */}
+      <LcdDisplay
+        track={track}
+        progress={progress}
+        duration={duration}
+        onSeek={onSeek}
+      />
+
+      {/* Right: capsule search */}
       <motion.div
-        className="
-          flex items-center gap-1 relative
-          bg-[linear-gradient(180deg,#fcfcfc_0%,#d8d8d8_100%)]
-          border border-[#8a8a8a]/60
-          rounded-[4px]
-          shadow-[inset_0_1px_rgba(255,255,255,0.8)]
-          overflow-hidden
-        "
-        animate={{ width: search ? 180 : 150 }}
+        className="flex items-center relative shrink-0"
+        animate={{ width: search ? 170 : 140 }}
         transition={{ duration: 0.2 }}
+        style={{
+          background: "linear-gradient(180deg,#fcfcfc 0%,#dcdcdc 100%)",
+          border: "1px solid #8a8a8a",
+          borderRadius: 999,
+          boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2), inset 0 1px rgba(255,255,255,0.9)",
+        }}
       >
-        <Search
-          size={12}
-          className="absolute left-1.5 text-neutral-500 opacity-70 pointer-events-none"
-        />
+        <Search size={12} className="absolute left-2 text-neutral-500 pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Library"
-          className="
-            pl-5 pr-2 py-[3px] w-full
-            bg-transparent text-[11.5px] text-[#222]
-            placeholder:text-neutral-500
-            focus:outline-none
-            focus:ring-1 focus:ring-blue-400/60
-            rounded-[4px]
-          "
+          placeholder="Search"
+          className="pl-6 pr-3 py-[3px] w-full bg-transparent text-[11.5px] text-[#222] placeholder:text-neutral-500 focus:outline-none rounded-full"
+          style={{ fontFamily: tigerFont }}
         />
       </motion.div>
     </div>
   )
 }
 
-/* ---------- Segmented Button ---------- */
-function SegmentButton({
-  icon,
-  active,
-  onClick,
+/* ---------- LCD now-playing display ---------- */
+function LcdDisplay({
+  track,
+  progress,
+  duration,
+  onSeek,
 }: {
-  icon: React.ReactNode
-  active: boolean
-  onClick: () => void
+  track?: any
+  progress: number
+  duration: number
+  onSeek?: (ms: number) => void
+}) {
+  const pct = duration ? Math.min((progress / duration) * 100, 100) : 0
+  const remaining = duration ? duration - progress : 0
+
+  return (
+    <div
+      className="flex-1 min-w-0 h-[42px] flex items-center px-3 gap-3 relative overflow-hidden"
+      style={{
+        // Pale Aqua-LCD: soft blue-grey glass with an inset bezel + top sheen.
+        background: "linear-gradient(180deg,#eef3f7 0%,#dde6ee 50%,#e7eef4 100%)",
+        borderRadius: 8,
+        border: "1px solid #9aa6b2",
+        boxShadow:
+          "inset 0 2px 4px rgba(60,80,110,0.25), inset 0 -1px 0 rgba(255,255,255,0.8), 0 1px 0 rgba(255,255,255,0.6)",
+      }}
+    >
+      {/* glass top sheen */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+        style={{ background: "linear-gradient(180deg,rgba(255,255,255,0.55),transparent)" }}
+      />
+      {track?.album?.images?.[0]?.url && (
+        <img
+          src={track.album.images[track.album.images.length - 1]?.url || track.album.images[0].url}
+          alt=""
+          className="w-8 h-8 rounded-[2px] border border-[#9aa6b2] shrink-0 relative z-10"
+        />
+      )}
+
+      <div className="flex-1 min-w-0 relative z-10 text-center">
+        {track ? (
+          <>
+            <div className="truncate text-[12px] font-semibold text-[#1f2d3d] leading-tight">
+              {track.name}
+            </div>
+            <div className="truncate text-[10.5px] text-[#4a5a6b] leading-tight">
+              {track.artists?.map((a: any) => a.name).join(", ")}
+            </div>
+            {/* thin scrubber */}
+            <div
+              className="mt-[3px] h-[4px] rounded-full relative cursor-pointer mx-auto w-[88%]"
+              style={{
+                background: "linear-gradient(180deg,#b9c4d0,#cdd6e0)",
+                boxShadow: "inset 0 1px 1px rgba(0,0,0,0.25)",
+              }}
+              onClick={(e) => {
+                if (!onSeek || !duration) return
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                onSeek(((e.clientX - rect.left) / rect.width) * duration)
+              }}
+            >
+              <div
+                className="absolute left-0 top-0 h-full rounded-full"
+                style={{
+                  width: `${pct}%`,
+                  background: "linear-gradient(180deg,#7fb6ff,#2f86e0)",
+                  boxShadow: "inset 0 1px rgba(255,255,255,0.6)",
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-[12px] text-[#6a7a8b] tracking-wide">iTunes</div>
+        )}
+      </div>
+
+      {track && (
+        <div className="text-[10px] tabular-nums text-[#4a5a6b] shrink-0 relative z-10 text-right leading-tight">
+          <div>{fmt(progress)}</div>
+          <div className="opacity-70">-{fmt(remaining)}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ---------- Round Aqua transport button ---------- */
+function TransportButton({
+  children,
+  onClick,
+  aria,
+  large = false,
+}: {
+  children: React.ReactNode
+  onClick?: () => void
+  aria: string
+  large?: boolean
 }) {
   return (
     <motion.button
+      whileTap={{ scale: 0.9 }}
+      whileHover={{ filter: "brightness(1.06)" }}
       onClick={onClick}
-      whileTap={{ scale: 0.92 }}
-      whileHover={{ scale: 1.06 }}
-      className={` 
-        w-[28px] h-[23px] flex items-center justify-center
-        border-r border-[#7f7f7f]/40 last:border-r-0
-        transition-all duration-150
-        ${
-          active
-            ? "bg-[linear-gradient(180deg,#4ea3ff_0%,#1a73ff_100%)] text-white shadow-[inset_0_1px_rgba(255,255,255,0.6),0_0_4px_rgba(50,130,255,0.6)]"
-            : "bg-[linear-gradient(180deg,#f6f6f6_0%,#d0d0d0_100%)] hover:bg-[linear-gradient(180deg,#ffffff_0%,#dcdcdc_100%)] text-[#2a2a2a]"
-        }
-      `}
+      aria-label={aria}
+      className="flex items-center justify-center rounded-full text-[#3a4655]"
+      style={{
+        width: large ? 32 : 26,
+        height: large ? 32 : 26,
+        background: "linear-gradient(180deg,#ffffff 0%,#e3e8ee 48%,#cdd5de 52%,#dde3ea 100%)",
+        border: "1px solid #8e98a4",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 1px 1px rgba(0,0,0,0.2)",
+      }}
     >
-      {icon}
+      {children}
     </motion.button>
   )
+}
+
+function fmt(ms: number) {
+  if (!ms || ms < 0) return "0:00"
+  const s = Math.floor(ms / 1000)
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`
 }

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
+import { ChevronLeft, ChevronRight, RotateCw, X } from "lucide-react"
+import { brushedMetalBar, tigerFont } from "../../lib/aquaSkin"
 
 type Tab = {
   title: string
@@ -112,6 +112,46 @@ export default function Browser() {
     setActive(Math.max(0, i - 1))
   }
 
+  const canBack = current.index > 0
+  const canForward = current.index < current.history.length - 1
+
+  function goBack() {
+    if (!canBack) return
+    setTabs((p) =>
+      p.map((t, i) => {
+        if (i !== active) return t
+        const idx = t.index - 1
+        setAddr(t.history[idx])
+        return { ...t, index: idx, url: t.history[idx] }
+      })
+    )
+    setLoading(true)
+  }
+  function goForward() {
+    if (!canForward) return
+    setTabs((p) =>
+      p.map((t, i) => {
+        if (i !== active) return t
+        const idx = t.index + 1
+        setAddr(t.history[idx])
+        return { ...t, index: idx, url: t.history[idx] }
+      })
+    )
+    setLoading(true)
+  }
+  function reload() {
+    if (loading) {
+      setLoading(false) // acts as Stop while loading
+      return
+    }
+    if (current.url.startsWith("iweb://")) return
+    if (iframeRef.current) {
+      setLoading(true)
+      // eslint-disable-next-line no-self-assign
+      iframeRef.current.src = iframeRef.current.src
+    }
+  }
+
   useEffect(() => {
     const ifr = iframeRef.current
     if (!ifr) return
@@ -161,24 +201,61 @@ export default function Browser() {
         </button>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-[#999] bg-[linear-gradient(180deg,#f7f7f7_0%,#dadada_100%)]">
-        <Input
-          value={addr}
-          onChange={(e) => setAddr(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && navigate(addr)}
-          className="flex-1 bg-white border border-[#999] rounded-md text-xs px-2 h-6 focus:ring-1 focus:ring-blue-400"
-        />
-      </div>
+      {/* Toolbar — Tiger Safari brushed metal: graphite Back/Forward + Reload,
+          then the recessed Aqua address lozenge (favicon + blue progress fill). */}
+      <div
+        className="flex items-center gap-2 px-3 py-2 border-b border-[#8d8d8d]"
+        style={{ ...brushedMetalBar, fontFamily: tigerFont }}
+      >
+        {/* Joined Back/Forward graphite capsule */}
+        <div
+          className="flex overflow-hidden rounded-full"
+          style={{ border: "1px solid #8e98a4", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.85)" }}
+        >
+          <NavButton aria="Back" disabled={!canBack} onClick={goBack}>
+            <ChevronLeft size={15} />
+          </NavButton>
+          <div style={{ width: 1, background: "#8e98a4" }} />
+          <NavButton aria="Forward" disabled={!canForward} onClick={goForward}>
+            <ChevronRight size={15} />
+          </NavButton>
+        </div>
 
-      {/* Loading bar */}
-      <motion.div
-        className="h-[2px] bg-[#0b84ff]"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: loading ? [0, 0.6, 1] : 0 }}
-        transition={{ duration: loading ? 1.5 : 0.4, ease: "easeInOut" }}
-        style={{ transformOrigin: "0% 50%" }}
-      />
+        {/* Address lozenge — recessed Aqua well with favicon + blue progress fill */}
+        <div
+          className="relative flex-1 flex items-center h-[24px] rounded-full overflow-hidden"
+          style={{
+            background: "#fff",
+            border: "1px solid #9aa3ad",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.22)",
+          }}
+        >
+          {/* Tiger blue progress fill behind the text */}
+          <motion.div
+            className="absolute left-0 top-0 bottom-0 pointer-events-none"
+            style={{ background: "rgba(120,175,255,0.45)", transformOrigin: "0% 50%" }}
+            initial={{ width: "0%" }}
+            animate={{ width: loading ? ["0%", "65%", "92%"] : "0%", opacity: loading ? 1 : 0 }}
+            transition={{ duration: loading ? 1.6 : 0.3, ease: "easeOut" }}
+          />
+          <img src={faviconFor(current.url)} className="relative z-10 ml-2 w-3.5 h-3.5" alt="" />
+          <input
+            value={addr}
+            onChange={(e) => setAddr(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && navigate(addr)}
+            className="relative z-10 flex-1 bg-transparent text-[12px] px-2 h-full outline-none text-[#222]"
+            aria-label="Address"
+            spellCheck={false}
+          />
+          <button
+            onClick={reload}
+            aria-label={loading ? "Stop" : "Reload"}
+            className="relative z-10 mr-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[#666] hover:text-black hover:bg-black/[0.06]"
+          >
+            {loading ? <X size={13} /> : <RotateCw size={12} />}
+          </button>
+        </div>
+      </div>
 
       {/* Content */}
       <div className="flex-1 bg-[#eaeaea] relative overflow-hidden">
@@ -281,5 +358,32 @@ export default function Browser() {
         </AnimatePresence>
       </div>
     </div>
+  )
+}
+
+/* ---------- Graphite Aqua toolbar button (Tiger Safari) ---------- */
+function NavButton({
+  children,
+  onClick,
+  disabled,
+  aria,
+}: {
+  children: React.ReactNode
+  onClick: () => void
+  disabled?: boolean
+  aria: string
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={aria}
+      className="flex h-[24px] w-9 items-center justify-center text-[#3a4655] disabled:opacity-35"
+      style={{
+        background: "linear-gradient(180deg,#ffffff 0%,#e3e8ee 48%,#cdd5de 52%,#dde3ea 100%)",
+      }}
+    >
+      {children}
+    </button>
   )
 }

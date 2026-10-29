@@ -283,10 +283,12 @@ export default function Finder() {
         {/* Sidebar — DEVICES/PLACES nav. On a phone it took ~45% of the width
             and squeezed the file area, so hide it on mobile and give the icons
             the full screen (UX_AUDIT_JEFFOS_APPS). */}
-        <div className={`${isMobile ? "hidden" : "w-44"} border-r bg-gradient-to-b from-gray-100 to-gray-200
-                        text-sm flex-shrink-0 overflow-y-auto`}>
+        <div
+          className={`${isMobile ? "hidden" : "w-44"} border-r border-[#9aa6b2]/60 text-[13px] flex-shrink-0 overflow-y-auto`}
+          style={{ background: "linear-gradient(to bottom, #d6dde6, #c6cfdb)" }}
+        >
           {/* Devices */}
-          <div className="px-2 py-1 text-[11px] font-semibold text-gray-500">DEVICES</div>
+          <div className="px-2 pt-2 pb-0.5 text-[10.5px] font-bold tracking-wide text-[#5a6b7d]">DEVICES</div>
           <div className="py-1">
             {[
               { id: "network", title: "Network", iconUrl: "/icons/Network Utility.png" },
@@ -296,7 +298,7 @@ export default function Finder() {
               <div
                 key={entry.id}
                 className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-r-sm
-                  ${path.includes(entry.title) ? "bg-blue-500 text-white" : "hover:bg-gray-300"}`}
+                  ${path.includes(entry.title) ? "tiger-sidebar-selected text-white" : "hover:bg-black/[0.06]"}`}
                 onClick={() => {
                   setCwd([])
                   setPath(["Macintosh HD", entry.title])
@@ -311,7 +313,7 @@ export default function Finder() {
           </div>
 
           {/* Places */}
-          <div className="px-2 py-1 text-[11px] font-semibold text-gray-500">PLACES</div>
+          <div className="px-2 pt-2 pb-0.5 text-[10.5px] font-bold tracking-wide text-[#5a6b7d]">PLACES</div>
           <div className="py-1">
             {rootEntries
               .filter((f) =>
@@ -322,7 +324,7 @@ export default function Finder() {
                 <div
                   key={entry.id}
                   className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-r-sm
-                    ${path.includes(entry.title) ? "bg-blue-500 text-white" : "hover:bg-gray-300"}`}
+                    ${path.includes(entry.title) ? "tiger-sidebar-selected text-white" : "hover:bg-black/[0.06]"}`}
                   onClick={() => {
                     setCwd(entry.children ?? [])
                     setPath(["Macintosh HD", entry.title])
@@ -337,11 +339,11 @@ export default function Finder() {
           </div>
 
           {/* Trash */}
-          <div className="px-2 py-1 text-[11px] font-semibold text-gray-500">TRASH</div>
+          <div className="px-2 pt-2 pb-0.5 text-[10.5px] font-bold tracking-wide text-[#5a6b7d]">TRASH</div>
           <div className="py-1">
             <div
               className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-r-sm
-                ${path.includes("Trash") ? "bg-blue-500 text-white" : "hover:bg-gray-300"}`}
+                ${path.includes("Trash") ? "tiger-sidebar-selected text-white" : "hover:bg-black/[0.06]"}`}
               onClick={() => {
                 const trashFolder = rootEntries.find((e) => e.id === "trash")
                 setCwd(trashFolder?.children ?? [])
@@ -381,22 +383,36 @@ export default function Finder() {
           )}
 
           {view === "list" && (
-            <table className="w-full text-sm" role="table">
+            <table className="w-full text-[13px] border-collapse" role="table">
+              {/* Brushed-metal Tiger column header */}
               <thead>
-                <tr className="text-left border-b">
-                  <th className="py-1 pr-3">Name</th>
-                  <th className="py-1 pr-3">Kind</th>
+                <tr
+                  className="text-left text-[#333] text-[12px]"
+                  style={{
+                    background: "linear-gradient(to bottom, #fbfbfb, #dadada)",
+                    boxShadow: "inset 0 1px rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <th className="py-1 px-3 font-normal border-b border-r border-[#bcbcbc]">Name</th>
+                  <th className="py-1 px-3 font-normal border-b border-[#bcbcbc]">Kind</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((entry) => (
+                {filtered.map((entry, i) => (
                   <ContextMenu.Root key={entry.id}>
                     <ContextMenu.Trigger asChild>
                       <tr
-                        className="hover:bg-gray-100 cursor-pointer"
+                        className="cursor-pointer transition-colors duration-75"
+                        // Tiger list view: alternating blue/white striping, flat
+                        // blue selection on hover (no zoom).
+                        style={{ background: i % 2 === 0 ? "#ffffff" : "#edf3fb" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#d3e3f7")}
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.background = i % 2 === 0 ? "#ffffff" : "#edf3fb")
+                        }
                         onDoubleClick={() => handleOpen(entry)}
                       >
-                        <td className="py-1 pr-3 flex items-center gap-2">
+                        <td className="py-1 px-3 flex items-center gap-2">
                           {entry.appRef ? (
                             <AppIconRenderer icon={entry.appRef} size="list" />
                           ) : (
@@ -408,7 +424,7 @@ export default function Finder() {
                           )}
                           {entry.title}
                         </td>
-                        <td className="py-1 pr-3">
+                        <td className="py-1 px-3 text-[#555]">
                           {entry.type === "folder" ? "Folder" : "Application"}
                         </td>
                       </tr>

@@ -13,10 +13,27 @@
  *
  * `renderImage` is a safe no-op for non-Supabase URLs (e.g. the dummyimage
  * fallback thumb) and for URLs already pointing at the render endpoint.
+ *
+ * ⚠️ Image Transformations is a Supabase PRO feature. On the Free plan the
+ * render endpoint returns `403 FeatureNotEnabled` for EVERY image (blank
+ * desktop, empty wallpaper grid, missing game thumbs). So it is OFF unless
+ * `VITE_SUPABASE_IMAGE_TRANSFORMS=true` — set that only on a Pro org.
+ *
+ * Default resizer = Vercel Image Optimization (`/_vercel/image`), which works on
+ * any plan: it fetches the Supabase original once, resizes to WebP and caches
+ * it on Vercel's CDN. Only enabled for builds running ON Vercel
+ * (`__VERCEL_IMAGES__`); local dev / `vite preview` get the originals.
+ * Width-only (no crop) — every call site paints with CSS `cover`.
  */
 
 const OBJECT_PUBLIC = "/storage/v1/object/public/"
 const RENDER_PUBLIC = "/storage/v1/render/image/public/"
+const SUPABASE_TRANSFORMS = import.meta.env.VITE_SUPABASE_IMAGE_TRANSFORMS === "true"
+
+// Must mirror vercel.json `images.sizes` / `images.qualities` — the API
+// rejects any `w` / `q` not in those lists.
+const VERCEL_SIZES = [256, 384, 640, 1080, 1280, 1920]
+const VERCEL_QUALITIES = [65, 70, 78]
 
 export type RenderOpts = {
   width?: number
@@ -25,10 +42,21 @@ export type RenderOpts = {
   resize?: "cover" | "contain" | "fill"
 }
 
+function vercelImage(url: string, opts: RenderOpts): string {
+  // No crop on Vercel: take the longer requested edge so CSS `cover` has enough pixels.
+  const want = Math.max(opts.width ?? 0, opts.height ?? 0) || 1280
+  const w = VERCEL_SIZES.find((s) => s >= want) ?? VERCEL_SIZES[VERCEL_SIZES.length - 1]
+  const q = VERCEL_QUALITIES.reduce((best, v) =>
+    Math.abs(v - (opts.quality ?? 70)) < Math.abs(best - (opts.quality ?? 70)) ? v : best
+  )
+  return `/_vercel/image?url=${encodeURIComponent(url)}&w=${w}&q=${q}`
+}
+
 export function renderImage(url: string | undefined | null, opts: RenderOpts = {}): string {
   if (!url) return ""
   // Only transform Supabase public-object URLs; leave everything else untouched.
   if (!url.includes(OBJECT_PUBLIC)) return url
+  if (!SUPABASE_TRANSFORMS) return __VERCEL_IMAGES__ ? vercelImage(url, opts) : url
 
   const base = url.replace(OBJECT_PUBLIC, RENDER_PUBLIC)
   const params = new URLSearchParams()

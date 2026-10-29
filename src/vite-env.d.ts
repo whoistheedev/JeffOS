@@ -8,3 +8,6 @@ declare const __APP_VERSION__: {
   buildId: string
   releaseTimestamp: string
 }
+
+/** True when built on Vercel, where `/_vercel/image` is available (see vite.config.ts). */
+declare const __VERCEL_IMAGES__: boolean

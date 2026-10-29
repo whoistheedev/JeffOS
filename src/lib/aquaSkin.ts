@@ -54,3 +54,24 @@ export const aquaWell: CSSProperties = {
 
 /** Lucida Grande — Tiger's system font. */
 export const tigerFont = "'Lucida Grande','Lucida Sans Unicode','Helvetica Neue',Helvetica,Arial,sans-serif"
+
+/**
+ * Tiger pull-down menu surface: near-white, hairline grey border, slight
+ * rounding, soft drop shadow — the Aqua menu panel from the Tiger menu bar.
+ */
+export const tigerMenuSurface: CSSProperties = {
+  background: "rgba(250,250,250,0.98)",
+  border: "1px solid #b4b4b4",
+  borderRadius: 5,
+  boxShadow: "0 6px 18px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.9)",
+  fontFamily: tigerFont,
+  padding: "3px",
+}
+
+/**
+ * The classic Aqua menu HIGHLIGHT — a glossy blue gradient bar with white text,
+ * applied to the whole hovered/focused row (label + shortcut). Pair with the
+ * `tiger-menu-item` class below (defined in index.css) which sets this on hover.
+ */
+export const tigerMenuHighlight =
+  "linear-gradient(to bottom, #5b9df9 0%, #2f7bea 50%, #2670e3 51%, #1e63d6 100%)"
