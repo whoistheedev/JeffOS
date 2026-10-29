@@ -36,7 +36,7 @@ export function Hero({
             {IDENTITY.name}
           </span>
           <span className="sr-only"> — </span>
-          <span className="mt-5 block max-w-[24ch] text-[22px] font-medium leading-[1.2] tracking-[-0.015em] text-balance text-foreground/85 @2xl:text-[26px]">
+          <span className="mt-5 block max-w-[28ch] text-[22px] font-medium leading-[1.2] tracking-[-0.015em] text-balance text-foreground/85 @2xl:text-[26px]">
             {IDENTITY.headline}
           </span>
         </h1>

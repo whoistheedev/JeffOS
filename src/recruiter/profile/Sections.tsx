@@ -98,7 +98,7 @@ export function CareerLog() {
       <ol className="border-b border-border">
         {EXPERIENCE.map((e) => (
           <li key={e.period} className="grid gap-x-6 gap-y-2 border-t border-border py-6 @2xl:grid-cols-[11rem_minmax(0,1fr)]">
-            <p className="rx-mono flex items-center gap-2 text-[12px] leading-6 text-muted-foreground">
+            <p className="rx-mono flex h-6 items-center gap-2 self-start text-[12px] text-muted-foreground">
               {e.current && <LiveDot />}
               {e.period}
             </p>

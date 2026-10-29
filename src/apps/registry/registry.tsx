@@ -50,6 +50,6 @@ export const AppRegistry: Partial<Record<AppId, AppMeta>> = {
   terminal:     { component: Terminal,    resizable: true,  expandToFit: true, title: "Terminal" },
   calendar:     { component: Calendar,    resizable: true,  expandToFit: true, title: "iCal" },
   bmcoffee:     { component: BuyMeCoffee, resizable: true,  expandToFit: true, title: "Buy Me a Coffee" },
-  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true, title: "Hire Me", defaultSize: { width: 980, height: 700 } },
+  recruiter:    { component: Recruiter,   resizable: true,  expandToFit: true, title: "Hire Me", defaultSize: { width: 960, height: 620 } },
 
 };
