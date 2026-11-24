@@ -1,11 +1,11 @@
-import { useId, useRef, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import { Mail, Moon, ScanEye, Sun } from "lucide-react"
-import { FEATURED_WORK, IDENTITY, PRIMARY_CTA } from "../content"
+import { IDENTITY, PRIMARY_CTA } from "../content"
 import { LaunchJeffOSButton } from "../components/LaunchJeffOSButton"
 import { Hero } from "./Hero"
-import { ProjectExplorer } from "./ProjectExplorer"
 import { QuickLook } from "./QuickLook"
-import { Capabilities, CareerLog, ConnectionPanel, JeffOSCallout, SystemInformation } from "./Sections"
+import { CareerLog, ConnectionPanel, JeffOSCallout, ProofStrip, Skills } from "./Sections"
+import { WorkList } from "./WorkList"
 import { cn } from "../../lib/utils"
 import { Monogram, SectionHeader } from "./primitives"
 import { buttonClass, scrollToId } from "./ui"
@@ -18,6 +18,10 @@ type PageProps = {
 }
 type WindowProps = { variant: "window" }
 
+/** Chrome CTAs fade in only once the hero's own CTA is gone — one filled button on screen at a time. */
+const chromeCta = (show: boolean) =>
+  cn("transition-opacity duration-200 motion-reduce:transition-none", show ? "opacity-100" : "pointer-events-none invisible opacity-0")
+
 /**
  * The recruiter experience — one component tree for both homes:
  *   - variant "page":   the Recruiter Mode front door (full document scroll,
@@ -28,8 +32,9 @@ type WindowProps = { variant: "window" }
  * Layout responds to its CONTAINER (Tailwind @container), not the viewport, so
  * the same sections reflow correctly in a 600px window on a 1440px screen.
  *
- * Order follows the Serial Position Effect: identity + contact first, proof of
- * work second, depth in the middle, contact again at the end.
+ * Order follows what a recruiter scans for (Jakob's Law, Serial Position):
+ * identity + career facts + contact first, proof second, experience third,
+ * skills as supporting depth, contact again at the end (Peak-End).
  */
 export function RecruiterProfile(props: PageProps | WindowProps) {
   const isPage = props.variant === "page"
@@ -40,8 +45,7 @@ export function RecruiterProfile(props: PageProps | WindowProps) {
   // open Hire Me windows never share an id.
   const idFor = (name: string) => (isPage ? name : `${uid}-${name}`)
 
-  const flagship = FEATURED_WORK.find((w) => w.flagship) ?? FEATURED_WORK[0]
-  const [project, setProject] = useState(flagship.slug)
+  const [highlight, setHighlight] = useState<string | null>(null)
   const [quickLook, setQuickLook] = useState(false)
   const quickLookOpener = useRef<HTMLElement | null>(null)
   const openQuickLook = () => {
@@ -49,76 +53,76 @@ export function RecruiterProfile(props: PageProps | WindowProps) {
     setQuickLook(true)
   }
 
+  // Without IntersectionObserver (old browsers, tests) the chrome CTA is simply always shown.
+  const heroCta = useRef<HTMLAnchorElement | null>(null)
+  const [pastHero, setPastHero] = useState(() => typeof IntersectionObserver === "undefined")
+  useEffect(() => {
+    const el = heroCta.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    // The sticky strip is 56px tall; a CTA underneath it counts as gone.
+    const io = new IntersectionObserver(([entry]) => setPastHero(!entry.isIntersecting), { rootMargin: "-56px 0px 0px 0px" })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   const showProject = (slug: string) => {
-    setProject(slug)
-    // Focus goes to the Work section, not back to the Quick Look opener.
+    setHighlight(slug)
+    // Focus goes to the case, not back to the Quick Look opener.
     quickLookOpener.current = null
     setQuickLook(false)
     // Let Quick Look's close (and focus restore) finish before moving focus.
-    requestAnimationFrame(() => scrollToId(idFor("work")))
+    requestAnimationFrame(() => scrollToId(idFor(`work-${slug}`)))
   }
+
+  const section = "mt-20 scroll-mt-20 @3xl:mt-24"
 
   return (
     <div className="rx @container min-h-full bg-background text-foreground">
       {isPage ? (
-        <PageActionStrip {...(props as PageProps)} onQuickLook={openQuickLook} />
+        <PageActionStrip {...(props as PageProps)} onQuickLook={openQuickLook} showCta={pastHero} />
       ) : (
-        <WindowToolbar onQuickLook={openQuickLook} />
+        <WindowToolbar onQuickLook={openQuickLook} showCta={pastHero} />
       )}
 
       <Body className={`mx-auto max-w-[72rem] px-5 @2xl:px-8 @5xl:px-12 ${isPage ? "pb-32 pt-10 @2xl:pt-16 sm:pb-24" : "pb-16 pt-8"}`}>
-        <Hero
-          hintId={idFor("cta-hint")}
-          onExploreWork={() => scrollToId(idFor("work"))}
-          onMoreInfo={() => scrollToId(idFor("system"))}
-          onQuickLook={openQuickLook}
-        />
+        <Hero hintId={idFor("cta-hint")} ctaRef={heroCta} onExploreWork={() => scrollToId(idFor("work"))} />
 
-        <section id={idFor("work")} aria-labelledby={idFor("work-h")} className="mt-24 scroll-mt-20 @3xl:mt-32">
+        <div className="mt-14 @3xl:mt-16">
+          <ProofStrip />
+        </div>
+
+        <section id={idFor("work")} aria-labelledby={idFor("work-h")} className={section}>
           <SectionHeader
             id={idFor("work-h")}
             index="01"
-            kicker="Proof of work"
-            title="Shipped, not just built."
-            lead="Production systems in healthcare operations — and the operating system this portfolio runs on. Each one links to its full case study."
+            title="Selected work"
+            lead="Three production healthcare systems, and the operating system this portfolio runs in. Outcome first; each links to its full case study."
           />
-          <ProjectExplorer value={project} onValueChange={setProject} newTab={!isPage} />
+          <WorkList idFor={idFor} highlight={highlight} newTab={!isPage} />
         </section>
 
-        <section id={idFor("own")} aria-labelledby={idFor("own-h")} className="mt-24 scroll-mt-20 @3xl:mt-32">
-          <SectionHeader
-            id={idFor("own-h")}
-            index="02"
-            kicker="Capabilities"
-            title="What I can own."
-            lead="Outcomes I take responsibility for end to end — each backed by shipped work."
-          />
-          <Capabilities onEvidence={showProject} />
-        </section>
-
-        <section id={idFor("system")} aria-labelledby={idFor("system-h")} className="mt-24 scroll-mt-20 @3xl:mt-32">
-          <SectionHeader
-            id={idFor("system-h")}
-            index="03"
-            kicker="System information"
-            title="The engineer, profiled."
-            lead="A plain-English summary for every area. Open Specs for the technical detail."
-          />
-          <SystemInformation name={IDENTITY.name} />
-        </section>
-
-        <section id={idFor("career")} aria-labelledby={idFor("career-h")} className="mt-24 scroll-mt-20 @3xl:mt-32">
-          <SectionHeader id={idFor("career-h")} index="04" kicker="Career log" title="Where the work happened." />
+        <section id={idFor("career")} aria-labelledby={idFor("career-h")} className={section}>
+          <SectionHeader id={idFor("career-h")} index="02" title="Experience" />
           <CareerLog />
         </section>
 
+        <section id={idFor("skills")} aria-labelledby={idFor("skills-h")} className={section}>
+          <SectionHeader
+            id={idFor("skills-h")}
+            index="03"
+            title="Skills"
+            lead="In plain English first. Open the technical detail for the stack, or follow the evidence to the work that backs it."
+          />
+          <Skills onEvidence={showProject} />
+        </section>
+
         {isPage && (
-          <div className="mt-24 @3xl:mt-32">
+          <div className={section}>
             <JeffOSCallout onLaunchJeffOS={(props as PageProps).onLaunchJeffOS} />
           </div>
         )}
 
-        <div id={idFor("contact")} className="mt-24 scroll-mt-20 @3xl:mt-32">
+        <div id={idFor("contact")} className={section}>
           <ConnectionPanel name={IDENTITY.name.split(" ")[0]} initials={IDENTITY.initials} headingId={idFor("contact-h")} />
         </div>
 
@@ -128,7 +132,7 @@ export function RecruiterProfile(props: PageProps | WindowProps) {
         </footer>
       </Body>
 
-      {isPage && <MobileThumbBar onQuickLook={openQuickLook} />}
+      {isPage && <MobileThumbBar onQuickLook={openQuickLook} show={pastHero} />}
 
       <QuickLook open={quickLook} onOpenChange={setQuickLook} onSelectProject={showProject} returnFocusTo={quickLookOpener} />
     </div>
@@ -146,22 +150,24 @@ function PageActionStrip({
   isDark,
   toggleTheme,
   onQuickLook,
-}: PageProps & { onQuickLook: () => void }) {
+  showCta,
+}: PageProps & { onQuickLook: () => void; showCta: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 pt-[var(--space-safe-top)] backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-[72rem] items-center gap-3 px-5 @2xl:px-8 @5xl:px-12">
         <Monogram initials={IDENTITY.initials} size={30} />
         <p className="hidden min-w-0 truncate text-[14px] font-semibold @lg:block">{IDENTITY.name}</p>
         <div className="ml-auto flex items-center gap-2">
+          {/* First in the group, so the others don't shift when it fades in. */}
+          <a href={PRIMARY_CTA.href} className={cn(buttonClass("primary", "sm"), "hidden sm:inline-flex", chromeCta(showCta))}>
+            <Mail size={15} aria-hidden /> {PRIMARY_CTA.label}
+          </a>
           <button type="button" onClick={onQuickLook} className={cn(buttonClass("secondary", "sm"), "hidden @lg:inline-flex")}>
             <ScanEye size={15} aria-hidden /> Quick Look
           </button>
           <div className="hidden @3xl:block">
             <LaunchJeffOSButton onClick={onLaunchJeffOS} variant="compact" />
           </div>
-          <a href={PRIMARY_CTA.href} className={cn(buttonClass("primary", "sm"), "hidden sm:inline-flex")}>
-            <Mail size={15} aria-hidden /> {PRIMARY_CTA.label}
-          </a>
           <button
             type="button"
             onClick={toggleTheme}
@@ -176,12 +182,18 @@ function PageActionStrip({
   )
 }
 
-/** Phone-width front door: the two key actions in the thumb zone (Fitts's Law). */
-function MobileThumbBar({ onQuickLook }: { onQuickLook: () => void }) {
+/**
+ * Phone-width front door: the two key actions in the thumb zone (Fitts's Law).
+ * Slides in once the hero's own CTA has scrolled away.
+ */
+function MobileThumbBar({ onQuickLook, show }: { onQuickLook: () => void; show: boolean }) {
   return (
     <aside
       aria-label="Quick actions"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/92 px-4 pb-[max(0.75rem,var(--space-safe-bottom))] pt-3 backdrop-blur-md sm:hidden"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/92 px-4 pb-[max(0.75rem,var(--space-safe-bottom))] pt-3 backdrop-blur-md transition-[transform,visibility] duration-200 motion-reduce:transition-none sm:hidden",
+        show ? "translate-y-0" : "invisible translate-y-full"
+      )}
     >
       <div className="grid grid-cols-[auto_1fr] gap-2">
         <button type="button" onClick={onQuickLook} className={buttonClass("secondary", "sm")}>
@@ -196,13 +208,13 @@ function MobileThumbBar({ onQuickLook }: { onQuickLook: () => void }) {
 }
 
 /** Inside the Hire Me window: a slim Tiger-style toolbar pinned to the top. */
-function WindowToolbar({ onQuickLook }: { onQuickLook: () => void }) {
+function WindowToolbar({ onQuickLook, showCta }: { onQuickLook: () => void; showCta: boolean }) {
   return (
     <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-foreground/10 bg-[linear-gradient(to_bottom,#f3f3f3,#e2e2e2)] px-3 py-1.5">
       <button type="button" onClick={onQuickLook} className={cn(buttonClass("secondary", "sm"), "bg-white/70")}>
         <ScanEye size={15} aria-hidden /> Quick Look
       </button>
-      <a href={PRIMARY_CTA.href} className={cn(buttonClass("primary", "sm"), "ml-auto")}>
+      <a href={PRIMARY_CTA.href} className={cn(buttonClass("primary", "sm"), "ml-auto", chromeCta(showCta))}>
         <Mail size={15} aria-hidden /> {PRIMARY_CTA.label}
       </a>
     </div>

@@ -26,9 +26,9 @@ export const CONTACT = {
   schedulerUrl: null as string | null,
 }
 
-/** The one primary action. Honest label: it opens an email, so it says so in its hint. */
+/** The one primary action. The label says what it does: it opens an email. */
 export const PRIMARY_CTA = {
-  label: "Let’s Work Together",
+  label: "Email Jeffrey",
   href: `mailto:${CONTACT.email}?subject=${encodeURIComponent("Let's work together")}`,
   hint: "Opens an email to Jeffrey",
 }
@@ -45,31 +45,25 @@ export const IDENTITY = {
   /** Hero statement — what he builds, in one line. */
   headline: "I build the AI-powered systems behind healthcare revenue cycles.",
   subtitle:
-    "Senior Software Engineer at BFLOW Solutions — full-stack, with a backend, security and AI focus: EDI infrastructure, multi-tenant Supabase platforms, and AI-assisted automation for healthcare operations.",
-  /** Plain-English version for non-technical readers (Quick Look + System Information). */
+    "I turn healthcare claims and payment files (EDI 837/835/277/999) into automated, auditable workflows — on multi-tenant Supabase and PostgreSQL, with AI handling the repetitive steps.",
+  /** Plain-English version for non-technical readers (Quick Look). */
   plainEnglish:
     "Builds the software that moves healthcare claims and payments — reliably, securely, and with AI handling the repetitive work.",
 }
 
-/** The "About This Engineer" panel in the hero — a nod to Tiger's About This Mac. */
-export const ABOUT_ROWS: { label: string; value: string }[] = [
-  { label: "Role", value: "Senior Software Engineer" },
-  { label: "Currently", value: "BFLOW Solutions" },
-  { label: "Focus", value: "AI-powered RCM · EDI" },
-  { label: "Stack", value: "TypeScript · Node.js · Supabase · PostgreSQL" },
-  { label: "Works", value: "Remote" },
+/**
+ * Proof strip under the hero — three facts a recruiter can repeat. Every value
+ * is already stated elsewhere in this file; nothing new is claimed here.
+ */
+export const PROOF: { value: string; label: string }[] = [
+  { value: "4", label: "EDI transaction sets automated — 837, 835, 277 and 999" },
+  // CONFIRM: 50+
+  { value: "50+", label: "healthcare databases moving onto one multi-tenant platform" },
+  { value: "200+", label: "network and system issues diagnosed and resolved" },
 ]
 
-/** Role/engagement signal (shown in Quick Look). */
-export const AVAILABLE_FOR = [
-  "Senior Software Engineer",
-  "Staff Engineer",
-  "HealthTech Engineering",
-  "Supabase Architecture",
-  "EDI Platforms",
-  "Technical Consulting",
-  "Remote Opportunities",
-]
+/** Role/engagement signal (hero Get Info panel + Quick Look). */
+export const AVAILABLE_FOR = ["Senior and Staff Engineer roles", "HealthTech platforms", "Technical consulting", "Remote"]
 
 /**
  * Featured Work — case-study format. The front door shows
@@ -93,6 +87,9 @@ export const FEATURED_WORK: {
   architecture: string
   solution: string
   outcome: string
+  /** Title + ordered steps for the small diagram beside the case card. */
+  flowTitle: string
+  flow: string[]
   tech: string[]
   flagship?: boolean
 }[] = [
@@ -107,7 +104,9 @@ export const FEATURED_WORK: {
     constraints: "HIPAA-aware data handling; multi-tenant isolation; auditability; integration with existing EDI transaction formats.",
     architecture: "AI-assisted automation on a multi-tenant Supabase backend (RLS isolation), server-authoritative Edge Functions, and event-driven EDI pipelines.",
     solution: "Automated the revenue cycle end-to-end — claims → eligibility → payments → denials → reporting — with AI-assisted workflows over connected, auditable data.",
-    outcome: "Less manual touch and rework; faster claim-to-cash; improved data integrity and operational scale across tenants.",
+    outcome: "Claims, eligibility, payments and denials run through one connected, auditable pipeline — with AI taking the repetitive steps off people.",
+    flowTitle: "Revenue cycle",
+    flow: ["Claims", "Eligibility", "Payments", "Denials", "Reporting"],
     tech: ["AI/LLM", "Supabase", "PostgreSQL", "RLS", "Edge Functions", "EDI"],
     flagship: true,
   },
@@ -124,7 +123,9 @@ export const FEATURED_WORK: {
     architecture: "Unified multi-tenant schema with Supabase Row-Level Security per tenant; tracked migrations; least-privilege access; data-integrity validation.",
     // CONFIRM: 50+
     solution: "Migrating 50+ healthcare databases into a single RLS-isolated multi-tenant platform.",
-    outcome: "Unified architecture, consistent data integrity, and a foundation that scales with new tenants.",
+    outcome: "One schema and one access model replace dozens of separate databases — a foundation each new tenant plugs into.",
+    flowTitle: "Migration path",
+    flow: ["Isolated databases", "Tracked migrations", "Unified schema", "Row-Level Security per tenant"],
     tech: ["Supabase", "PostgreSQL", "RLS", "Migrations", "RBAC"],
   },
   {
@@ -138,7 +139,9 @@ export const FEATURED_WORK: {
     constraints: "Format fidelity; auditability; reliability; compliant handling of sensitive data.",
     architecture: "Ingestion → normalization → reconciliation pipelines on serverless Edge Functions, with audit trails and secure storage.",
     solution: "Automated claims-processing pipelines that parse and route 837/835/277/999 into normalized operational workflows.",
-    outcome: "Faster, auditable claims processing replacing manual transaction handling.",
+    outcome: "Transaction files once handled by hand now parse, route and reconcile automatically, with an audit trail at every step.",
+    flowTitle: "EDI pipeline",
+    flow: ["837 · 835 · 277 · 999", "Ingest", "Normalize", "Reconcile", "Operational workflow"],
     tech: ["EDI", "Supabase Edge Functions", "Node.js", "PostgreSQL"],
   },
   {
@@ -152,60 +155,26 @@ export const FEATURED_WORK: {
     constraints: "Real backend, real realtime, real performance/accessibility budgets — not a demo.",
     architecture: "React 19 windowing OS, capability-based responsive shells, Supabase realtime via a counter pattern, PWA, tracked migrations, security-hardened RLS.",
     solution: "A working web OS with apps, realtime visitor counts, themes, and a security/scalability-audited backend.",
-    outcome: "Proof of systems thinking — the portfolio is itself the engineering demo.",
+    outcome: "The portfolio is the demo: a working web OS with windowing, a Dock, Spotlight and realtime, on a security-audited backend.",
+    flowTitle: "Architecture",
+    flow: ["React 19 window manager", "Apps · Dock · Spotlight", "Supabase realtime", "RLS-hardened backend"],
     tech: ["React 19", "TypeScript", "Supabase", "PWA", "Zustand"],
   },
 ]
 
 /**
- * "What I Can Own" — outcome-oriented capabilities, each tied to evidence
- * (a FEATURED_WORK slug) so the claim is backed by a case study.
+ * Skills — one row per area: a plain-English summary (for recruiters), the
+ * technical specs behind a disclosure (for engineering managers), and the
+ * case study that backs the claim (a FEATURED_WORK slug).
  */
-export const CAPABILITIES: { title: string; detail: string; evidence: string }[] = [
+export const SKILLS: {
+  title: string
+  summary: string
+  specs: { label: string; value: string }[]
+  evidence: string
+}[] = [
   {
-    title: "Full-Stack Product Engineering",
-    detail: "Production applications from interface to infrastructure — product UI, APIs, data model and deployment.",
-    evidence: "jeffos",
-  },
-  {
-    title: "Backend Architecture",
-    detail: "Reliable APIs, PostgreSQL data models and event-driven pipelines that hold up under real operations.",
-    evidence: "edi-automation",
-  },
-  {
-    title: "Security Engineering",
-    detail: "Tenant isolation with Row-Level Security, RBAC, least-privilege access and secrets kept server-side.",
-    evidence: "multi-tenant-migration",
-  },
-  {
-    title: "AI & Automation",
-    detail: "AI-assisted workflows and OCR + LLM document pipelines that take repetitive work off people.",
-    evidence: "bflow-rcm",
-  },
-  {
-    title: "Healthcare Technology",
-    detail: "Revenue cycle management and EDI transaction infrastructure, built HIPAA-aware.",
-    evidence: "bflow-rcm",
-  },
-]
-
-/**
- * "System Information" — a Tiger System Profiler for the engineer. Each row has
- * a plain-English summary (for recruiters) and technical specs behind a
- * disclosure (for engineering managers).
- */
-export const SYSTEM_INFO: { category: string; summary: string; specs: { label: string; value: string }[] }[] = [
-  {
-    category: "Overview",
-    summary: IDENTITY.plainEnglish,
-    specs: [
-      { label: "Role", value: "Senior Software Engineer, BFLOW Solutions (Dec 2025 – present)" },
-      { label: "Domain", value: "Healthcare revenue cycle management and EDI" },
-      { label: "Works", value: "Remote" },
-    ],
-  },
-  {
-    category: "Backend & Data",
+    title: "Backend & Data",
     summary: "Designs the APIs, databases and data pipelines a product runs on.",
     specs: [
       { label: "Languages", value: "TypeScript, JavaScript" },
@@ -213,42 +182,47 @@ export const SYSTEM_INFO: { category: string; summary: string; specs: { label: s
       { label: "Data", value: "PostgreSQL, Supabase, tracked migrations" },
       { label: "Patterns", value: "Event-driven pipelines, multi-tenant schemas" },
     ],
+    evidence: "edi-automation",
   },
   {
-    category: "Security",
+    title: "Security",
     summary: "Keeps each customer’s data separate and access tightly scoped.",
     specs: [
       { label: "Isolation", value: "Row-Level Security per tenant" },
       { label: "Access", value: "RBAC, least privilege" },
       { label: "Data handling", value: "HIPAA-aware; secrets off-client; signed URLs" },
     ],
+    evidence: "multi-tenant-migration",
   },
   {
-    category: "AI & Automation",
-    summary: "Uses AI to automate repetitive operational work — with an audit trail.",
+    title: "AI & Automation",
+    summary: "Uses AI to take repetitive operational work off people, with an audit trail.",
     specs: [
       { label: "RCM", value: "AI-assisted claims, eligibility, denials, reconciliation" },
       { label: "Documents", value: "OCR + LLM extraction pipelines" },
       { label: "Integration", value: "Workflow automation across APIs" },
     ],
+    evidence: "bflow-rcm",
   },
   {
-    category: "Healthcare",
-    summary: "Speaks the industry’s formats and constraints — no translation layer.",
+    title: "Healthcare",
+    summary: "Works directly in the industry’s formats and rules: EDI transactions, revenue cycle, HIPAA-aware design.",
     specs: [
       { label: "EDI", value: "837 · 835 · 277 · 999" },
       { label: "Operations", value: "Revenue cycle management" },
       { label: "Compliance", value: "HIPAA-aware system design" },
     ],
+    evidence: "bflow-rcm",
   },
   {
-    category: "Frontend & Product",
+    title: "Frontend & Product",
     summary: "Ships polished, accessible interfaces — this portfolio is one.",
     specs: [
       { label: "UI", value: "React 19, TypeScript, Tailwind CSS" },
       { label: "State", value: "Zustand, TanStack Query" },
       { label: "Platform", value: "PWA, performance and accessibility budgets" },
     ],
+    evidence: "jeffos",
   },
 ]
 
@@ -269,11 +243,11 @@ export const EXPERIENCE: {
     role: "Senior Software Engineer",
     org: "BFLOW Solutions · Remote",
     bullets: [
-      "Building AI-powered revenue-cycle automation — claims, denials, eligibility, reconciliation.",
-      "EDI transaction infrastructure — 837/835/277/999 into operational workflows.",
+      "Build AI-assisted revenue-cycle automation across claims, eligibility, denials and reconciliation.",
+      "Build the EDI infrastructure that turns 837/835/277/999 transactions into operational workflows.",
       // CONFIRM: 50+
-      "Leading a multi-tenant migration of 50+ healthcare databases onto Supabase with RLS isolation.",
-      "HIPAA-aware secure data layers (RLS + RBAC) and serverless Edge processing.",
+      "Lead the migration of 50+ healthcare databases onto one multi-tenant Supabase platform with RLS isolation.",
+      "Design HIPAA-aware data layers (RLS and RBAC) and serverless Edge processing.",
     ],
   },
   {
@@ -281,8 +255,8 @@ export const EXPERIENCE: {
     role: "Project & Technology Officer",
     org: "Eastley Park Limited",
     bullets: [
-      "Designed automation + multi-system data workflows via API integrations.",
-      "Owned backend process design and documentation for team scalability.",
+      "Designed automation and multi-system data workflows through API integrations.",
+      "Owned backend process design and documentation so the team could scale.",
     ],
   },
   {
@@ -290,7 +264,7 @@ export const EXPERIENCE: {
     role: "Project Manager / Automation Engineer",
     org: "Fobat Properties",
     bullets: [
-      "Led database-driven reporting systems; improved accuracy and auditability.",
+      "Led database-driven reporting systems that improved accuracy and auditability.",
       "Owned backend-dependent projects from requirements through delivery.",
     ],
   },
@@ -299,8 +273,8 @@ export const EXPERIENCE: {
     role: "Network Operations Engineer",
     org: "Suburban Fibreco",
     bullets: [
-      "Maintained 99% SLA uptime for enterprise clients — reliability-engineering discipline.",
-      "Diagnosed and resolved 200+ network/system issues.",
+      "Held 99% SLA uptime for enterprise clients.",
+      "Diagnosed and resolved 200+ network and system issues.",
     ],
   },
 ]
@@ -310,7 +284,7 @@ export const EDUCATION: { credential: string; org: string; period: string }[] = 
   { credential: "Full-Stack Web Development", org: "New Horizons Nigeria", period: "2025" },
 ]
 
-/** Lookup helper used by capability evidence links and Quick Look. */
+/** Lookup helper used by skill evidence links and Quick Look. */
 export function workBySlug(slug: string) {
   return FEATURED_WORK.find((w) => w.slug === slug)
 }
