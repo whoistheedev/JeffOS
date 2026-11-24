@@ -1,35 +1,38 @@
-import { ArrowDown, Mail, ScanEye } from "lucide-react"
-import { ABOUT_ROWS, IDENTITY, PRIMARY_CTA } from "../content"
-import { cn } from "../../lib/utils"
-import { LiveDot, MacPanel, Monogram } from "./primitives"
+import type { RefObject } from "react"
+import { ArrowDown, FileText, Linkedin, Mail } from "lucide-react"
+import { AVAILABLE_FOR, CONTACT, EDUCATION, EXPERIENCE, IDENTITY, PRIMARY_CTA, RESUME_REQUEST_HREF } from "../content"
+import { LiveDot, MacPanel } from "./primitives"
 import { buttonClass } from "./ui"
 
+const label = "rx-mono mb-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground"
+
 /**
- * Hero — "Meet the engineer". Asymmetric: an editorial name + statement on the
- * left, and an "About This Engineer" window on the right (Tiger's About This
- * Mac, re-cast as a spec card). Who / what / how-to-contact are all answered
- * in the first viewport; the primary CTA is the only filled button
- * (Von Restorff). Only the About panel animates in (transform/opacity,
- * motion-safe) — the name, statement and CTAs paint immediately.
+ * Hero — a profile header. Left: who, what he builds, and the one filled CTA
+ * (Von Restorff). Right: a Tiger "Get Info" window holding what a recruiter
+ * scans for first — roles and dates, education, what he is open to, and the
+ * résumé route (Jakob's Law: the same facts every recruiting tool leads with).
+ * Nothing in the panel repeats the left column.
+ *
+ * Only the panel animates in (transform/opacity, motion-safe) — the name,
+ * statement and CTAs paint immediately.
  */
 export function Hero({
   onExploreWork,
-  onMoreInfo,
-  onQuickLook,
   hintId,
+  ctaRef,
 }: {
   onExploreWork: () => void
-  onMoreInfo: () => void
-  onQuickLook: () => void
   hintId: string
+  /** Observed by the page chrome, which shows its own CTA only once this one scrolls away. */
+  ctaRef: RefObject<HTMLAnchorElement | null>
 }) {
   return (
-    <section aria-label="Introduction" className="grid gap-10 @4xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] @4xl:items-center @4xl:gap-14">
+    <section aria-label="Introduction" className="grid gap-10 @4xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] @4xl:items-center @4xl:gap-14">
       <div>
         <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
           <LiveDot />
           <span>
-            Shipping at <span className="font-medium text-foreground">{IDENTITY.org}</span> since {IDENTITY.since}
+            {IDENTITY.title} at <span className="font-medium text-foreground">{IDENTITY.org}</span>
           </span>
         </p>
 
@@ -43,49 +46,76 @@ export function Hero({
           </span>
         </h1>
 
-        <p className="mt-5 max-w-[58ch] text-[15px] leading-6 text-muted-foreground">
-          {IDENTITY.subtitle}
-        </p>
+        <p className="mt-5 max-w-[58ch] text-[15px] leading-6 text-muted-foreground">{IDENTITY.subtitle}</p>
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
-          <a href={PRIMARY_CTA.href} aria-describedby={hintId} className={buttonClass("primary")}>
+          <a ref={ctaRef} href={PRIMARY_CTA.href} aria-describedby={hintId} className={buttonClass("primary")}>
             <Mail size={17} aria-hidden /> {PRIMARY_CTA.label}
           </a>
           <button type="button" onClick={onExploreWork} className={buttonClass("secondary")}>
-            Explore My Work <ArrowDown size={16} aria-hidden />
+            See the Work <ArrowDown size={16} aria-hidden />
           </button>
         </div>
         <p id={hintId} className="sr-only">{PRIMARY_CTA.hint}</p>
-
-        {/* The recruiter shortcut — essentials in one panel, never gated. */}
-        <p className="mt-5 flex flex-wrap items-center gap-x-2 text-[13px] text-muted-foreground">
-          Need the essentials?
-          <button type="button" onClick={onQuickLook} className={cn(buttonClass("tertiary", "sm"), "-ml-1 font-medium text-foreground")}>
-            <ScanEye size={15} aria-hidden /> Open Quick Look
-          </button>
-        </p>
       </div>
 
       <MacPanel
         as="aside"
-        title="About This Engineer"
-        className="rx-rise mx-auto w-full max-w-[25rem] [animation-delay:160ms] @4xl:mx-0 @4xl:justify-self-end"
-        bodyClassName="px-6 pb-6 pt-7 text-center"
+        title="Get Info"
+        label="Career at a glance"
+        className="rx-rise mx-auto w-full max-w-[27rem] [animation-delay:160ms] @4xl:mx-0 @4xl:justify-self-end"
+        bodyClassName="text-[13px] leading-5"
       >
-        <Monogram initials={IDENTITY.initials} size={68} />
-        <p className="mt-4 text-[19px] font-semibold tracking-[-0.01em]">{IDENTITY.name}</p>
-        <p className="text-[13px] text-muted-foreground">{IDENTITY.title}</p>
-        <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-left text-[13px] leading-5">
-          {ABOUT_ROWS.map((r) => (
-            <div key={r.label} className="contents">
-              <dt className="text-right font-medium text-muted-foreground">{r.label}</dt>
-              <dd className="min-w-0">{r.value}</dd>
-            </div>
-          ))}
-        </dl>
-        <button type="button" onClick={onMoreInfo} className={cn(buttonClass("secondary", "sm"), "mt-6")}>
-          More Info…
-        </button>
+        <div className="px-5 pb-4 pt-5">
+          <p className={label}>Experience</p>
+          <ol aria-label="Experience" className="space-y-2.5">
+            {EXPERIENCE.map((e) => (
+              <li key={e.period} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3">
+                <span className="min-w-0">
+                  <span className="block font-medium">{e.role}</span>
+                  <span className="block text-muted-foreground">{e.org}</span>
+                </span>
+                <span className="rx-mono flex h-5 items-center gap-1.5 text-[11px] text-muted-foreground">
+                  {e.current && <LiveDot />}
+                  {e.period}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="border-t border-border px-5 py-4">
+          <p className={label}>Education</p>
+          <ul aria-label="Education" className="space-y-1">
+            {EDUCATION.map((ed) => (
+              <li key={ed.credential} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3">
+                <span className="min-w-0">
+                  <span className="font-medium">{ed.credential}</span>
+                  <span className="text-muted-foreground"> · {ed.org}</span>
+                </span>
+                <span className="rx-mono text-[11px] text-muted-foreground">{ed.period}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="border-t border-border px-5 py-4">
+          <p className={label}>Open to</p>
+          <p>{AVAILABLE_FOR.join(" · ")}</p>
+        </div>
+
+        <ul className="flex flex-wrap gap-x-5 border-t border-border bg-muted/50 px-5 py-1" aria-label="Résumé and profile">
+          <li>
+            <a href={RESUME_REQUEST_HREF} className={buttonClass("tertiary", "sm")}>
+              <FileText size={15} aria-hidden /> Request résumé
+            </a>
+          </li>
+          <li>
+            <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" className={buttonClass("tertiary", "sm")}>
+              <Linkedin size={15} aria-hidden /> LinkedIn<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
       </MacPanel>
     </section>
   )

@@ -42,6 +42,7 @@ export function MacPanel({
   bodyClassName,
   as: Tag = "div",
   labelledBy,
+  label,
 }: {
   title: string
   children: ReactNode
@@ -49,10 +50,13 @@ export function MacPanel({
   bodyClassName?: string
   as?: "div" | "section" | "aside"
   labelledBy?: string
+  /** Accessible name when there is no visible heading to point at. */
+  label?: string
 }) {
   return (
     <Tag
       aria-labelledby={labelledBy}
+      aria-label={label}
       className={cn(
         "overflow-hidden rounded-[10px] border border-foreground/12 bg-background shadow-[var(--rx-panel-shadow)]",
         className
@@ -97,29 +101,16 @@ export function Monogram({ initials, size = 64 }: { initials: string; size?: num
 
 /* ------------------------------ typography -------------------------------- */
 /**
- * Swiss section header: mono index + rule + kicker, then the heading. The
- * repeated index/rule gives the page one continuous scanning rhythm
- * (Law of Continuity).
+ * Swiss section header: mono index + rule, then a plain, scannable heading
+ * (Jakob's Law — "Experience" beats a clever line when someone is skimming).
+ * The repeated index/rule gives the page one continuous scanning rhythm.
  */
-export function SectionHeader({
-  index,
-  kicker,
-  title,
-  lead,
-  id,
-}: {
-  index: string
-  kicker: string
-  title: string
-  lead?: string
-  id: string
-}) {
+export function SectionHeader({ index, title, lead, id }: { index: string; title: string; lead?: string; id: string }) {
   return (
-    <header className="mb-8 @3xl:mb-10">
+    <header className="mb-6 @3xl:mb-8">
       <div className="rx-mono flex items-center gap-3 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
         <span>{index}</span>
         <span aria-hidden className="h-px flex-1 bg-border" />
-        <span>{kicker}</span>
       </div>
       <h2 id={id} className="mt-5 max-w-[24ch] scroll-mt-24 focus:outline-none text-[28px] font-semibold leading-[1.1] tracking-[-0.02em] text-balance @3xl:text-[36px]">
         {title}

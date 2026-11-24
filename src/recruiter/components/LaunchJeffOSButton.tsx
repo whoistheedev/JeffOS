@@ -91,7 +91,7 @@ export function LaunchJeffOSButton({
             <ArrowUpRight size={15} aria-hidden className="opacity-80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </div>
           <div className="mt-0.5 truncate text-[12px] leading-tight text-white/65">
-            Boot my macOS Tiger desktop — built from scratch
+            Boot the Tiger desktop I built
           </div>
         </div>
       </div>

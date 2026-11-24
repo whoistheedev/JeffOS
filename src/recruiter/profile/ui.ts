@@ -31,9 +31,9 @@ export function scrollToId(id: string) {
   const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
   const el = document.getElementById(id)
   el?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
-  // Move focus to the section heading so keyboard/screen-reader users land there too.
+  // Move focus to the target's heading so keyboard/screen-reader users land there too.
   if (el instanceof HTMLElement) {
-    const heading = el.querySelector<HTMLElement>("h2")
+    const heading = el.querySelector<HTMLElement>("h2, h3")
     if (heading) {
       heading.tabIndex = -1
       heading.focus({ preventScroll: true })

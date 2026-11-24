@@ -1,47 +1,68 @@
 import { ChevronRight, Github, Linkedin, Mail, FileText } from "lucide-react"
 import { LaunchJeffOSButton } from "../components/LaunchJeffOSButton"
-import {
-  CAPABILITIES,
-  CONTACT,
-  EDUCATION,
-  EXPERIENCE,
-  PRIMARY_CTA,
-  RESUME_REQUEST_HREF,
-  SYSTEM_INFO,
-  workBySlug,
-} from "../content"
+import { CONTACT, EDUCATION, EXPERIENCE, PRIMARY_CTA, PROOF, RESUME_REQUEST_HREF, SKILLS, workBySlug } from "../content"
 import { CopyEmailButton, LiveDot, MacPanel, Monogram } from "./primitives"
 import { buttonClass } from "./ui"
 
-/* ------------------------------ What I Can Own ---------------------------- */
-/**
- * Numbered Swiss list, not five identical cards. Each capability links to the
- * case study that backs it — the evidence button selects that project in the
- * explorer above.
- */
-export function Capabilities({ onEvidence }: { onEvidence: (slug: string) => void }) {
+/* -------------------------------- Proof strip ----------------------------- */
+/** One ruled row of repeatable facts, directly under the hero. */
+export function ProofStrip() {
   return (
-    <ol className="border-b border-border">
-      {CAPABILITIES.map((c, i) => {
-        const work = workBySlug(c.evidence)
+    <ul aria-label="At a glance" className="grid border-y border-border @2xl:grid-cols-3">
+      {PROOF.map((f, i) => (
+        <li
+          key={f.label}
+          className={`flex items-baseline gap-4 py-5 @2xl:block @2xl:px-6 @2xl:first:pl-0 ${i > 0 ? "border-t border-border @2xl:border-l @2xl:border-t-0" : ""}`}
+        >
+          <p className="w-16 shrink-0 text-[32px] font-semibold leading-none tracking-[-0.03em] tabular-nums @2xl:w-auto @3xl:text-[40px]">
+            {f.value}
+          </p>
+          <p className="text-[13px] leading-5 text-muted-foreground @2xl:mt-2 @2xl:max-w-[26ch]">{f.label}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/* ----------------------------------- Skills ------------------------------- */
+/**
+ * One row per area: plain-English summary (for recruiters), the technical
+ * specs behind a native <details> (for engineering managers), and a link to
+ * the case study that backs the claim.
+ */
+export function Skills({ onEvidence }: { onEvidence: (slug: string) => void }) {
+  return (
+    <ul className="border-b border-border">
+      {SKILLS.map((s) => {
+        const work = workBySlug(s.evidence)
         return (
           <li
-            key={c.title}
-            className="group grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-border py-6 @3xl:grid-cols-[5rem_minmax(0,15rem)_minmax(0,1fr)_auto] @3xl:items-baseline @3xl:gap-x-6"
+            key={s.title}
+            className="grid gap-x-6 gap-y-1 border-t border-border py-5 @3xl:grid-cols-[11rem_minmax(0,1fr)_auto] @3xl:items-start"
           >
-            <span
-              aria-hidden
-              className="rx-mono row-span-3 text-[28px] font-medium leading-none text-foreground/45 transition-colors duration-200 group-hover:text-[var(--rx-accent-text)] @3xl:row-span-1 @3xl:text-[40px]"
-            >
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h3 className="text-[17px] font-semibold leading-6 tracking-[-0.01em]">{c.title}</h3>
-            <p className="text-[15px] leading-6 text-muted-foreground">{c.detail}</p>
+            <h3 className="text-[17px] font-semibold leading-6 tracking-[-0.01em]">{s.title}</h3>
+            <div className="min-w-0">
+              <p className="text-[15px] leading-6 text-foreground/85">{s.summary}</p>
+              <details className="group">
+                <summary className="rx-mono inline-flex min-h-11 cursor-pointer list-none items-center gap-1 rounded-md text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)] [&::-webkit-details-marker]:hidden">
+                  Technical detail
+                  <ChevronRight size={13} aria-hidden className="transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none" />
+                </summary>
+                <dl className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-x-4 gap-y-2 pb-2">
+                  {s.specs.map((spec) => (
+                    <div key={spec.label} className="contents">
+                      <dt className="text-[12px] font-medium leading-5 text-muted-foreground">{spec.label}</dt>
+                      <dd className="rx-mono text-[12.5px] leading-5">{spec.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </details>
+            </div>
             {work && (
               <button
                 type="button"
                 onClick={() => onEvidence(work.slug)}
-                className="inline-flex min-h-11 items-center gap-1 justify-self-start rounded-md text-[13px] font-medium text-[var(--rx-accent-text)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)] @3xl:justify-self-end"
+                className="inline-flex min-h-11 items-center gap-1 justify-self-start rounded-md text-[13px] font-medium text-[var(--rx-accent-text)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-hire)] @3xl:-mt-2.5 @3xl:justify-self-end"
               >
                 <span className="text-muted-foreground">Evidence:</span> {work.name}
                 <ChevronRight size={14} aria-hidden />
@@ -50,45 +71,7 @@ export function Capabilities({ onEvidence }: { onEvidence: (slug: string) => voi
           </li>
         )
       })}
-    </ol>
-  )
-}
-
-/* ---------------------------- System Information -------------------------- */
-/**
- * Tiger System Profiler for the engineer. Plain-English summary per category
- * (for recruiters); the technical specs sit behind a native <details>
- * disclosure (for engineering managers) — progressive disclosure with zero JS.
- */
-export function SystemInformation({ name }: { name: string }) {
-  return (
-    <MacPanel title={`System Profiler — ${name}`} bodyClassName="text-[14px]">
-      <p className="rx-mono border-b border-border bg-muted/50 px-5 py-2.5 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-        Engineer Overview
-      </p>
-      {SYSTEM_INFO.map((row, i) => (
-        <details key={row.category} open={i === 0} className="group border-b border-border last:border-b-0">
-          <summary className="grid min-h-11 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 px-5 py-4 transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-hire)] @2xl:grid-cols-[11rem_minmax(0,1fr)_auto] [&::-webkit-details-marker]:hidden">
-            <span className="text-[13px] font-semibold">{row.category}</span>
-            <span className="col-start-1 row-start-2 text-[15px] leading-6 text-foreground/85 @2xl:col-start-2 @2xl:row-start-1">
-              {row.summary}
-            </span>
-            <span className="rx-mono col-start-2 row-start-1 inline-flex items-center gap-1 pt-0.5 text-[11px] uppercase tracking-wider text-muted-foreground @2xl:col-start-3">
-              Specs
-              <ChevronRight size={13} aria-hidden className="transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none" />
-            </span>
-          </summary>
-          <dl className="grid grid-cols-[minmax(0,8rem)_minmax(0,1fr)] gap-x-4 gap-y-2 px-5 pb-5 @2xl:ml-[11rem] @2xl:pl-9">
-            {row.specs.map((s) => (
-              <div key={s.label} className="contents">
-                <dt className="text-[12px] font-medium leading-5 text-muted-foreground">{s.label}</dt>
-                <dd className="rx-mono text-[12.5px] leading-5">{s.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </details>
-      ))}
-    </MacPanel>
+    </ul>
   )
 }
 
@@ -178,13 +161,13 @@ export function ConnectionPanel({ name, initials, headingId }: { name: string; i
             Have an interesting engineering challenge? Let’s talk.
           </h2>
           <p className="mt-3 max-w-[56ch] text-[15px] leading-6 text-muted-foreground">
-            Email is the fastest route. Résumé available on request.
+            Email is the fastest way to reach me. Ask for my résumé and I’ll send the PDF.
           </p>
           <p className="rx-mono mt-5 select-all text-[14px]">{CONTACT.email}</p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <a href={PRIMARY_CTA.href} className={buttonClass("primary")}>
-              <Mail size={17} aria-hidden /> Send an Email
+              <Mail size={17} aria-hidden /> {PRIMARY_CTA.label}
             </a>
             <CopyEmailButton />
           </div>

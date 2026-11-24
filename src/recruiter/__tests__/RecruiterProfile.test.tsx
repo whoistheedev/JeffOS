@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest"
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { RecruiterProfile } from "../profile/RecruiterProfile"
-import { CAPABILITIES, CONTACT, FEATURED_WORK, PRIMARY_CTA, workBySlug } from "../content"
+import { CONTACT, EXPERIENCE, FEATURED_WORK, PRIMARY_CTA, SKILLS, workBySlug } from "../content"
 
 function renderPage(onLaunchJeffOS = vi.fn()) {
   render(<RecruiterProfile variant="page" onLaunchJeffOS={onLaunchJeffOS} isDark={false} toggleTheme={vi.fn()} />)
@@ -16,7 +16,7 @@ describe("Recruiter front door", () => {
     expect(h1).toHaveTextContent("Jeffrey James Idodo")
     expect(h1).toHaveTextContent("healthcare revenue cycles")
 
-    const ctas = screen.getAllByRole("link", { name: /Let’s Work Together/ })
+    const ctas = screen.getAllByRole("link", { name: PRIMARY_CTA.label })
     expect(ctas.length).toBeGreaterThan(0)
     for (const a of ctas) expect(a).toHaveAttribute("href", PRIMARY_CTA.href)
   })
@@ -33,34 +33,36 @@ describe("Recruiter front door", () => {
     expect(onLaunchJeffOS).toHaveBeenCalledTimes(1)
   })
 
-  it("shows the flagship case file by default and switches with the keyboard", async () => {
-    const user = userEvent.setup()
+  it("puts career facts and the résumé route in the hero", () => {
     renderPage()
-    const list = screen.getByRole("tablist", { name: "Projects" })
-    const tabs = within(list).getAllByRole("tab")
-    expect(tabs).toHaveLength(FEATURED_WORK.length)
-    expect(tabs[0]).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("heading", { level: 3, name: FEATURED_WORK[0].name })).toBeInTheDocument()
-
-    tabs[0].focus()
-    await user.keyboard("{ArrowDown}")
-    expect(tabs[1]).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("heading", { level: 3, name: FEATURED_WORK[1].name })).toBeInTheDocument()
+    const info = screen.getByRole("complementary", { name: "Career at a glance" })
+    for (const e of EXPERIENCE) expect(within(info).getByText(e.period)).toBeInTheDocument()
+    expect(within(info).getByRole("link", { name: /Request résumé/ })).toHaveAttribute("href", expect.stringMatching(/^mailto:/))
   })
 
-  it("links each case file to its prerendered case study", () => {
+  it("shows every case on the page, outcome included, with no tabs", () => {
     renderPage()
-    const panel = screen.getByRole("tabpanel")
-    expect(within(panel).getByRole("link", { name: /Read the case study/ })).toHaveAttribute("href", `/projects/${FEATURED_WORK[0].slug}/`)
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument()
+    for (const w of FEATURED_WORK) {
+      expect(screen.getByRole("heading", { level: 3, name: w.name })).toBeInTheDocument()
+      expect(screen.getByText(w.outcome)).toBeInTheDocument()
+    }
   })
 
-  it("capability evidence selects the backing project", async () => {
+  it("links each case to its prerendered case study", () => {
+    renderPage()
+    const links = screen.getAllByRole("link", { name: /Read the case study/ })
+    expect(links).toHaveLength(FEATURED_WORK.length)
+    links.forEach((a, i) => expect(a).toHaveAttribute("href", `/projects/${FEATURED_WORK[i].slug}/`))
+  })
+
+  it("skill evidence jumps to the backing case", async () => {
     const user = userEvent.setup()
     renderPage()
-    const security = CAPABILITIES.find((c) => c.title === "Security Engineering")!
+    const security = SKILLS.find((k) => k.title === "Security")!
     const work = workBySlug(security.evidence)!
     await user.click(screen.getByRole("button", { name: new RegExp(`Evidence:\\s*${work.name}`) }))
-    expect(screen.getByRole("tab", { name: new RegExp(work.name) })).toHaveAttribute("aria-selected", "true")
+    await waitFor(() => expect(screen.getByRole("heading", { level: 3, name: work.name })).toHaveFocus())
   })
 
   it("opens Quick Look, closes on Escape without leaking it, and restores focus", async () => {
@@ -69,7 +71,7 @@ describe("Recruiter front door", () => {
     const outerEscape = vi.fn()
     window.addEventListener("keydown", outerEscape)
 
-    const trigger = screen.getByRole("button", { name: /Open Quick Look/ })
+    const trigger = screen.getAllByRole("button", { name: /Quick Look/ })[0]
     await user.click(trigger)
     const dialog = screen.getByRole("dialog", { name: "Quick Look — The Essentials" })
     expect(within(dialog).getByText(CONTACT.email)).toBeInTheDocument()
@@ -99,6 +101,6 @@ describe("Hire Me window", () => {
     render(<RecruiterProfile variant="window" />)
     expect(screen.queryByRole("button", { name: /Launch JeffOS/ })).not.toBeInTheDocument()
     expect(screen.queryByRole("main")).not.toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /Read the case study/ })).toHaveAttribute("target", "_blank")
+    for (const a of screen.getAllByRole("link", { name: /Read the case study/ })) expect(a).toHaveAttribute("target", "_blank")
   })
 })
